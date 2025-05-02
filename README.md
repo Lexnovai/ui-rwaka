@@ -18,7 +18,7 @@ A modern chat interface for AI agents built with Next.js, Tailwind CSS, and Type
 
 ### Prerequisites
 
-Before setting up Agent UI, you may want to have an Agno Playground running. If you haven't set up the Agno Playground yet, follow the [official guide](https://agno.link/agent-ui#connect-to-local-agents) to run the Playground locally.
+Before setting up Agent UI, you may want to have an Agno Playground running. If you haven't set up the Agno Playground yet, follow the [official guide run the Playground locally.
 
 ### Installation
 
@@ -33,7 +33,7 @@ npx create-agent-ui@latest
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/agno-agi/agent-ui.git
+
 cd agent-ui
 ```
 
