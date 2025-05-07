@@ -5,6 +5,7 @@ import { motion, Variants, AnimatePresence } from 'framer-motion'
 import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import useAIChatStreamHandler from '@/hooks/useAIStreamHandler'
+import { LandPlot, Users2, Briefcase, ExternalLink } from 'lucide-react'
 
 const USER_ROLES = [
   'Lawyers',
@@ -19,7 +20,7 @@ const USER_ROLES = [
 interface ActionButtonProps {
   href: string
   variant?: 'primary'
-  text: string
+  text: React.ReactNode
   isFocused?: boolean
   onClick?: () => void
   onFocus?: () => void
@@ -52,6 +53,7 @@ const ActionButton = ({
 const LEGAL_CATEGORIES = [
   {
     name: 'Land Law',
+    icon: LandPlot,
     questions: [
       'How do I transfer land ownership in Rwanda?',
       'What documents are needed for land registration?',
@@ -60,6 +62,7 @@ const LEGAL_CATEGORIES = [
   },
   {
     name: 'Family Law',
+    icon: Users2,
     questions: [
       'What are the grounds for divorce in Rwanda?',
       'How is child custody decided legally?',
@@ -68,6 +71,7 @@ const LEGAL_CATEGORIES = [
   },
   {
     name: 'Business Law',
+    icon: Briefcase,
     questions: [
       'How do I register a company in Rwanda?',
       'What taxes do small businesses pay?',
@@ -112,7 +116,7 @@ const ChatBlankState = () => {
       aria-label="Welcome message"
     >
       <div className="flex max-w-3xl flex-col gap-y-8">
-        <div className="mx-auto flex w-fit items-center justify-center gap-3 rounded-full bg-blue-600 px-3 py-1 text-sm text-white">
+        <div className="mx-auto flex w-fit items-center justify-center gap-3 rounded-xl bg-blue-600 px-3 py-1 text-sm text-white">
           <span>Free Plan</span>
           <Link
             href="/upgrade"
@@ -156,16 +160,19 @@ const ChatBlankState = () => {
           transition={{ duration: 0.5, delay: 0.5 }}
           className="relative flex flex-wrap justify-center gap-3"
         >
-          {LEGAL_CATEGORIES.map((cat) => (
+          {LEGAL_CATEGORIES.map(({ name, icon: Icon }) => (
             <ActionButton
-              key={cat.name}
+              key={name}
               variant="primary"
               href="#"
-              text={cat.name}
+              text={
+                <div className="flex items-center gap-2">
+                  <Icon size={16} />
+                  <span>{name}</span>
+                </div>
+              }
               onClick={() =>
-                setActiveCategory((prev) =>
-                  prev === cat.name ? null : cat.name
-                )
+                setActiveCategory((prev) => (prev === name ? null : name))
               }
               onFocus={() => setIsFocused(true)}
             />
@@ -179,9 +186,13 @@ const ChatBlankState = () => {
                 <button
                   key={idx}
                   onClick={() => handleQuery(q)}
-                  className="block w-full rounded px-3 py-2 text-left text-sm text-gray-200 hover:bg-neutral-800"
+                  className="group relative flex w-full items-center justify-between rounded px-3 py-2 text-left text-sm text-gray-200 hover:bg-neutral-800"
                 >
-                  {q}
+                  <span>{q}</span>
+                  <ExternalLink
+                    className="text-gray-400 opacity-0 transition-opacity group-hover:opacity-100"
+                    size={16}
+                  />
                 </button>
               ))}
             </div>

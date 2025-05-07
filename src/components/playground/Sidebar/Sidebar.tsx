@@ -6,13 +6,27 @@ import { usePlaygroundStore } from '@/store'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import Icon from '@/components/ui/icon'
-import { getProviderIcon } from '@/lib/modelProvider'
 import Sessions from './Sessions'
 import { isValidUrl } from '@/lib/utils'
 import { toast } from 'sonner'
 import { useQueryState } from 'nuqs'
 import { truncateText } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Ellipsis, UserCircle } from 'lucide-react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu'
+
 const ENDPOINT_PLACEHOLDER = 'NO ENDPOINT ADDED'
 const SidebarHeader = () => (
   <div className="flex items-center gap-2">
@@ -39,16 +53,6 @@ const NewChatButton = ({
     <Icon type="plus-icon" size="xs" className="text-background" />
     <span className="uppercase">New Chat</span>
   </Button>
-)
-
-const ModelDisplay = ({ model }: { model: string }) => (
-  <div className="border-primary/15 bg-accent text-muted flex h-9 w-full items-center gap-3 rounded-xl border p-3 text-xs font-medium uppercase">
-    {(() => {
-      const icon = getProviderIcon(model)
-      return icon ? <Icon type={icon} className="shrink-0" size="xs" /> : null
-    })()}
-    {model}
-  </div>
 )
 
 const Endpoint = () => {
@@ -200,6 +204,40 @@ const Endpoint = () => {
   )
 }
 
+const ProfileMenu = () => {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger>
+        <Ellipsis className="cursor-pointer" />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        className="bg-background border-border w-56"
+        align="end"
+        forceMount
+      >
+        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuItem>Help</DropdownMenuItem>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>Pricing Plans</DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent className="border-border bg-background">
+                <DropdownMenuItem>Free Plan</DropdownMenuItem>
+                <DropdownMenuItem>Pro</DropdownMenuItem>
+                <DropdownMenuItem>Team</DropdownMenuItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+          <DropdownMenuItem>New Team</DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem>Log out</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
 const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const { clearChat, focusChatInput, initializePlayground } = useChatActions()
@@ -207,12 +245,10 @@ const Sidebar = () => {
     messages,
     selectedEndpoint,
     isEndpointActive,
-    selectedModel,
     hydrated,
     isEndpointLoading
   } = usePlaygroundStore()
   const [isMounted, setIsMounted] = useState(false)
-  const [agentId] = useQueryState('agent')
   useEffect(() => {
     setIsMounted(true)
     if (hydrated) initializePlayground()
@@ -281,9 +317,6 @@ const Sidebar = () => {
                   ) : (
                     <>
                       <AgentSelector />
-                      {selectedModel && agentId && (
-                        <ModelDisplay model={selectedModel} />
-                      )}
                     </>
                   )}
                 </motion.div>
@@ -292,6 +325,18 @@ const Sidebar = () => {
             )}
           </>
         )}
+      </motion.div>
+      <motion.div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <UserCircle size={24} />
+          <div className="flex flex-col gap-1">
+            <div className="text-secondary-foreground text-[12px] font-semibold">
+              John Doe
+            </div>
+            <div className="text-accent-foreground text-[10px]">Attorney</div>
+          </div>
+        </div>
+        <ProfileMenu />
       </motion.div>
     </motion.aside>
   )
