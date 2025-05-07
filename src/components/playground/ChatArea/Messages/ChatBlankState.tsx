@@ -84,7 +84,6 @@ const ChatBlankState = () => {
   const { handleStreamResponse } = useAIChatStreamHandler()
   const [currentRoleIndex, setCurrentRoleIndex] = useState(0)
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
-  const [isFocused, setIsFocused] = useState(false)
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentRoleIndex((prevIndex) => (prevIndex + 1) % USER_ROLES.length)
@@ -174,7 +173,6 @@ const ChatBlankState = () => {
               onClick={() =>
                 setActiveCategory((prev) => (prev === name ? null : name))
               }
-              onFocus={() => setIsFocused(true)}
             />
           ))}
 
