@@ -3,11 +3,8 @@
 import Link from 'next/link'
 import { motion, Variants, AnimatePresence } from 'framer-motion'
 import React, { useEffect, useState } from 'react'
-
-const EXTERNAL_LINKS = {
-  documentation: '/docs',
-  playground: '/demo'
-}
+import { toast } from 'sonner'
+import useAIChatStreamHandler from '@/hooks/useAIStreamHandler'
 
 const USER_ROLES = [
   'Lawyers',
@@ -23,9 +20,18 @@ interface ActionButtonProps {
   href: string
   variant?: 'primary'
   text: string
+  isFocused?: boolean
+  onClick?: () => void
+  onFocus?: () => void
 }
 
-const ActionButton = ({ href, variant, text }: ActionButtonProps) => {
+const ActionButton = ({
+  variant,
+  text,
+  isFocused,
+  onClick,
+  onFocus
+}: ActionButtonProps) => {
   const baseStyles =
     'px-4 py-2 text-sm transition-colors font-dmmono tracking-tight'
   const variantStyles = {
@@ -33,23 +39,52 @@ const ActionButton = ({ href, variant, text }: ActionButtonProps) => {
   }
 
   return (
-    <Link
-      href={href}
-      className={`${baseStyles} ${variant ? variantStyles[variant] : ''}`}
+    <button
+      onClick={onClick}
+      onFocus={onFocus}
+      className={`${baseStyles} ${variant ? variantStyles[variant] : ''} ${isFocused ? 'bg-neutral-800' : ''}`}
     >
       {text}
-    </Link>
+    </button>
   )
 }
 
-const ChatBlankState = () => {
-  const [currentRoleIndex, setCurrentRoleIndex] = useState(0)
+const LEGAL_CATEGORIES = [
+  {
+    name: 'Land Law',
+    questions: [
+      'How do I transfer land ownership in Rwanda?',
+      'What documents are needed for land registration?',
+      'What are the laws around land disputes?'
+    ]
+  },
+  {
+    name: 'Family Law',
+    questions: [
+      'What are the grounds for divorce in Rwanda?',
+      'How is child custody decided legally?',
+      'Can I get married without a church wedding?'
+    ]
+  },
+  {
+    name: 'Business Law',
+    questions: [
+      'How do I register a company in Rwanda?',
+      'What taxes do small businesses pay?',
+      'Can a foreigner open a business in Rwanda?'
+    ]
+  }
+]
 
+const ChatBlankState = () => {
+  const { handleStreamResponse } = useAIChatStreamHandler()
+  const [currentRoleIndex, setCurrentRoleIndex] = useState(0)
+  const [activeCategory, setActiveCategory] = useState<string | null>(null)
+  const [isFocused, setIsFocused] = useState(false)
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentRoleIndex((prevIndex) => (prevIndex + 1) % USER_ROLES.length)
     }, 2500)
-
     return () => clearInterval(interval)
   }, [])
 
@@ -59,12 +94,33 @@ const ChatBlankState = () => {
     exit: { y: -20, opacity: 0 }
   }
 
+  const handleQuery = async (query: string) => {
+    try {
+      await handleStreamResponse(query)
+    } catch (error) {
+      toast.error(
+        `Error in handling query: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      )
+    }
+  }
+
   return (
     <section
       className="font-geist flex flex-col items-center text-center"
       aria-label="Welcome message"
     >
       <div className="flex max-w-3xl flex-col gap-y-8">
+        <div className="mx-auto flex w-fit items-center justify-center gap-3 rounded-full bg-blue-600 px-3 py-1 text-sm text-white">
+          <span>Free Plan</span>
+          <Link
+            href="/upgrade"
+            className="text-white underline hover:text-gray-200"
+          >
+            Upgrade to Premium
+          </Link>
+        </div>
         <motion.h1
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -72,8 +128,8 @@ const ChatBlankState = () => {
           className="text-3xl font-[600] tracking-tight"
         >
           <div className="mb-2 flex items-center justify-center gap-x-5 whitespace-nowrap font-medium">
-            <p className="flex items-center font-[600]">Designed to empower </p>
-            <span className="relative inline-flex h-[40px] w-[120px] items-center justify-center overflow-hidden rounded-xl bg-white">
+            <p className="flex items-center font-[600]">Designed to assist </p>
+            <span className="relative inline-flex h-[40px] w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-xl bg-white hover:scale-[1.05]">
               <AnimatePresence mode="wait">
                 <motion.span
                   key={USER_ROLES[currentRoleIndex]}
@@ -98,12 +154,38 @@ const ChatBlankState = () => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.5 }}
-          className="flex justify-center gap-4"
+          className="relative flex flex-wrap justify-center gap-3"
         >
-          <ActionButton
-            href={EXTERNAL_LINKS.playground}
-            text="START A NEW CONVERSATION"
-          />
+          {LEGAL_CATEGORIES.map((cat) => (
+            <ActionButton
+              key={cat.name}
+              variant="primary"
+              href="#"
+              text={cat.name}
+              onClick={() =>
+                setActiveCategory((prev) =>
+                  prev === cat.name ? null : cat.name
+                )
+              }
+              onFocus={() => setIsFocused(true)}
+            />
+          ))}
+
+          {activeCategory && (
+            <div className="border-border absolute left-0 right-0 top-full z-10 mt-4 w-full rounded-xl border bg-neutral-900 p-4 shadow-xl">
+              {LEGAL_CATEGORIES.find(
+                (c) => c.name === activeCategory
+              )?.questions.map((q, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handleQuery(q)}
+                  className="block w-full rounded px-3 py-2 text-left text-sm text-gray-200 hover:bg-neutral-800"
+                >
+                  {q}
+                </button>
+              ))}
+            </div>
+          )}
         </motion.div>
       </div>
     </section>
