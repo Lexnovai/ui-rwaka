@@ -7,10 +7,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import Icon from '@/components/ui/icon'
 import Sessions from './Sessions'
-import { isValidUrl } from '@/lib/utils'
+import { isValidUrl, truncateText } from '@/lib/utils'
 import { toast } from 'sonner'
 import { useQueryState } from 'nuqs'
-import { truncateText } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Ellipsis, UserCircle } from 'lucide-react'
 import {
@@ -28,6 +27,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 
 const ENDPOINT_PLACEHOLDER = 'NO ENDPOINT ADDED'
+
 const SidebarHeader = () => (
   <div className="flex items-center gap-2">
     <Icon type="agno" size="xs" />
@@ -239,7 +239,10 @@ const ProfileMenu = () => {
 }
 
 const Sidebar = () => {
-  const [isCollapsed, setIsCollapsed] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
+  const [, setIsMobile] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(true)
+
   const { clearChat, focusChatInput, initializePlayground } = useChatActions()
   const {
     messages,
@@ -248,97 +251,110 @@ const Sidebar = () => {
     hydrated,
     isEndpointLoading
   } = usePlaygroundStore()
-  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 768
+      setIsMobile(mobile)
+      // Auto-collapse on mobile, expand on desktop
+      setSidebarOpen(!mobile)
+    }
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
   useEffect(() => {
     setIsMounted(true)
     if (hydrated) initializePlayground()
   }, [selectedEndpoint, initializePlayground, hydrated])
+
   const handleNewChat = () => {
     clearChat()
     focusChatInput()
   }
+
   return (
-    <motion.aside
-      className="font-dmmono relative flex h-screen shrink-0 grow-0 flex-col overflow-hidden px-2 py-3"
-      initial={{ width: '16rem' }}
-      animate={{ width: isCollapsed ? '2.5rem' : '16rem' }}
-      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-    >
-      <motion.button
-        onClick={() => setIsCollapsed(!isCollapsed)}
-        className="absolute right-2 top-2 z-10 p-1"
-        aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-        type="button"
-        whileTap={{ scale: 0.95 }}
-      >
-        <Icon
-          type="sheet"
-          size="xs"
-          className={`transform ${isCollapsed ? 'rotate-180' : 'rotate-0'}`}
-        />
-      </motion.button>
-      <motion.div
-        className="w-60 space-y-5"
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: isCollapsed ? 0 : 1, x: isCollapsed ? -20 : 0 }}
-        transition={{ duration: 0.3, ease: 'easeInOut' }}
-        style={{
-          pointerEvents: isCollapsed ? 'none' : 'auto'
-        }}
-      >
-        <SidebarHeader />
-        <NewChatButton
-          disabled={messages.length === 0}
-          onClick={handleNewChat}
-        />
-        {isMounted && (
-          <>
-            <Endpoint />
-            {isEndpointActive && (
-              <>
-                <motion.div
-                  className="flex w-full flex-col items-start gap-2"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.5, ease: 'easeInOut' }}
-                >
-                  <div className="text-primary text-xs font-medium uppercase">
-                    Agent
-                  </div>
-                  {isEndpointLoading ? (
-                    <div className="flex w-full flex-col gap-2">
-                      {Array.from({ length: 2 }).map((_, index) => (
-                        <Skeleton
-                          key={index}
-                          className="h-9 w-full rounded-xl"
-                        />
-                      ))}
-                    </div>
-                  ) : (
+    <>
+      {!sidebarOpen && (
+        <button
+          className="fixed left-2 top-2 z-50 p-2 text-white"
+          onClick={() => setSidebarOpen(true)}
+        >
+          <Icon type="sheet" size="sm" />
+        </button>
+      )}
+      <AnimatePresence>
+        {sidebarOpen && (
+          <motion.aside
+            className="font-dmmono bg-background fixed inset-y-0 left-0 z-40 w-64 px-2 py-3 shadow-lg md:relative md:block"
+            initial={{ x: -300 }}
+            animate={{ x: 0 }}
+            exit={{ x: -300 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+          >
+            <div className="flex justify-between">
+              <SidebarHeader />
+              <button className="" onClick={() => setSidebarOpen(false)}>
+                <Icon
+                  type="sheet"
+                  size="sm"
+                  className="rotate-180 transition-transform"
+                />
+              </button>
+            </div>
+
+            <div className="mt-6 space-y-5">
+              <NewChatButton
+                disabled={messages.length === 0}
+                onClick={handleNewChat}
+              />
+              {isMounted && (
+                <>
+                  <Endpoint />
+                  {isEndpointActive && (
                     <>
-                      <AgentSelector />
+                      <div className="flex flex-col items-start gap-2">
+                        <div className="text-primary text-xs font-medium uppercase">
+                          Agent
+                        </div>
+                        {isEndpointLoading ? (
+                          <div className="flex w-full flex-col gap-2">
+                            {Array.from({ length: 2 }).map((_, index) => (
+                              <Skeleton
+                                key={index}
+                                className="h-9 w-full rounded-xl"
+                              />
+                            ))}
+                          </div>
+                        ) : (
+                          <AgentSelector />
+                        )}
+                      </div>
+                      <Sessions />
                     </>
                   )}
-                </motion.div>
-                <Sessions />
-              </>
-            )}
-          </>
-        )}
-      </motion.div>
-      <motion.div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <UserCircle size={24} />
-          <div className="flex flex-col gap-1">
-            <div className="text-secondary-foreground text-[12px] font-semibold">
-              John Doe
+                </>
+              )}
             </div>
-            <div className="text-accent-foreground text-[10px]">Attorney</div>
-          </div>
-        </div>
-        <ProfileMenu />
-      </motion.div>
-    </motion.aside>
+            <div className="mt-auto flex items-center justify-between pt-4">
+              <div className="flex items-center gap-2">
+                <UserCircle size={24} />
+                <div className="flex flex-col gap-1">
+                  <div className="text-secondary-foreground text-[12px] font-semibold">
+                    John Doe
+                  </div>
+                  <div className="text-accent-foreground text-[10px]">
+                    Attorney
+                  </div>
+                </div>
+              </div>
+              <ProfileMenu />
+            </div>
+          </motion.aside>
+        )}
+      </AnimatePresence>
+    </>
   )
 }
 
