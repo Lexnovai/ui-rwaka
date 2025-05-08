@@ -128,7 +128,7 @@ const ChatBlankState = () => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="text-3xl font-[600] tracking-tight"
+          className="text-2xl font-[600] tracking-tight sm:text-3xl"
         >
           <div className="mb-2 flex items-center justify-center gap-x-5 whitespace-nowrap font-medium">
             <p className="flex items-center font-[600]">Designed to assist </p>
