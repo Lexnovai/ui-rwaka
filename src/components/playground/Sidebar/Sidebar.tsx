@@ -175,7 +175,7 @@ const Endpoint = () => {
                     {isMounted
                       ? truncateText(selectedEndpoint, 21) ||
                         ENDPOINT_PLACEHOLDER
-                      : 'http://localhost:7777'}
+                      : 'https://chatapi.rwaka.rw'}
                   </p>
                   <div
                     className={`size-2 shrink-0 rounded-full ${getStatusColor(isEndpointActive)}`}
@@ -281,7 +281,11 @@ const Sidebar = () => {
           className="fixed left-2 top-2 z-50 p-2 text-white"
           onClick={() => setSidebarOpen(true)}
         >
-          <Icon type="sheet" size="sm" />
+          <Icon
+            type="sheet"
+            size="sm"
+            className="rotate-180 transition-transform"
+          />
         </button>
       )}
       <AnimatePresence>
@@ -295,12 +299,8 @@ const Sidebar = () => {
           >
             <div className="flex justify-between">
               <SidebarHeader />
-              <button className="" onClick={() => setSidebarOpen(false)}>
-                <Icon
-                  type="sheet"
-                  size="sm"
-                  className="rotate-180 transition-transform"
-                />
+              <button onClick={() => setSidebarOpen(false)}>
+                <Icon type="sheet" size="sm" />
               </button>
             </div>
 
