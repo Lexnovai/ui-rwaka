@@ -111,7 +111,7 @@ const ChatBlankState = () => {
 
   return (
     <section
-      className="font-geist flex flex-grow flex-col items-center justify-start pt-12 text-center"
+      className="font-geist flex flex-grow flex-col items-center justify-start overflow-y-auto pt-12 text-center"
       aria-label="Welcome message"
     >
       <div className="flex max-w-3xl flex-col gap-y-8">

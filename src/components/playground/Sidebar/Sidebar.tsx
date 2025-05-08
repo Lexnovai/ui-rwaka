@@ -291,7 +291,7 @@ const Sidebar = () => {
       <AnimatePresence>
         {sidebarOpen && (
           <motion.aside
-            className="font-dmmono bg-background fixed inset-y-0 left-0 z-40 w-64 px-2 py-3 shadow-lg md:relative md:block"
+            className="font-dmmono bg-background fixed inset-y-0 left-0 z-40 flex max-h-screen w-64 flex-col overflow-y-auto px-2 py-3 shadow-lg md:relative md:block"
             initial={{ x: -300 }}
             animate={{ x: 0 }}
             exit={{ x: -300 }}
@@ -304,7 +304,7 @@ const Sidebar = () => {
               </button>
             </div>
 
-            <div className="mt-6 space-y-5">
+            <div className="mt-3 space-y-4">
               <NewChatButton
                 disabled={messages.length === 0}
                 onClick={handleNewChat}
@@ -344,7 +344,7 @@ const Sidebar = () => {
                   <div className="text-secondary-foreground text-[12px] font-semibold">
                     John Doe
                   </div>
-                  <div className="text-accent-foreground text-[10px]">
+                  <div className="font-geist text-accent-foreground text-[10px]">
                     Attorney
                   </div>
                 </div>
