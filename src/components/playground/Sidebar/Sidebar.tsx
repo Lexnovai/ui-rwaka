@@ -11,7 +11,7 @@ import { isValidUrl, truncateText } from '@/lib/utils'
 import { toast } from 'sonner'
 import { useQueryState } from 'nuqs'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Ellipsis, UserCircle, Menu, X } from 'lucide-react'
+import { Ellipsis, UserCircle } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -240,8 +240,8 @@ const ProfileMenu = () => {
 
 const Sidebar = () => {
   const [isMounted, setIsMounted] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
-  const [mobileOpen, setMobileOpen] = useState(false)
+  const [, setIsMobile] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(true)
 
   const { clearChat, focusChatInput, initializePlayground } = useChatActions()
   const {
@@ -253,7 +253,12 @@ const Sidebar = () => {
   } = usePlaygroundStore()
 
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768)
+    const handleResize = () => {
+      const mobile = window.innerWidth < 768
+      setIsMobile(mobile)
+      // Auto-collapse on mobile, expand on desktop
+      setSidebarOpen(!mobile)
+    }
     handleResize()
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
@@ -271,16 +276,16 @@ const Sidebar = () => {
 
   return (
     <>
-      {isMobile && !mobileOpen && (
+      {!sidebarOpen && (
         <button
-          className="fixed left-2 top-2 z-50 p-2 text-white md:hidden"
-          onClick={() => setMobileOpen(true)}
+          className="fixed left-2 top-2 z-50 p-2 text-white"
+          onClick={() => setSidebarOpen(true)}
         >
-          <Menu />
+          <Icon type="sheet" size="sm" />
         </button>
       )}
       <AnimatePresence>
-        {(!isMobile || mobileOpen) && (
+        {sidebarOpen && (
           <motion.aside
             className="font-dmmono bg-background fixed inset-y-0 left-0 z-40 w-64 px-2 py-3 shadow-lg md:relative md:block"
             initial={{ x: -300 }}
@@ -288,16 +293,18 @@ const Sidebar = () => {
             exit={{ x: -300 }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           >
-            {isMobile && (
-              <button
-                className="absolute right-2 top-2 z-50 p-2 text-white"
-                onClick={() => setMobileOpen(false)}
-              >
-                <X />
-              </button>
-            )}
-            <div className="space-y-5">
+            <div className="flex justify-between">
               <SidebarHeader />
+              <button className="" onClick={() => setSidebarOpen(false)}>
+                <Icon
+                  type="sheet"
+                  size="sm"
+                  className="rotate-180 transition-transform"
+                />
+              </button>
+            </div>
+
+            <div className="mt-6 space-y-5">
               <NewChatButton
                 disabled={messages.length === 0}
                 onClick={handleNewChat}
