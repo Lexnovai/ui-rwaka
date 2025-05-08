@@ -111,7 +111,7 @@ const ChatBlankState = () => {
 
   return (
     <section
-      className="font-geist flex flex-col items-center text-center"
+      className="font-geist flex flex-grow flex-col items-center justify-start pt-12 text-center"
       aria-label="Welcome message"
     >
       <div className="flex max-w-3xl flex-col gap-y-8">
@@ -177,7 +177,7 @@ const ChatBlankState = () => {
           ))}
 
           {activeCategory && (
-            <div className="border-border absolute left-0 right-0 top-full z-10 mt-4 w-full rounded-xl border bg-neutral-900 p-4 shadow-xl">
+            <div className="border-border top-full mt-4 w-full rounded-xl border bg-neutral-900 p-4 shadow-xl">
               {LEGAL_CATEGORIES.find(
                 (c) => c.name === activeCategory
               )?.questions.map((q, idx) => (
