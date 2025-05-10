@@ -2,10 +2,7 @@
 
 import Link from 'next/link'
 import { motion, Variants, AnimatePresence } from 'framer-motion'
-import React, { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-import useAIChatStreamHandler from '@/hooks/useAIStreamHandler'
-import { LandPlot, Users2, Briefcase, ExternalLink } from 'lucide-react'
+import React, { useEffect, useRef, useState } from 'react'
 
 const USER_ROLES = [
   'Lawyers',
@@ -17,73 +14,60 @@ const USER_ROLES = [
   'Mediators'
 ]
 
-interface ActionButtonProps {
-  href?: string
-  variant?: 'primary'
-  text: React.ReactNode
-  isFocused?: boolean
-  onClick?: () => void
-  onFocus?: () => void
-}
+// interface ActionButtonProps {
+//   href?: string
+//   variant?: 'primary'
+//   text: React.ReactNode
+//   isFocused?: boolean
+//   onClick?: () => void
+//   onFocus?: () => void
+// }
 
-const ActionButton = ({
-  variant,
-  text,
-  isFocused,
-  onClick,
-  onFocus
-}: ActionButtonProps) => {
-  const baseStyles =
-    'px-4 py-2 text-sm transition-colors font-dmmono tracking-tight'
-  const variantStyles = {
-    primary: 'border border-border hover:bg-neutral-800 rounded-xl'
-  }
+// const ActionButton = ({
+//   variant,
+//   text,
+//   isFocused,
+//   onClick,
+//   onFocus
+// }: ActionButtonProps) => {
+//   const baseStyles =
+//     'px-4 py-2 text-sm transition-colors font-dmmono tracking-tight'
+//   const variantStyles = {
+//     primary: 'border border-border hover:bg-neutral-800 rounded-xl'
+//   }
 
-  return (
-    <button
-      onClick={onClick}
-      onFocus={onFocus}
-      className={`${baseStyles} ${variant ? variantStyles[variant] : ''} ${isFocused ? 'bg-neutral-800' : ''}`}
-    >
-      {text}
-    </button>
-  )
-}
-
-const LEGAL_CATEGORIES = [
-  {
-    name: 'Land Law',
-    icon: LandPlot,
-    questions: [
-      'How do I transfer land ownership in Rwanda?',
-      'What documents are needed for land registration?',
-      'What are the laws around land disputes?'
-    ]
-  },
-  {
-    name: 'Family Law',
-    icon: Users2,
-    questions: [
-      'What are the grounds for divorce in Rwanda?',
-      'How is child custody decided legally?',
-      'Can I get married without a church wedding?'
-    ]
-  },
-  {
-    name: 'Business Law',
-    icon: Briefcase,
-    questions: [
-      'How do I register a company in Rwanda?',
-      'What taxes do small businesses pay?',
-      'Can a foreigner open a business in Rwanda?'
-    ]
-  }
-]
+//   return (
+//     <button
+//       onClick={onClick}
+//       onFocus={onFocus}
+//       className={`${baseStyles} ${variant ? variantStyles[variant] : ''} ${isFocused ? 'bg-neutral-800' : ''}`}
+//     >
+//       {text}
+//     </button>
+//   )
+// }
 
 const ChatBlankState = () => {
-  const { handleStreamResponse } = useAIChatStreamHandler()
+  // const { handleStreamResponse } = useAIChatStreamHandler()
   const [currentRoleIndex, setCurrentRoleIndex] = useState(0)
-  const [activeCategory, setActiveCategory] = useState<string | null>(null)
+  const [, setActiveCategory] = useState<string | null>(null)
+
+  const dropdownRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setActiveCategory(null)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -98,24 +82,24 @@ const ChatBlankState = () => {
     exit: { y: -20, opacity: 0 }
   }
 
-  const handleQuery = async (query: string) => {
-    try {
-      await handleStreamResponse(query)
-    } catch (error) {
-      toast.error(
-        `Error in handling query: ${
-          error instanceof Error ? error.message : String(error)
-        }`
-      )
-    }
-  }
+  // const handleQuery = async (query: string) => {
+  //   try {
+  //     await handleStreamResponse(query)
+  //   } catch (error) {
+  //     toast.error(
+  //       `Error in handling query: ${
+  //         error instanceof Error ? error.message : String(error)
+  //       }`
+  //     )
+  //   }
+  // }
 
   return (
     <section
       className="font-geist flex flex-col items-center text-center"
       aria-label="Welcome message"
     >
-      <div className="flex max-w-3xl flex-col gap-y-8">
+      <div className="flex max-w-3xl flex-col gap-y-8 md:max-w-4xl lg:max-w-6xl">
         <div className="mx-auto flex w-fit items-center justify-center gap-3 rounded-xl bg-blue-600 px-3 py-1 text-sm text-white">
           <span>Free Plan</span>
           <Link
@@ -155,7 +139,7 @@ const ChatBlankState = () => {
           <p>Curious? Kick off with your first question.</p>
         </motion.h1>
 
-        <motion.div
+        {/* <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.5 }}
@@ -178,7 +162,10 @@ const ChatBlankState = () => {
           ))}
 
           {activeCategory && (
-            <div className="border-border top-full mt-4 w-full rounded-xl border bg-neutral-900 p-4 shadow-xl">
+            <div
+              ref={dropdownRef}
+              className="border-border top-full z-10 mt-4 w-full rounded-xl border bg-neutral-900 p-4 shadow-xl sm:absolute"
+            >
               {LEGAL_CATEGORIES.find(
                 (c) => c.name === activeCategory
               )?.questions.map((q, idx) => (
@@ -196,7 +183,7 @@ const ChatBlankState = () => {
               ))}
             </div>
           )}
-        </motion.div>
+        </motion.div> */}
       </div>
     </section>
   )
