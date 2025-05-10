@@ -100,13 +100,29 @@ const ChatBlankState = () => {
       aria-label="Welcome message"
     >
       <div className="flex max-w-3xl flex-col gap-y-8 md:max-w-4xl lg:max-w-6xl">
-        <div className="mx-auto flex w-fit items-center justify-center gap-3 rounded-xl bg-[#0C555D] px-4 py-2 text-sm shadow-md">
-          <span className="font-semibold">Free Plan</span>
+        <div className="mx-auto flex w-fit items-center justify-center gap-3 rounded-xl bg-white/10 px-5 py-2 text-sm shadow-lg ring-1 ring-white/10 backdrop-blur-md">
+          <span className="font-semibold text-white">
+            You&apos;re currently using the Free Plan
+          </span>
           <Link
             href="/upgrade"
-            className="text-[#49EA99] underline transition-opacity duration-200 hover:opacity-80"
+            className="flex items-center gap-1 text-[#49EA99] transition-opacity duration-200 hover:opacity-80"
           >
-            Upgrade to Premium
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M14 5l7 7m0 0l-7 7m7-7H3"
+              />
+            </svg>
+            <span className="underline">Upgrade</span>
           </Link>
         </div>
 
@@ -137,7 +153,7 @@ const ChatBlankState = () => {
               </AnimatePresence>
             </span>
           </div>
-          <p>Curious? Kick off with your first question.</p>
+          <p>Curious? Kick off with your first question!</p>
         </motion.h1>
 
         {/* <motion.div

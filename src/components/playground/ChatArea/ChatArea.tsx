@@ -4,7 +4,7 @@ import ChatInput from './ChatInput'
 import MessageArea from './MessageArea'
 const ChatArea = () => {
   return (
-    <main className="bg-background relative mx-1.5 flex min-h-screen flex-grow flex-col rounded-xl">
+    <main className="bg-background relative flex min-h-screen flex-grow flex-col rounded-xl">
       <MessageArea />
       <div className="sticky bottom-0 ml-9 px-4 pb-2">
         <ChatInput />
