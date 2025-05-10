@@ -25,8 +25,8 @@ const SidebarHeader = () => (
     <Image
       src="/assets/rwaka.svg"
       alt="Rwaka Logo"
-      width={180}
-      height={180}
+      width={200}
+      height={200}
       className="rounded-full"
     />
   </div>
@@ -57,7 +57,7 @@ const ProfileMenu = () => {
         <Ellipsis className="cursor-pointer" />
       </DropdownMenuTrigger>
       <DropdownMenuContent
-        className="mb-4 w-60 border-none bg-white/5"
+        className="bg-background-secondary mb-4 w-60 border-none"
         align="end"
         forceMount
       >
@@ -103,7 +103,7 @@ const Sidebar = () => {
     <>
       {isMobile && !isCollapsed && (
         <div
-          className="fixed inset-0 z-30 bg-black/50 sm:hidden"
+          className="bg-background-secondary fixed inset-0 z-30 sm:hidden"
           onClick={() => setIsCollapsed(true)}
         />
       )}
@@ -119,7 +119,7 @@ const Sidebar = () => {
 
       {(!isMobile || !isCollapsed) && isMounted && (
         <motion.aside
-          className="font-dmmono fixed left-0 top-0 z-40 flex h-screen w-[16rem] flex-shrink-0 flex-col overflow-hidden bg-white/5 px-2 py-3"
+          className="font-dmmono bg-background-secondary fixed left-0 top-0 z-40 flex h-screen w-[16rem] flex-shrink-0 flex-col overflow-hidden px-2 py-3"
           initial={{ width: '16rem' }}
           animate={{ width: isCollapsed ? '2.3rem' : '16rem' }}
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}

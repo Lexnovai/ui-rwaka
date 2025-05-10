@@ -74,7 +74,7 @@ export function AgentSelector() {
                 alt="Rwaka Logo"
                 width={25}
                 height={25}
-              />{' '}
+              />
               {agent.label}
             </div>
           </SelectItem>
