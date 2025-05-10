@@ -57,9 +57,9 @@ const ChatInput = () => {
         onClick={handleSubmit}
         disabled={!selectedAgent || !inputMessage.trim() || isStreaming}
         size="icon"
-        className="text-primaryAccent rounded-xl bg-[#49EA99] p-5"
+        className="text-primary rounded-xl bg-[#0C555D] p-5"
       >
-        <Icon type="send" color="#0C555D" />
+        <Icon type="send" color="#49EA99" />
       </Button>
     </div>
   )

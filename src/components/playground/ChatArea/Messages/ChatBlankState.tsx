@@ -99,11 +99,9 @@ const ChatBlankState = () => {
       className="font-geist flex flex-col items-center text-center"
       aria-label="Welcome message"
     >
-      <div className="flex max-w-3xl flex-col gap-y-8 md:max-w-4xl lg:max-w-6xl">
-        <div className="mx-auto flex w-fit items-center justify-center gap-3 rounded-xl bg-white/10 px-5 py-2 text-sm shadow-lg ring-1 ring-white/10 backdrop-blur-md">
-          <span className="font-semibold text-white">
-            You&apos;re currently using the Free Plan
-          </span>
+      <div className="flex max-w-3xl flex-col gap-y-6 md:max-w-4xl lg:max-w-6xl">
+        <div className="mx-auto flex w-fit items-center justify-center gap-3 rounded-xl bg-[#0C555D] px-5 py-2 text-sm shadow-lg ring-1 ring-white/10 backdrop-blur-md">
+          <span className="font-semibold text-white">Free Plan</span>
           <Link
             href="/upgrade"
             className="flex items-center gap-1 text-[#49EA99] transition-opacity duration-200 hover:opacity-80"
