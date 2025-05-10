@@ -1,20 +1,20 @@
 # Base image for building
 FROM node:20-alpine AS builder
 
-# Install necessary tools
-RUN apk add --no-cache libc6-compat
+
+RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
 
 WORKDIR /app
 
 # Copy package files and install dependencies
-COPY package.json  package-lock.json ./
-RUN npm ci
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
 
 # Copy the rest of the application
 COPY . .
 
 # Build the application
-RUN npm run build && ls -la /app/.next
+RUN pnpm build && ls -la /app/.next
 
 # Production image
 FROM node:20-alpine AS runner
