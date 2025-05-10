@@ -22,6 +22,7 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Ellipsis, UserCircle } from 'lucide-react'
+import useIsMobile from '@/hooks/useIsMobile'
 const SidebarHeader = () => (
   <div className="flex items-center gap-2">
     <Icon type="agno" size="xs" />
@@ -84,6 +85,7 @@ const ProfileMenu = () => {
 }
 
 const Sidebar = () => {
+  const isMobile = useIsMobile()
   const [isCollapsed, setIsCollapsed] = useState(false)
   const { clearChat, focusChatInput, initializePlayground } = useChatActions()
   const {
@@ -104,13 +106,13 @@ const Sidebar = () => {
   }
   return (
     <>
-      {!isCollapsed && (
+      {isMobile && !isCollapsed && (
         <div
           className="fixed inset-0 z-30 bg-black/50 sm:hidden"
           onClick={() => setIsCollapsed(true)}
         />
       )}
-      {isCollapsed && (
+      {isMobile && isCollapsed && (
         <button
           onClick={() => setIsCollapsed(false)}
           className="fixed left-2 top-2 z-40 p-2"
@@ -119,7 +121,8 @@ const Sidebar = () => {
           <Icon type="sheet" size="xs" className="rotate-180" />
         </button>
       )}
-      {(isMounted && !isCollapsed) || typeof window === 'undefined' ? (
+
+      {(!isMobile || !isCollapsed) && isMounted && (
         <motion.aside
           className="bg-background font-dmmono absolute z-40 flex h-screen w-[90vw] shrink-0 grow-0 flex-col overflow-hidden px-2 py-3 sm:relative sm:w-[16rem]"
           initial={{ width: '16rem' }}
@@ -202,7 +205,7 @@ const Sidebar = () => {
             <ProfileMenu />
           </motion.div>
         </motion.aside>
-      ) : null}
+      )}
     </>
   )
 }
