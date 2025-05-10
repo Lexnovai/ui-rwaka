@@ -7,9 +7,10 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import Icon from '@/components/ui/icon'
 import Sessions from './Sessions'
-import { isValidUrl, truncateText } from '@/lib/utils'
+import { isValidUrl } from '@/lib/utils'
 import { toast } from 'sonner'
 import { useQueryState } from 'nuqs'
+import { truncateText } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Ellipsis, UserCircle } from 'lucide-react'
 import {
@@ -27,7 +28,6 @@ import {
 } from '@/components/ui/dropdown-menu'
 
 const ENDPOINT_PLACEHOLDER = 'NO ENDPOINT ADDED'
-
 const SidebarHeader = () => (
   <div className="flex items-center gap-2">
     <Icon type="agno" size="xs" />
@@ -175,7 +175,7 @@ const Endpoint = () => {
                     {isMounted
                       ? truncateText(selectedEndpoint, 21) ||
                         ENDPOINT_PLACEHOLDER
-                      : 'https://chatapi.rwaka.rw'}
+                      : 'http://localhost:7777'}
                   </p>
                   <div
                     className={`size-2 shrink-0 rounded-full ${getStatusColor(isEndpointActive)}`}
@@ -239,10 +239,8 @@ const ProfileMenu = () => {
 }
 
 const Sidebar = () => {
-  const [isMounted, setIsMounted] = useState(false)
-  const [, setIsMobile] = useState(false)
-  const [sidebarOpen, setSidebarOpen] = useState(true)
-
+  const [isCollapsed, setIsCollapsed] = useState(false)
+  const [isMobileOpen, setIsMobileOpen] = useState(false)
   const { clearChat, focusChatInput, initializePlayground } = useChatActions()
   const {
     messages,
@@ -251,18 +249,7 @@ const Sidebar = () => {
     hydrated,
     isEndpointLoading
   } = usePlaygroundStore()
-
-  useEffect(() => {
-    const handleResize = () => {
-      const mobile = window.innerWidth < 768
-      setIsMobile(mobile)
-      // Auto-collapse on mobile, expand on desktop
-      setSidebarOpen(!mobile)
-    }
-    handleResize()
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
+  const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
     setIsMounted(true)
@@ -274,86 +261,108 @@ const Sidebar = () => {
     focusChatInput()
   }
 
+  const sidebarWidth = isCollapsed ? '2.5rem' : '16rem'
+
   return (
     <>
-      {!sidebarOpen && (
-        <button
-          className="fixed left-2 top-2 z-50 p-2 text-white"
-          onClick={() => setSidebarOpen(true)}
+      {/* Mobile Toggle Button */}
+      <div className="fixed left-2 top-2 z-50 md:hidden">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setIsMobileOpen(!isMobileOpen)}
+          aria-label="Toggle sidebar"
+        >
+          <Icon type="sheet" size="xs" />
+        </Button>
+      </div>
+
+      {/* Desktop + Mobile Sidebar */}
+      <motion.aside
+        className={`font-dmmono bg-background fixed z-40 h-screen shrink-0 grow-0 flex-col overflow-hidden px-2 py-3 shadow-md md:relative md:flex ${
+          isMobileOpen ? 'flex' : 'hidden'
+        } md:block`}
+        initial={{ x: -260 }}
+        animate={{ x: isMobileOpen || window.innerWidth >= 768 ? 0 : -260 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        style={{ width: sidebarWidth }}
+      >
+        {/* Collapse Toggle for Desktop */}
+        <motion.button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="absolute right-2 top-2 z-10 hidden p-1 md:block"
+          aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          type="button"
+          whileTap={{ scale: 0.95 }}
         >
           <Icon
             type="sheet"
-            size="sm"
-            className="rotate-180 transition-transform"
+            size="xs"
+            className={`transform ${isCollapsed ? 'rotate-180' : 'rotate-0'}`}
           />
-        </button>
-      )}
-      <AnimatePresence>
-        {sidebarOpen && (
-          <motion.aside
-            className="font-dmmono bg-background fixed inset-y-0 left-0 z-40 flex max-h-screen w-64 flex-col overflow-y-auto px-2 py-3 shadow-lg md:relative md:block"
-            initial={{ x: -300 }}
-            animate={{ x: 0 }}
-            exit={{ x: -300 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-          >
-            <div className="flex justify-between">
-              <SidebarHeader />
-              <button onClick={() => setSidebarOpen(false)}>
-                <Icon type="sheet" size="sm" />
-              </button>
-            </div>
+        </motion.button>
 
-            <div className="mt-3 space-y-4">
-              <NewChatButton
-                disabled={messages.length === 0}
-                onClick={handleNewChat}
-              />
-              {isMounted && (
+        {/* Sidebar Content */}
+        <motion.div
+          className="w-60 space-y-5"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: isCollapsed ? 0 : 1, x: isCollapsed ? -20 : 0 }}
+          transition={{ duration: 0.3, ease: 'easeInOut' }}
+          style={{ pointerEvents: isCollapsed ? 'none' : 'auto' }}
+        >
+          <SidebarHeader />
+          <NewChatButton
+            disabled={messages.length === 0}
+            onClick={handleNewChat}
+          />
+          {isMounted && (
+            <>
+              <Endpoint />
+              {isEndpointActive && (
                 <>
-                  <Endpoint />
-                  {isEndpointActive && (
-                    <>
-                      <div className="flex flex-col items-start gap-2">
-                        <div className="text-primary text-xs font-medium uppercase">
-                          Agent
-                        </div>
-                        {isEndpointLoading ? (
-                          <div className="flex w-full flex-col gap-2">
-                            {Array.from({ length: 2 }).map((_, index) => (
-                              <Skeleton
-                                key={index}
-                                className="h-9 w-full rounded-xl"
-                              />
-                            ))}
-                          </div>
-                        ) : (
-                          <AgentSelector />
-                        )}
+                  <motion.div
+                    className="flex w-full flex-col items-start gap-2"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5, ease: 'easeInOut' }}
+                  >
+                    <div className="text-primary text-xs font-medium uppercase">
+                      Agent
+                    </div>
+                    {isEndpointLoading ? (
+                      <div className="flex w-full flex-col gap-2">
+                        {Array.from({ length: 2 }).map((_, index) => (
+                          <Skeleton
+                            key={index}
+                            className="h-9 w-full rounded-xl"
+                          />
+                        ))}
                       </div>
-                      <Sessions />
-                    </>
-                  )}
+                    ) : (
+                      <AgentSelector />
+                    )}
+                  </motion.div>
+                  <Sessions />
                 </>
               )}
-            </div>
-            <div className="mt-auto flex items-center justify-between pt-4">
-              <div className="flex items-center gap-2">
-                <UserCircle size={24} />
-                <div className="flex flex-col gap-1">
-                  <div className="text-secondary-foreground text-[12px] font-semibold">
-                    John Doe
-                  </div>
-                  <div className="font-geist text-accent-foreground text-[10px]">
-                    Attorney
-                  </div>
-                </div>
+            </>
+          )}
+        </motion.div>
+
+        {/* Footer */}
+        <motion.div className="mt-auto flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <UserCircle size={24} />
+            <div className="flex flex-col gap-1">
+              <div className="text-secondary-foreground text-[12px] font-semibold">
+                John Doe
               </div>
-              <ProfileMenu />
+              <div className="text-accent-foreground text-[10px]">Attorney</div>
             </div>
-          </motion.aside>
-        )}
-      </AnimatePresence>
+          </div>
+          <ProfileMenu />
+        </motion.div>
+      </motion.aside>
     </>
   )
 }
