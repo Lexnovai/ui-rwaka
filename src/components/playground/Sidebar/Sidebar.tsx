@@ -14,14 +14,10 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuPortal,
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-import { Ellipsis, UserCircle } from 'lucide-react'
+import { Ellipsis, LogOut, UserCircle } from 'lucide-react'
 import useIsMobile from '@/hooks/useIsMobile'
 import Image from 'next/image'
 const SidebarHeader = () => (
@@ -29,8 +25,8 @@ const SidebarHeader = () => (
     <Image
       src="/assets/rwaka.svg"
       alt="Rwaka Logo"
-      width={180}
-      height={180}
+      width={200}
+      height={200}
       className="rounded-full"
     />
   </div>
@@ -61,28 +57,23 @@ const ProfileMenu = () => {
         <Ellipsis className="cursor-pointer" />
       </DropdownMenuTrigger>
       <DropdownMenuContent
-        className="bg-background border-border mb-4 w-60"
+        className="bg-background-secondary mb-4 w-60 border-none"
         align="end"
         forceMount
       >
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
-        <DropdownMenuSeparator />
+        <DropdownMenuSeparator className="border-border" />
         <DropdownMenuGroup>
           <DropdownMenuItem>Help</DropdownMenuItem>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>Pricing Plans</DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent className="border-border bg-background">
-                <DropdownMenuItem>Free Plan</DropdownMenuItem>
-                <DropdownMenuItem>Pro Plan</DropdownMenuItem>
-                <DropdownMenuItem>Entreprise</DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-          <DropdownMenuItem>New Team</DropdownMenuItem>
+          <DropdownMenuItem>Settings</DropdownMenuItem>
+          <DropdownMenuItem>Pricing Plans</DropdownMenuItem>
+          <DropdownMenuItem>Manage Team</DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Log out</DropdownMenuItem>
+        <DropdownMenuItem className="flex justify-between font-semibold">
+          Log out
+          <LogOut className="text-[#49EA99]" />
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )
@@ -112,7 +103,7 @@ const Sidebar = () => {
     <>
       {isMobile && !isCollapsed && (
         <div
-          className="fixed inset-0 z-30 bg-black/50 sm:hidden"
+          className="bg-background-secondary fixed inset-0 z-30 sm:hidden"
           onClick={() => setIsCollapsed(true)}
         />
       )}
@@ -128,7 +119,7 @@ const Sidebar = () => {
 
       {(!isMobile || !isCollapsed) && isMounted && (
         <motion.aside
-          className="bg-background font-dmmono absolute z-40 flex h-screen w-[90vw] shrink-0 grow-0 flex-col overflow-hidden px-2 py-3 sm:relative sm:w-[16rem]"
+          className="font-dmmono bg-background-secondary fixed left-0 top-0 z-40 flex h-screen w-[16rem] flex-shrink-0 flex-col overflow-hidden px-2 py-3"
           initial={{ width: '16rem' }}
           animate={{ width: isCollapsed ? '2.3rem' : '16rem' }}
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
@@ -143,7 +134,7 @@ const Sidebar = () => {
             <Icon
               type="sheet"
               size="xs"
-              className={`mt-2 transform ${isCollapsed ? 'rotate-180' : 'rotate-0'}`}
+              className={`mt-3 transform ${isCollapsed ? 'rotate-180' : 'rotate-0'}`}
             />
           </motion.button>
           <motion.div
@@ -195,10 +186,10 @@ const Sidebar = () => {
             )}
           </motion.div>
           {!isCollapsed && (
-            <motion.div className="p fixed bottom-2 flex w-60 items-center justify-between">
+            <motion.div className="fixed bottom-3 flex w-60 items-center justify-between">
               <div className="flex items-center gap-2">
                 <UserCircle size={24} />
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col">
                   <div className="text-secondary-foreground text-[12px] font-semibold">
                     John Doe
                   </div>
