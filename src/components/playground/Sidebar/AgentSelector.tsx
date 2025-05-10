@@ -10,10 +10,9 @@ import {
 } from '@/components/ui/select'
 import { usePlaygroundStore } from '@/store'
 import { useQueryState } from 'nuqs'
-import Icon from '@/components/ui/icon'
 import { useEffect } from 'react'
 import useChatActions from '@/hooks/useChatActions'
-
+import Image from 'next/image'
 export function AgentSelector() {
   const { agents, setMessages, setSelectedModel, setHasStorage } =
     usePlaygroundStore()
@@ -59,10 +58,10 @@ export function AgentSelector() {
       value={agentId || ''}
       onValueChange={(value) => handleOnValueChange(value)}
     >
-      <SelectTrigger className="h-9 w-full rounded-xl border border-primary/15 bg-primaryAccent text-xs font-medium uppercase">
+      <SelectTrigger className="border-primary/15 bg-primaryAccent h-9 w-full rounded-xl border text-xs font-medium uppercase">
         <SelectValue placeholder="Select Agent" />
       </SelectTrigger>
-      <SelectContent className="border-none bg-primaryAccent font-dmmono shadow-lg">
+      <SelectContent className="bg-primaryAccent font-dmmono border-none shadow-lg">
         {agents.map((agent, index) => (
           <SelectItem
             className="cursor-pointer"
@@ -70,7 +69,12 @@ export function AgentSelector() {
             value={agent.value}
           >
             <div className="flex items-center gap-3 text-xs font-medium uppercase">
-              <Icon type={'agent'} size="xs" />
+              <Image
+                src="/assets/rwaka-chat.svg"
+                alt="Rwaka Logo"
+                width={25}
+                height={25}
+              />{' '}
               {agent.label}
             </div>
           </SelectItem>
