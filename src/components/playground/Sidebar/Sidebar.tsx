@@ -23,12 +23,16 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Ellipsis, UserCircle } from 'lucide-react'
 import useIsMobile from '@/hooks/useIsMobile'
+import Image from 'next/image'
 const SidebarHeader = () => (
   <div className="flex items-center gap-2">
-    <Icon type="agno" size="xs" />
-    <span className="text-xs font-medium uppercase text-white">
-      Rwaka Legal Assistant
-    </span>
+    <Image
+      src="/assets/rwaka.svg"
+      alt="Rwaka Logo"
+      width={180}
+      height={180}
+      className="rounded-full"
+    />
   </div>
 )
 
@@ -139,7 +143,7 @@ const Sidebar = () => {
             <Icon
               type="sheet"
               size="xs"
-              className={`transform ${isCollapsed ? 'rotate-180' : 'rotate-0'}`}
+              className={`mt-2 transform ${isCollapsed ? 'rotate-180' : 'rotate-0'}`}
             />
           </motion.button>
           <motion.div
@@ -190,20 +194,22 @@ const Sidebar = () => {
               </>
             )}
           </motion.div>
-          <motion.div className="mt-auto flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <UserCircle size={24} />
-              <div className="flex flex-col gap-1">
-                <div className="text-secondary-foreground text-[12px] font-semibold">
-                  John Doe
-                </div>
-                <div className="text-accent-foreground text-[10px]">
-                  Attorney
+          {!isCollapsed && (
+            <motion.div className="p fixed bottom-2 flex w-60 items-center justify-between">
+              <div className="flex items-center gap-2">
+                <UserCircle size={24} />
+                <div className="flex flex-col gap-1">
+                  <div className="text-secondary-foreground text-[12px] font-semibold">
+                    John Doe
+                  </div>
+                  <div className="text-accent-foreground text-[10px]">
+                    Attorney
+                  </div>
                 </div>
               </div>
-            </div>
-            <ProfileMenu />
-          </motion.div>
+              <ProfileMenu />
+            </motion.div>
+          )}
         </motion.aside>
       )}
     </>
