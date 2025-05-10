@@ -100,15 +100,16 @@ const ChatBlankState = () => {
       aria-label="Welcome message"
     >
       <div className="flex max-w-3xl flex-col gap-y-8 md:max-w-4xl lg:max-w-6xl">
-        <div className="mx-auto flex w-fit items-center justify-center gap-3 rounded-xl bg-blue-600 px-3 py-1 text-sm text-white">
-          <span>Free Plan</span>
+        <div className="mx-auto flex w-fit items-center justify-center gap-3 rounded-xl bg-[#0C555D] px-4 py-2 text-sm shadow-md">
+          <span className="font-semibold">Free Plan</span>
           <Link
             href="/upgrade"
-            className="text-white underline hover:text-gray-200"
+            className="text-[#49EA99] underline transition-opacity duration-200 hover:opacity-80"
           >
             Upgrade to Premium
           </Link>
         </div>
+
         <motion.h1
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
