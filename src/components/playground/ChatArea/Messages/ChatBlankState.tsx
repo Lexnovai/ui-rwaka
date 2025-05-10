@@ -18,7 +18,7 @@ const USER_ROLES = [
 ]
 
 interface ActionButtonProps {
-  href: string
+  href?: string
   variant?: 'primary'
   text: React.ReactNode
   isFocused?: boolean
@@ -84,6 +84,7 @@ const ChatBlankState = () => {
   const { handleStreamResponse } = useAIChatStreamHandler()
   const [currentRoleIndex, setCurrentRoleIndex] = useState(0)
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
+
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentRoleIndex((prevIndex) => (prevIndex + 1) % USER_ROLES.length)
@@ -111,7 +112,7 @@ const ChatBlankState = () => {
 
   return (
     <section
-      className="font-geist flex flex-grow flex-col items-center justify-start overflow-y-auto pt-12 text-center"
+      className="font-geist flex flex-col items-center text-center"
       aria-label="Welcome message"
     >
       <div className="flex max-w-3xl flex-col gap-y-8">
@@ -131,7 +132,7 @@ const ChatBlankState = () => {
           className="text-2xl font-[600] tracking-tight sm:text-3xl"
         >
           <div className="mb-2 flex items-center justify-center gap-x-5 whitespace-nowrap font-medium">
-            <p className="flex items-center font-[600]">Designed to assist </p>
+            <p className="flex items-center font-[600]">Designed to assist</p>
             <span className="relative inline-flex h-[40px] w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-xl bg-white hover:scale-[1.05]">
               <AnimatePresence mode="wait">
                 <motion.span
@@ -153,6 +154,7 @@ const ChatBlankState = () => {
           </div>
           <p>Curious? Kick off with your first question.</p>
         </motion.h1>
+
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -163,7 +165,6 @@ const ChatBlankState = () => {
             <ActionButton
               key={name}
               variant="primary"
-              href="#"
               text={
                 <div className="flex items-center gap-2">
                   <Icon size={16} />

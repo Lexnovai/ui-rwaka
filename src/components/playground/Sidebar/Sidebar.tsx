@@ -12,21 +12,6 @@ import { toast } from 'sonner'
 import { useQueryState } from 'nuqs'
 import { truncateText } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Ellipsis, UserCircle } from 'lucide-react'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuPortal,
-  DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
-
 const ENDPOINT_PLACEHOLDER = 'NO ENDPOINT ADDED'
 const SidebarHeader = () => (
   <div className="flex items-center gap-2">
@@ -204,43 +189,8 @@ const Endpoint = () => {
   )
 }
 
-const ProfileMenu = () => {
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger>
-        <Ellipsis className="cursor-pointer" />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent
-        className="bg-background border-border w-56"
-        align="end"
-        forceMount
-      >
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem>Help</DropdownMenuItem>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>Pricing Plans</DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent className="border-border bg-background">
-                <DropdownMenuItem>Free Plan</DropdownMenuItem>
-                <DropdownMenuItem>Pro</DropdownMenuItem>
-                <DropdownMenuItem>Team</DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-          <DropdownMenuItem>New Team</DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>Log out</DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  )
-}
-
 const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false)
-  const [isMobileOpen, setIsMobileOpen] = useState(false)
   const { clearChat, focusChatInput, initializePlayground } = useChatActions()
   const {
     messages,
@@ -250,47 +200,32 @@ const Sidebar = () => {
     isEndpointLoading
   } = usePlaygroundStore()
   const [isMounted, setIsMounted] = useState(false)
-
   useEffect(() => {
     setIsMounted(true)
     if (hydrated) initializePlayground()
   }, [selectedEndpoint, initializePlayground, hydrated])
-
   const handleNewChat = () => {
     clearChat()
     focusChatInput()
   }
-
-  const sidebarWidth = isCollapsed ? '2.5rem' : '16rem'
-
   return (
     <>
-      {/* Mobile Toggle Button */}
-      <div className="fixed left-2 top-2 z-50 md:hidden">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setIsMobileOpen(!isMobileOpen)}
-          aria-label="Toggle sidebar"
-        >
-          <Icon type="sheet" size="xs" />
-        </Button>
-      </div>
+      {!isCollapsed && (
+        <div
+          className="fixed inset-0 z-30 bg-black/50 sm:hidden"
+          onClick={() => setIsCollapsed(true)}
+        />
+      )}
 
-      {/* Desktop + Mobile Sidebar */}
       <motion.aside
-        className={`font-dmmono bg-background fixed z-40 h-screen shrink-0 grow-0 flex-col overflow-hidden px-2 py-3 shadow-md md:relative md:flex ${
-          isMobileOpen ? 'flex' : 'hidden'
-        } md:block`}
-        initial={{ x: -260 }}
-        animate={{ x: isMobileOpen || window.innerWidth >= 768 ? 0 : -260 }}
+        className="bg-background font-dmmono absolute z-40 flex h-screen w-[90vw] shrink-0 grow-0 flex-col overflow-hidden px-2 py-3 sm:relative sm:w-[16rem]"
+        initial={{ width: '16rem' }}
+        animate={{ width: isCollapsed ? '2.5rem' : '16rem' }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-        style={{ width: sidebarWidth }}
       >
-        {/* Collapse Toggle for Desktop */}
         <motion.button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="absolute right-2 top-2 z-10 hidden p-1 md:block"
+          className="absolute right-2 top-2 z-10 p-1"
           aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           type="button"
           whileTap={{ scale: 0.95 }}
@@ -301,14 +236,14 @@ const Sidebar = () => {
             className={`transform ${isCollapsed ? 'rotate-180' : 'rotate-0'}`}
           />
         </motion.button>
-
-        {/* Sidebar Content */}
         <motion.div
           className="w-60 space-y-5"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: isCollapsed ? 0 : 1, x: isCollapsed ? -20 : 0 }}
           transition={{ duration: 0.3, ease: 'easeInOut' }}
-          style={{ pointerEvents: isCollapsed ? 'none' : 'auto' }}
+          style={{
+            pointerEvents: isCollapsed ? 'none' : 'auto'
+          }}
         >
           <SidebarHeader />
           <NewChatButton
@@ -339,7 +274,9 @@ const Sidebar = () => {
                         ))}
                       </div>
                     ) : (
-                      <AgentSelector />
+                      <>
+                        <AgentSelector />
+                      </>
                     )}
                   </motion.div>
                   <Sessions />
@@ -347,20 +284,6 @@ const Sidebar = () => {
               )}
             </>
           )}
-        </motion.div>
-
-        {/* Footer */}
-        <motion.div className="mt-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <UserCircle size={24} />
-            <div className="flex flex-col gap-1">
-              <div className="text-secondary-foreground text-[12px] font-semibold">
-                John Doe
-              </div>
-              <div className="text-accent-foreground text-[10px]">Attorney</div>
-            </div>
-          </div>
-          <ProfileMenu />
         </motion.div>
       </motion.aside>
     </>
