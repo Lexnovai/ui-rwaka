@@ -6,7 +6,7 @@ const ChatArea = () => {
   return (
     <main className="bg-background relative flex min-h-screen flex-grow flex-col rounded-xl">
       <MessageArea />
-      <div className="sticky bottom-0 ml-9 px-4 pb-2">
+      <div className="sticky bottom-0 ml- px-4 pb-2">
         <ChatInput />
       </div>
     </main>

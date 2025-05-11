@@ -19,17 +19,15 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Ellipsis, LogOut, UserCircle } from 'lucide-react'
 import useIsMobile from '@/hooks/useIsMobile'
-import Image from 'next/image'
 const SidebarHeader = () => (
-  <div className="flex items-center gap-2">
-    <Image
-      src="/assets/rwaka.svg"
-      alt="Rwaka Logo"
-      width={200}
-      height={200}
-      className="rounded-full"
-    />
-  </div>
+<img
+  src="/assets/rwaka.svg"
+  alt="Rwaka Logo"
+  width={180}
+  height={180}
+  className="rounded-full"
+/>
+
 )
 
 const NewChatButton = ({
@@ -46,7 +44,7 @@ const NewChatButton = ({
     className="bg-primary text-background hover:bg-primary/80 h-9 w-full rounded-xl text-xs font-medium"
   >
     <Icon type="plus-icon" size="xs" className="text-background" />
-    <span className="uppercase">New Chat</span>
+    <span className="uppercase tracking-wide">New Chat</span>
   </Button>
 )
 
@@ -103,21 +101,22 @@ const Sidebar = () => {
     <>
       {isMobile && !isCollapsed && (
         <div
-          className="bg-background-secondary fixed inset-0 z-30 sm:hidden"
+          className=" fixed inset-0 z-30 sm:hidden"
           onClick={() => setIsCollapsed(true)}
         />
       )}
       {isMobile && isCollapsed && (
         <button
           onClick={() => setIsCollapsed(false)}
-          className="fixed left-2 top-2 z-40 p-2"
+          className="fixed left-2 top-2 z-40 p-2 bg-background-secondary rounded-md shadow mb-16 sm:mb-0"
           aria-label="Expand sidebar"
         >
           <Icon type="sheet" size="xs" className="rotate-180" />
         </button>
       )}
 
-      {(!isMobile || !isCollapsed) && isMounted && (
+
+      {(!isMobile || (isMobile && !isCollapsed)) && isMounted && (
         <motion.aside
           className="font-dmmono bg-background-secondary fixed left-0 top-0 z-40 flex h-screen w-[16rem] flex-shrink-0 flex-col overflow-hidden px-2 py-3"
           initial={{ width: '16rem' }}
