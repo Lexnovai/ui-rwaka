@@ -2,7 +2,7 @@ import { type FC } from 'react'
 
 export const AgnoIcon: FC = ({ ...props }) => {
   return (
-    <svg
+	 <svg
       width="16"
       height="16"
       viewBox="0 0 16 16"
@@ -26,7 +26,6 @@ export const AgnoIcon: FC = ({ ...props }) => {
     </svg>
   )
 }
-
 export const UserIcon: FC = ({ ...props }) => {
   return (
     <svg
