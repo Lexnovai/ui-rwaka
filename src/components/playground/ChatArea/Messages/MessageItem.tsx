@@ -70,13 +70,8 @@ const AgentMessage = ({ message }: MessageProps) => {
 
   return (
     <div className="font-geist flex flex-row items-start gap-4">
-      <div className="rounded-md bg-[#49EA99]/90 p-1">
-        <img
-          src="/assets/rwaka-chat.svg"
-          alt="Rwaka Chat"
-          width={20}
-          height={20}
-        />
+      <div className="rounded-md bg-[#49EA99]/90 p-0.5">
+      <Icon type="rwaka-chat" size="sm" />
       </div>
       {messageContent}
     </div>

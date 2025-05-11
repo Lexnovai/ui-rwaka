@@ -12,6 +12,8 @@ import { usePlaygroundStore } from '@/store'
 import { useQueryState } from 'nuqs'
 import { useEffect } from 'react'
 import useChatActions from '@/hooks/useChatActions'
+import Icon from '@/components/ui/icon'
+
 export function AgentSelector() {
   const { agents, setMessages, setSelectedModel, setHasStorage } =
     usePlaygroundStore()
@@ -68,12 +70,8 @@ export function AgentSelector() {
             value={agent.value}
           >
             <div className="flex items-center gap-3 text-xs font-medium uppercase">
-              <img
-                src="/assets/rwaka-chat.svg"
-                alt="Rwaka Logo"
-                width={25}
-                height={25}
-              />
+            <Icon type="rwaka-chat" size="sm" />
+
               {agent.label}
             </div>
           </SelectItem>
