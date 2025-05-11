@@ -20,13 +20,7 @@ import {
 import { Ellipsis, LogOut, UserCircle } from 'lucide-react'
 import useIsMobile from '@/hooks/useIsMobile'
 const SidebarHeader = () => (
-<img
-  src="/assets/rwaka.svg"
-  alt="Rwaka Logo"
-  width={180}
-  height={180}
-  className="rounded-full"
-/>
+<Icon type="rwaka" size="default" className="w-48"/>
 
 )
 
