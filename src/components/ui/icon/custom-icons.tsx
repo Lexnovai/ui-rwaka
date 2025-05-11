@@ -24,7 +24,8 @@ export const AgnoIcon: FC = ({ ...props }) => {
         </clipPath>
       </defs>
     </svg>
-
+  )
+}
 export const UserIcon: FC = ({ ...props }) => {
   return (
     <svg

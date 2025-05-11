@@ -10,9 +10,9 @@ import {
 } from '@/components/ui/select'
 import { usePlaygroundStore } from '@/store'
 import { useQueryState } from 'nuqs'
+import Icon from '@/components/ui/icon'
 import { useEffect } from 'react'
 import useChatActions from '@/hooks/useChatActions'
-import Icon from '@/components/ui/icon'
 
 export function AgentSelector() {
   const { agents, setMessages, setSelectedModel, setHasStorage } =
@@ -59,21 +59,23 @@ export function AgentSelector() {
       value={agentId || ''}
       onValueChange={(value) => handleOnValueChange(value)}
     >
-      <SelectTrigger className="border-primary/15 bg-primaryAccent h-9 w-full rounded-xl border text-xs font-medium uppercase">
+      <SelectTrigger className="h-9 w-full rounded-xl border border-primary/15 bg-primaryAccent text-xs font-medium uppercase">
         <SelectValue placeholder="Select Agent" />
       </SelectTrigger>
-      <SelectContent className="bg-primaryAccent font-dmmono border-none shadow-lg">
+      <SelectContent className="border-none bg-primaryAccent font-dmmono shadow-lg">
         {agents.map((agent, index) => (
           <SelectItem
             className="cursor-pointer"
             key={`${agent.value}-${index}`}
             value={agent.value}
           >
-            <div className="flex items-center gap-3 text-xs font-medium uppercase">
-            <Icon type="rwaka-chat" size="sm" />
+        <div className="flex items-center gap-3 text-xs font-medium uppercase">
+          <Icon type="rwaka-chat" size="sm" />
+          <span className="truncate overflow-hidden text-ellipsis whitespace-nowrap">
+            {agent.label}
+          </span>
+        </div>
 
-              {agent.label}
-            </div>
           </SelectItem>
         ))}
         {agents.length === 0 && (
