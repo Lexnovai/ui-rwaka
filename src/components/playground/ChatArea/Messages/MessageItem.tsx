@@ -7,7 +7,6 @@ import Images from './Multimedia/Images'
 import Audios from './Multimedia/Audios'
 import { memo } from 'react'
 import AgentThinkingLoader from './AgentThinkingLoader'
-import Image from 'next/image'
 
 interface MessageProps {
   message: PlaygroundChatMessage
@@ -72,7 +71,7 @@ const AgentMessage = ({ message }: MessageProps) => {
   return (
     <div className="font-geist flex flex-row items-start gap-4">
       <div className="rounded-md bg-[#49EA99]/90 p-1">
-        <Image
+        <img
           src="/assets/rwaka-chat.svg"
           alt="Rwaka Chat"
           width={20}

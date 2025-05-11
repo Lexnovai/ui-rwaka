@@ -19,17 +19,15 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Ellipsis, LogOut, UserCircle } from 'lucide-react'
 import useIsMobile from '@/hooks/useIsMobile'
-import Image from 'next/image'
 const SidebarHeader = () => (
-  <div className="flex items-center gap-2">
-    <Image
-      src="/assets/rwaka.svg"
-      alt="Rwaka Logo"
-      width={200}
-      height={200}
-      className="rounded-full"
-    />
-  </div>
+<img
+  src="/assets/rwaka.svg"
+  alt="Rwaka Logo"
+  width={180}
+  height={180}
+  className="rounded-full"
+/>
+
 )
 
 const NewChatButton = ({
@@ -46,7 +44,7 @@ const NewChatButton = ({
     className="bg-primary text-background hover:bg-primary/80 h-9 w-full rounded-xl text-xs font-medium"
   >
     <Icon type="plus-icon" size="xs" className="text-background" />
-    <span className="uppercase">New Chat</span>
+    <span className="uppercase tracking-wide">New Chat</span>
   </Button>
 )
 

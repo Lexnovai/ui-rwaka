@@ -20,7 +20,9 @@ import {
   TailwindTag,
   AgnoTag,
   ReasoningIcon,
-  ReferencesIcon
+  ReferencesIcon,
+  RwakaIcon,
+  RwakaChatIcon
 } from './custom-icons'
 import { IconTypeMap } from './types'
 import {
@@ -75,5 +77,7 @@ export const ICONS: IconTypeMap = {
   'chevron-up': ChevronUp,
   'plus-icon': PlusIcon,
   references: ReferencesIcon,
-  trash: Trash
+  trash: Trash,
+  rwaka: RwakaIcon,
+  'rwaka-chat': RwakaChatIcon
 }

@@ -36,6 +36,8 @@ export type IconType =
   | 'plus-icon'
   | 'references'
   | 'trash'
+  | 'rwaka'
+  | 'rwaka-chat'
 
 export interface IconProps {
   type: IconType
