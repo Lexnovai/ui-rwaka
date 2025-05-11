@@ -108,14 +108,15 @@ const Sidebar = () => {
       {isMobile && isCollapsed && (
         <button
           onClick={() => setIsCollapsed(false)}
-          className="fixed left-2 top-2 z-40 p-2"
+          className="fixed left-2 top-2 z-40 p-2 bg-background-secondary rounded-md shadow mb-16 sm:mb-0"
           aria-label="Expand sidebar"
         >
           <Icon type="sheet" size="xs" className="rotate-180" />
         </button>
       )}
 
-      {(!isMobile || !isCollapsed) && isMounted && (
+
+      {(!isMobile || (isMobile && !isCollapsed)) && isMounted && (
         <motion.aside
           className="font-dmmono bg-background-secondary fixed left-0 top-0 z-40 flex h-screen w-[16rem] flex-shrink-0 flex-col overflow-hidden px-2 py-3"
           initial={{ width: '16rem' }}
