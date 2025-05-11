@@ -95,7 +95,7 @@ const Sidebar = () => {
     <>
       {isMobile && !isCollapsed && (
         <div
-          className=" fixed inset-0 z-30 sm:hidden"
+          className="fixed inset-0 z-30 sm:hidden"
           onClick={() => setIsCollapsed(true)}
         />
       )}
@@ -112,7 +112,7 @@ const Sidebar = () => {
 
       {(!isMobile || (isMobile && !isCollapsed)) && isMounted && (
         <motion.aside
-          className="font-dmmono bg-background-secondary fixed left-0 top-0 z-40 flex h-screen w-[16rem] flex-shrink-0 flex-col overflow-hidden px-2 py-3"
+          className="font-dmmono bg-background-secondary fixed left-0 top-0 z-40 flex h-screen w-[16rem] flex-shrink-0 flex-col px-2 py-3"
           initial={{ width: '16rem' }}
           animate={{ width: isCollapsed ? '2.3rem' : '16rem' }}
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
