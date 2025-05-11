@@ -101,7 +101,7 @@ const Sidebar = () => {
     <>
       {isMobile && !isCollapsed && (
         <div
-          className="bg-background-secondary fixed inset-0 z-30 sm:hidden"
+          className=" fixed inset-0 z-30 sm:hidden"
           onClick={() => setIsCollapsed(true)}
         />
       )}
