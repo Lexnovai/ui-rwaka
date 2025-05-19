@@ -141,13 +141,13 @@ const ChatBlankState = () => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="text-2xl font-[600] tracking-tight sm:text-3xl"
+          className="px-4 text-xl font-[600] tracking-tight sm:text-2xl md:text-3xl"
         >
-          <div className="mb-2 flex items-center justify-center gap-x-5 whitespace-nowrap font-medium">
+          <div className="mb-2 flex flex-wrap justify-center gap-x-3 text-base font-medium sm:text-lg md:text-xl">
             <p className="flex items-center font-[600]">Designed to assist</p>
             {matchedCategory?.name === 'USERS LEGAL EXPERT' ? (
               <>
-                <span className="relative inline-flex h-[40px] w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-xl bg-white hover:scale-[1.05]">
+                <span className="relative mt-3 inline-flex h-[40px] min-w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-xl bg-white px-3 text-sm font-semibold text-black hover:scale-[1.05] sm:mt-0 md:text-lg">
                   <AnimatePresence mode="wait">
                     <motion.span
                       key={USER_ROLES[currentRoleIndex]}
@@ -167,19 +167,21 @@ const ChatBlankState = () => {
                 </span>
               </>
             ) : (
-              <span className="relative inline-flex h-[40px] w-fit cursor-pointer items-center justify-center overflow-hidden rounded-xl bg-white px-4 text-[22px] font-bold text-black hover:scale-[1.05]">
-                {matchedCategory?.name?.toLowerCase()}s
+              <span className="relative inline-flex h-[40px] w-fit cursor-pointer items-center justify-center overflow-hidden rounded-xl bg-white px-4 text-[12px] font-bold text-black hover:scale-[1.05] md:text-[15px] lg:text-[18px]">
+                {matchedCategory?.name}S
               </span>
             )}
           </div>
-          <div className="mt-4 text-center text-[16px]">
-            <p>
+          <div className="mx-auto mt-4 flex w-full max-w-lg flex-col gap-3 px-4 text-center text-[15px] leading-tight sm:text-[16px]">
+            <p className="align-top">
               Can:{' '}
-              <span className="font-light">{matchedCategory?.ability.can}</span>
+              <span className="align-top font-light">
+                {matchedCategory?.ability.can}
+              </span>
             </p>
-            <p>
+            <p className="align-top">
               Can not:{' '}
-              <span className="font-light">
+              <span className="align-top font-light">
                 {matchedCategory?.ability.cannot}
               </span>
             </p>
@@ -190,13 +192,13 @@ const ChatBlankState = () => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.5 }}
-          className="relative flex flex-wrap justify-center gap-3"
+          className="relative flex w-full flex-wrap justify-center gap-3 px-4"
         >
           <ActionButton
             key={matchedCategory?.name}
             variant="primary"
             text={
-              <div className="flex items-center gap-2">
+              <div className="items-centert flex gap-2 text-sm">
                 <span>VIEW SAMPLE {matchedCategory?.name} QUESTIONS</span>
                 <ChevronDown />
               </div>
@@ -207,10 +209,10 @@ const ChatBlankState = () => {
           {activeCategory && (
             <div
               ref={dropdownRef}
-              className="border-border top-full z-10 mt-4 w-full rounded-xl border bg-neutral-900 p-3 shadow-xl sm:absolute"
+              className="border-border top-full z-10 mt-4 w-full rounded-xl border bg-neutral-900 p-3 shadow-xl sm:absolute sm:left-1/2 sm:-translate-x-1/2"
             >
               {matchedCategory && (
-                <div className="mx-auto mt-4 w-full max-w-2xl">
+                <div className="mx-auto max-h-60 w-full max-w-2xl space-y-2 overflow-y-auto">
                   {matchedCategory.questions.map((q, idx) => (
                     <button
                       key={idx}
