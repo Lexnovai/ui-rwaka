@@ -143,11 +143,11 @@ const ChatBlankState = () => {
           transition={{ duration: 0.5, delay: 0.3 }}
           className="px-4 text-xl font-[600] tracking-tight sm:text-2xl md:text-3xl"
         >
-          <div className="mb-2 flex flex-wrap justify-center gap-x-3 text-base font-medium sm:text-lg md:text-xl">
+          <div className="mb-2 flex flex-wrap justify-center gap-x-3 text-base font-medium sm:text-xl md:text-2xl">
             <p className="flex items-center font-[600]">Designed to assist</p>
             {matchedCategory?.name === 'USERS LEGAL EXPERT' ? (
               <>
-                <span className="relative mt-3 inline-flex h-[40px] min-w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-xl bg-white px-3 text-sm font-semibold text-black hover:scale-[1.05] sm:mt-0 md:text-lg">
+                <span className="relative inline-flex h-[40px] min-w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-xl bg-white px-3 text-sm font-semibold text-black hover:scale-[1.05] md:text-lg">
                   <AnimatePresence mode="wait">
                     <motion.span
                       key={USER_ROLES[currentRoleIndex]}
@@ -167,7 +167,7 @@ const ChatBlankState = () => {
                 </span>
               </>
             ) : (
-              <span className="relative inline-flex h-[40px] w-fit cursor-pointer items-center justify-center overflow-hidden rounded-xl bg-white px-4 text-[12px] font-bold text-black hover:scale-[1.05] md:text-[15px] lg:text-[18px]">
+              <span className="relative inline-flex h-[40px] w-fit cursor-pointer items-center justify-center overflow-hidden rounded-xl bg-white px-4 text-[12px] font-bold text-black hover:scale-[1.05] md:text-[13px] lg:text-[16px]">
                 {matchedCategory?.name}S
               </span>
             )}
