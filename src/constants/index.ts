@@ -1,48 +1,80 @@
-import { Briefcase, ClipboardCheck, LandPlot, Users2 } from 'lucide-react'
-
 export const LEGAL_CATEGORIES = [
   {
-    name: 'Property',
-    icon: LandPlot,
+    name: 'CRIMINAL LAW EXPERT',
+    ability: {
+      can: 'Interpret and explain Rwandan criminal statutes, penalties, and defenses',
+      cannot: 'Advise on civil, tax, land, or procedural drafting'
+    },
     questions: [
-      'How do I transfer land ownership in Rwanda?',
-      'Can I buy land as a foreigner?',
-      'What is the process for land registration?',
-      'How do I resolve a land boundary dispute?',
-      'How can I verify a land title?'
+      'What defenses exist for homicide under Rwandan law?',
+      'Describe penalties for theft and robbery in Rwanda'
     ]
   },
   {
-    name: 'Family',
-    icon: Users2,
+    name: 'CIVIL LAW EXPERT',
+    ability: {
+      can: 'Explain obligations, contracts, property, family and inheritance law in Rwanda',
+      cannot: 'Handle criminal, tax, or land-specific policy'
+    },
     questions: [
-      'What are the legal grounds for divorce in Rwanda?',
-      'How is child custody determined?',
-      'What rights does a spouse have after separation?',
-      'Can a traditional marriage be legally recognized?',
-      'What’s the process for child support claims?'
+      'How is divorce processed under Rwandan law?',
+      'What are the formal requirements for a valid contract in Rwanda?'
     ]
   },
   {
-    name: 'Business',
-    icon: Briefcase,
+    name: 'LAND LAW EXPERT',
+    ability: {
+      can: 'Detail Rwandan land policy, use planning, registration, consolidation, and conflict resolution.',
+      cannot: 'Cover tax, criminal, or civil law beyond land issues'
+    },
     questions: [
-      'How do I register a business in Rwanda?',
-      'Can a foreigner own a business in Rwanda?',
-      'What licenses are needed to start a shop?',
-      'What taxes must a new business pay?',
-      'How do I protect my business name or logo?'
+      'What steps are required to register a land title?',
+      'Explain the land consolidation process in rural Rwanda.'
     ]
   },
   {
-    name: 'Employment',
-    icon: ClipboardCheck,
+    name: 'COURT SUBMISSIONS EXPERT',
+    ability: {
+      can: 'Draft complaints, motions, and other court filings under Rwandan civil procedure',
+      cannot: 'Offer strategy or negotiate settlements'
+    },
     questions: [
-      'What must be included in an employment contract?',
-      'Can I be fired without warning?',
-      'What are my rights during maternity leave?',
-      'Is verbal termination of a job legal?',
-      'How do I file a complaint against an employer?'
+      'Draft a summons for unpaid debt recovery',
+      'Prepare a motion to compel discovery'
+    ]
+  },
+  {
+    name: 'CONTRACT ANALYSIS EXPERT',
+    ability: {
+      can: 'Review and draft employment contracts under Rwandan labor law; identify risks',
+      cannot: 'Handle non-employment contracts like land or taxation'
+    },
+    questions: [
+      'Identify compliance issues in this employment agreement.',
+      "Draft a probation clause under Rwanda's labor law."
+    ]
+  },
+  {
+    name: 'RRA EXPERT',
+    ability: {
+      can: 'Advise on Rwanda Revenue Authority regulations—VAT, income tax, customs, and compliance',
+      cannot: 'Address non-tax matters'
+    },
+    questions: [
+      'How do I file VAT returns with the RRA?',
+      'What is the individual income tax rate for residents?'
+    ]
+  },
+  {
+    name: 'USERS LEGAL EXPERT',
+    ability: {
+      can: 'Answer general legal questions across multiple domains based on the knowledge',
+      cannot:
+        'Provide highly specialized guidance; will state when info is unavailable.'
+    },
+    questions: [
+      'What are theft and robbery penalties in Rwanda?',
+      'How is divorce processed in Rwanda?'
     ]
   }
 ]

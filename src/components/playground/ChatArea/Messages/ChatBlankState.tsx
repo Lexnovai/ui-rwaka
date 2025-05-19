@@ -3,6 +3,12 @@
 import Link from 'next/link'
 import { motion, Variants, AnimatePresence } from 'framer-motion'
 import React, { useEffect, useRef, useState } from 'react'
+import { toast } from 'sonner'
+import { LEGAL_CATEGORIES } from '@/constants'
+import { ChevronDown, ExternalLink } from 'lucide-react'
+import useAIChatStreamHandler from '@/hooks/useAIStreamHandler'
+import { usePlaygroundStore } from '@/store'
+import { useSearchParams } from 'next/navigation'
 
 const USER_ROLES = [
   'Lawyers',
@@ -14,43 +20,50 @@ const USER_ROLES = [
   'Mediators'
 ]
 
-// interface ActionButtonProps {
-//   href?: string
-//   variant?: 'primary'
-//   text: React.ReactNode
-//   isFocused?: boolean
-//   onClick?: () => void
-//   onFocus?: () => void
-// }
+interface ActionButtonProps {
+  href?: string
+  variant?: 'primary'
+  text: React.ReactNode
+  isFocused?: boolean
+  onClick?: () => void
+  onFocus?: () => void
+}
 
-// const ActionButton = ({
-//   variant,
-//   text,
-//   isFocused,
-//   onClick,
-//   onFocus
-// }: ActionButtonProps) => {
-//   const baseStyles =
-//     'px-4 py-2 text-sm transition-colors font-dmmono tracking-tight'
-//   const variantStyles = {
-//     primary: 'border border-border hover:bg-neutral-800 rounded-xl'
-//   }
+const ActionButton = ({
+  variant,
+  text,
+  isFocused,
+  onClick,
+  onFocus
+}: ActionButtonProps) => {
+  const baseStyles =
+    'px-4 py-2 text-sm transition-colors font-dmmono tracking-tight'
+  const variantStyles = {
+    primary: 'border border-border hover:bg-neutral-800 rounded-xl'
+  }
 
-//   return (
-//     <button
-//       onClick={onClick}
-//       onFocus={onFocus}
-//       className={`${baseStyles} ${variant ? variantStyles[variant] : ''} ${isFocused ? 'bg-neutral-800' : ''}`}
-//     >
-//       {text}
-//     </button>
-//   )
-// }
+  return (
+    <button
+      onClick={onClick}
+      onFocus={onFocus}
+      className={`${baseStyles} ${variant ? variantStyles[variant] : ''} ${isFocused ? 'bg-neutral-800' : ''}`}
+    >
+      {text}
+    </button>
+  )
+}
 
 const ChatBlankState = () => {
-  // const { handleStreamResponse } = useAIChatStreamHandler()
+  const { handleStreamResponse } = useAIChatStreamHandler()
   const [currentRoleIndex, setCurrentRoleIndex] = useState(0)
-  const [, setActiveCategory] = useState<string | null>(null)
+  const [activeCategory, setActiveCategory] = useState<string | null>(null)
+  const { agents } = usePlaygroundStore()
+  const searchParams = useSearchParams()
+  const agentId = searchParams.get('agent')
+  const agentLabel = agents.find((a) => a.value === agentId)?.label
+  const matchedCategory = LEGAL_CATEGORIES.find(
+    (category) => category.name.toLowerCase() === agentLabel?.toLowerCase()
+  )
 
   const dropdownRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
@@ -82,17 +95,17 @@ const ChatBlankState = () => {
     exit: { y: -20, opacity: 0 }
   }
 
-  // const handleQuery = async (query: string) => {
-  //   try {
-  //     await handleStreamResponse(query)
-  //   } catch (error) {
-  //     toast.error(
-  //       `Error in handling query: ${
-  //         error instanceof Error ? error.message : String(error)
-  //       }`
-  //     )
-  //   }
-  // }
+  const handleQuery = async (query: string) => {
+    try {
+      await handleStreamResponse(query)
+    } catch (error) {
+      toast.error(
+        `Error in handling query: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      )
+    }
+  }
 
   return (
     <section
@@ -128,77 +141,96 @@ const ChatBlankState = () => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="text-2xl font-[600] tracking-tight sm:text-3xl"
+          className="px-4 text-xl font-[600] tracking-tight sm:text-2xl md:text-3xl"
         >
-          <div className="mb-2 flex items-center justify-center gap-x-5 whitespace-nowrap font-medium">
+          <div className="mb-2 flex flex-wrap justify-center gap-x-3 text-base font-medium sm:text-xl md:text-2xl">
             <p className="flex items-center font-[600]">Designed to assist</p>
-            <span className="relative inline-flex h-[40px] w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-xl bg-white hover:scale-[1.05]">
-              <AnimatePresence mode="wait">
-                <motion.span
-                  key={USER_ROLES[currentRoleIndex]}
-                  className="absolute rounded-md px-3 py-1 text-xl font-semibold text-black"
-                  style={{ transform: 'skewX(-6deg)' }}
-                  variants={roleVariants}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  transition={{ duration: 0.4 }}
-                >
-                  <span style={{ transform: 'skewX(6deg)' }}>
-                    {USER_ROLES[currentRoleIndex]}
-                  </span>
-                </motion.span>
-              </AnimatePresence>
-            </span>
+            {matchedCategory?.name === 'USERS LEGAL EXPERT' ? (
+              <>
+                <span className="relative inline-flex h-[40px] min-w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-xl bg-white px-3 text-sm font-semibold text-black hover:scale-[1.05] md:text-lg">
+                  <AnimatePresence mode="wait">
+                    <motion.span
+                      key={USER_ROLES[currentRoleIndex]}
+                      className="absolute rounded-md px-3 py-1 text-xl font-semibold text-black"
+                      style={{ transform: 'skewX(-6deg)' }}
+                      variants={roleVariants}
+                      initial="initial"
+                      animate="animate"
+                      exit="exit"
+                      transition={{ duration: 0.4 }}
+                    >
+                      <span style={{ transform: 'skewX(6deg)' }}>
+                        {USER_ROLES[currentRoleIndex]}
+                      </span>
+                    </motion.span>
+                  </AnimatePresence>
+                </span>
+              </>
+            ) : (
+              <span className="relative inline-flex h-[40px] w-fit cursor-pointer items-center justify-center overflow-hidden rounded-xl bg-white px-4 text-[12px] font-bold text-black hover:scale-[1.05] md:text-[13px] lg:text-[16px]">
+                {matchedCategory?.name}S
+              </span>
+            )}
           </div>
-          <p>Curious? Kick off with your first question!</p>
+          <div className="mx-auto mt-4 flex w-full max-w-lg flex-col gap-3 px-4 text-center text-[15px] leading-tight sm:text-[16px]">
+            <p className="align-top">
+              Can:{' '}
+              <span className="align-top font-light">
+                {matchedCategory?.ability.can}
+              </span>
+            </p>
+            <p className="align-top">
+              Can not:{' '}
+              <span className="align-top font-light">
+                {matchedCategory?.ability.cannot}
+              </span>
+            </p>
+          </div>
         </motion.h1>
 
-        {/* <motion.div
+        <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.5 }}
-          className="relative flex flex-wrap justify-center gap-3"
+          className="relative flex w-full flex-wrap justify-center gap-3 px-4"
         >
-          {LEGAL_CATEGORIES.map(({ name, icon: Icon }) => (
-            <ActionButton
-              key={name}
-              variant="primary"
-              text={
-                <div className="flex items-center gap-2">
-                  <Icon size={16} />
-                  <span>{name}</span>
-                </div>
-              }
-              onClick={() =>
-                setActiveCategory((prev) => (prev === name ? null : name))
-              }
-            />
-          ))}
+          <ActionButton
+            key={matchedCategory?.name}
+            variant="primary"
+            text={
+              <div className="items-centert flex gap-2 text-sm">
+                <span>VIEW SAMPLE {matchedCategory?.name} QUESTIONS</span>
+                <ChevronDown />
+              </div>
+            }
+            onClick={() => setActiveCategory(matchedCategory?.name ?? null)}
+          />
 
           {activeCategory && (
             <div
               ref={dropdownRef}
-              className="border-border top-full z-10 mt-4 w-full rounded-xl border bg-neutral-900 p-4 shadow-xl sm:absolute"
+              className="border-border top-full z-10 mt-4 w-full rounded-xl border bg-neutral-900 p-3 shadow-xl sm:absolute sm:left-1/2 sm:-translate-x-1/2"
             >
-              {LEGAL_CATEGORIES.find(
-                (c) => c.name === activeCategory
-              )?.questions.map((q, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => handleQuery(q)}
-                  className="group relative flex w-full items-center justify-between rounded px-3 py-2 text-left text-sm text-gray-200 hover:bg-neutral-800"
-                >
-                  <span>{q}</span>
-                  <ExternalLink
-                    className="text-gray-400 opacity-0 transition-opacity group-hover:opacity-100"
-                    size={16}
-                  />
-                </button>
-              ))}
+              {matchedCategory && (
+                <div className="mx-auto max-h-60 w-full max-w-2xl space-y-2 overflow-y-auto">
+                  {matchedCategory.questions.map((q, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => handleQuery(q)}
+                      className="group relative flex w-full items-center justify-between rounded px-3 py-2 text-left text-sm text-gray-200 hover:bg-neutral-800"
+                    >
+                      <span>{q}</span>
+                      <ExternalLink
+                        className="text-gray-400 opacity-0 transition-opacity group-hover:opacity-100"
+                        size={16}
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           )}
-        </motion.div> */}
+        </motion.div>
       </div>
     </section>
   )
