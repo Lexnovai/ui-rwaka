@@ -172,7 +172,7 @@ const ChatBlankState = () => {
               </span>
             )}
           </div>
-          <div className="mx-auto mt-4 flex w-full max-w-lg flex-col gap-3 px-4 text-center text-[15px] leading-tight sm:text-[16px]">
+          <div className="mt-4 flex w-full flex-col gap-3 px-4 text-center text-[15px] leading-tight sm:text-[16px]">
             <p className="align-top">
               Can:{' '}
               <span className="align-top font-light">
