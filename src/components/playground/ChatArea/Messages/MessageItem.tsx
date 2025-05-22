@@ -1,3 +1,5 @@
+'use client'
+
 import Icon from '@/components/ui/icon'
 import MarkdownRenderer from '@/components/ui/typography/MarkdownRenderer'
 import { usePlaygroundStore } from '@/store'
@@ -5,8 +7,12 @@ import type { PlaygroundChatMessage } from '@/types/playground'
 import Videos from './Multimedia/Videos'
 import Images from './Multimedia/Images'
 import Audios from './Multimedia/Audios'
-import { memo } from 'react'
+import { memo, useState } from 'react'
 import AgentThinkingLoader from './AgentThinkingLoader'
+import { Check, ClipboardCheck, Copy } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import useAIChatStreamHandler from '@/hooks/useAIStreamHandler'
+import { toast } from 'sonner'
 
 interface MessageProps {
   message: PlaygroundChatMessage
@@ -14,6 +20,8 @@ interface MessageProps {
 
 const AgentMessage = ({ message }: MessageProps) => {
   const { streamingErrorMessage } = usePlaygroundStore()
+  const { handleStreamResponse } = useAIChatStreamHandler()
+
   let messageContent
   if (message.streamingError) {
     messageContent = (
@@ -67,13 +75,53 @@ const AgentMessage = ({ message }: MessageProps) => {
       </div>
     )
   }
+  const [copied, setCopied] = useState(false)
+  const handleCopy = () => {
+    navigator.clipboard.writeText(message.content).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
+  }
 
+  const handleSummarize = async () => {
+    try {
+      await handleStreamResponse('Summarize')
+    } catch (error) {
+      toast.error(
+        `Error in handleSubmit: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      )
+    }
+  }
   return (
     <div className="font-geist flex flex-row items-start gap-4">
       <div className="rounded-md bg-[#49EA99]/90 p-0.5">
-      <Icon type="rwaka-chat" size="sm" />
+        <Icon type="rwaka-chat" size="sm" />
       </div>
-      {messageContent}
+      <div className="flex flex-col gap-2">
+        {messageContent}
+        <div className="mt-3 flex flex-row gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-border flex items-center gap-1 rounded-xl border text-sm"
+            onClick={handleCopy}
+          >
+            {copied ? <Check /> : <Copy />}
+            {copied ? 'Copied' : 'Copy'}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-border rounded-xl border text-sm"
+            onClick={handleSummarize}
+          >
+            <ClipboardCheck />
+            Summarize
+          </Button>
+        </div>
+      </div>
     </div>
   )
 }
