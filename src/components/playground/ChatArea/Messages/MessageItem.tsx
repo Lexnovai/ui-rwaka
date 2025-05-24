@@ -76,6 +76,11 @@ const AgentMessage = ({ message }: MessageProps) => {
     )
   }
   const [copied, setCopied] = useState(false)
+
+  const loading =
+    (!message.content && !message.streamingError) ||
+    (message.response_audio && !message.response_audio.transcript)
+
   const handleCopy = () => {
     navigator.clipboard.writeText(message.content).then(() => {
       setCopied(true)
@@ -107,6 +112,7 @@ const AgentMessage = ({ message }: MessageProps) => {
             size="sm"
             className="border-border flex items-center gap-1 rounded-xl border text-sm"
             onClick={handleCopy}
+            disabled={loading}
           >
             {copied ? <Check /> : <Copy />}
             {copied ? 'Copied' : 'Copy'}
@@ -116,6 +122,7 @@ const AgentMessage = ({ message }: MessageProps) => {
             size="sm"
             className="border-border rounded-xl border text-sm"
             onClick={handleSummarize}
+            disabled={loading}
           >
             <ClipboardCheck />
             Summarize
