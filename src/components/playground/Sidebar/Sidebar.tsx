@@ -19,9 +19,11 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Ellipsis, LogOut, UserCircle } from 'lucide-react'
 import useIsMobile from '@/hooks/useIsMobile'
+import { UserProfile } from '@/interface/profile'
+import { toast } from 'sonner'
+import { getProfile } from '@/service/profile.service'
 const SidebarHeader = () => (
-<Icon type="rwaka" size="default" className="w-48"/>
-
+  <Icon type="rwaka" size="default" className="w-48" />
 )
 
 const NewChatButton = ({
@@ -91,6 +93,21 @@ const Sidebar = () => {
     clearChat()
     focusChatInput()
   }
+  const [profile, setProfile] = useState<UserProfile | null>(null)
+
+  useEffect(() => {
+    toast.promise(getProfile(), {
+      loading: 'Loading profile...',
+      success: (res) => {
+        setProfile(res.data)
+        return 'Profile loaded!'
+      },
+      error: (err) => {
+        if (err.response.data.message) return err.response.data.message
+        return 'Error Signing up!'
+      }
+    })
+  }, [])
   return (
     <>
       {isMobile && !isCollapsed && (
@@ -102,13 +119,12 @@ const Sidebar = () => {
       {isMobile && isCollapsed && (
         <button
           onClick={() => setIsCollapsed(false)}
-          className="fixed left-2 top-2 z-40 p-2 bg-background-secondary rounded-md shadow mb-16 sm:mb-0"
+          className="bg-background-secondary fixed left-2 top-2 z-40 mb-16 rounded-md p-2 shadow sm:mb-0"
           aria-label="Expand sidebar"
         >
           <Icon type="sheet" size="xs" className="rotate-180" />
         </button>
       )}
-
 
       {(!isMobile || (isMobile && !isCollapsed)) && isMounted && (
         <motion.aside
@@ -179,15 +195,15 @@ const Sidebar = () => {
             )}
           </motion.div>
           {!isCollapsed && (
-            <motion.div className="fixed bottom-3 flex w-60 items-center justify-between">
+            <motion.div className="bg-background bottom-3 flex w-60 items-center justify-between bg-fixed">
               <div className="flex items-center gap-2">
                 <UserCircle size={24} />
                 <div className="flex flex-col">
                   <div className="text-secondary-foreground text-[12px] font-semibold">
-                    John Doe
+                    {profile?.name}
                   </div>
                   <div className="text-accent-foreground text-[10px]">
-                    Attorney
+                    {profile?.email}
                   </div>
                 </div>
               </div>

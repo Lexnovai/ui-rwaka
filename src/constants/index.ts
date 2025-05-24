@@ -76,5 +76,27 @@ export const LEGAL_CATEGORIES = [
       'What are theft and robbery penalties in Rwanda?',
       'How is divorce processed in Rwanda?'
     ]
+  },
+  {
+    name: 'JURIST LEGAL EXPERT',
+    ability: {
+      can: 'Research broad legal doctrines from statutes, case law, and commentary.',
+      cannot: 'Provide deep specialist focus (use domain experts instead).'
+    },
+    questions: [
+      'List key environmental protection laws in Rwanda',
+      'What does Article 189 of the Penal Code state?'
+    ]
+  },
+  {
+    name: 'COMPANY LAW EXPERT',
+    ability: {
+      can: 'Research broad legal doctrines from statutes, case law, and commentary.',
+      cannot: 'Provide deep specialist focus (use domain experts instead).'
+    },
+    questions: [
+      'List key environmental protection laws in Rwanda',
+      'What does Article 189 of the Penal Code state?'
+    ]
   }
 ]
