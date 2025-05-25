@@ -88,7 +88,7 @@ export const usePlaygroundStore = create<PlaygroundStore>()(
       hasStorage: false,
       setHasStorage: (hasStorage) => set(() => ({ hasStorage })),
       chatInputRef: { current: null },
-      selectedEndpoint: 'https://chatapi.rwaka.rw',
+      selectedEndpoint: process.env.NEXT_PUBLIC_BACKEND_API_URL ?? '',
       setSelectedEndpoint: (selectedEndpoint) =>
         set(() => ({ selectedEndpoint })),
       agents: [],
