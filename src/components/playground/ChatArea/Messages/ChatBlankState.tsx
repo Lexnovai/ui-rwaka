@@ -59,7 +59,7 @@ const ChatBlankState = () => {
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
   const { agents } = usePlaygroundStore()
   const searchParams = useSearchParams()
-  const agentId = searchParams.get('agent')
+  const agentId = searchParams?.get('agent')
   const agentLabel = agents.find((a) => a.value === agentId)?.label
   const matchedCategory = LEGAL_CATEGORIES.find(
     (category) => category.name.toLowerCase() === agentLabel?.toLowerCase()

@@ -1,7 +1,0 @@
-import a from 'axios'
-
-const axios = a.create({
-  baseURL: process.env.NEXT_PUBLIC_BACKEND_API_URL
-})
-
-export default axios
