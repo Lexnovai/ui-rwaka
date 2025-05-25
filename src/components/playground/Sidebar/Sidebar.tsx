@@ -195,7 +195,7 @@ const Sidebar = () => {
             )}
           </motion.div>
           {!isCollapsed && (
-            <motion.div className="bg-background bottom-3 flex w-60 items-center justify-between bg-fixed">
+            <motion.div className="bottom-3 flex w-60 items-center justify-between bg-fixed">
               <div className="flex items-center gap-2">
                 <UserCircle size={24} />
                 <div className="flex flex-col">
