@@ -5,6 +5,7 @@ import {
   type PlaygroundChatMessage,
   type SessionEntry
 } from '@/types/playground'
+import { getBaseUrl } from './lib/getBaseUrl'
 
 interface Agent {
   value: string
@@ -88,7 +89,7 @@ export const usePlaygroundStore = create<PlaygroundStore>()(
       hasStorage: false,
       setHasStorage: (hasStorage) => set(() => ({ hasStorage })),
       chatInputRef: { current: null },
-      selectedEndpoint: '/api/chat/',
+      selectedEndpoint: `${getBaseUrl()}/api/proxy/chat`,
       setSelectedEndpoint: (selectedEndpoint) =>
         set(() => ({ selectedEndpoint })),
       agents: [],
