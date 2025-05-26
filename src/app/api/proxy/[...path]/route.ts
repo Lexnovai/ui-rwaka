@@ -27,18 +27,22 @@ async function handle(req: NextRequest, path: string[]) {
   })
 
   const responseBody = await backendRes.text()
-  const resHeaders = new Headers()
-  backendRes.headers.forEach((value, key) => {
-    if (key.toLowerCase() === 'set-cookie') {
-      resHeaders.append('set-cookie', value)
-    } else {
-      resHeaders.set(key, value)
-    }
-  })
+
   const response = new NextResponse(responseBody, {
-    status: backendRes.status,
-    headers: backendRes.headers
+    status: backendRes.status
   })
+
+  const setCookie = backendRes.headers.getSetCookie?.()
+  if (setCookie) {
+    // Can be string or array
+    if (Array.isArray(setCookie)) {
+      setCookie.forEach((cookie) =>
+        response.headers.append('Set-Cookie', cookie)
+      )
+    } else {
+      response.headers.set('Set-Cookie', setCookie)
+    }
+  }
 
   return response
 }
