@@ -26,8 +26,14 @@ async function handle(req: NextRequest, path: string[]) {
     credentials: 'include'
   })
 
-  const data = await backendRes.json()
-  return NextResponse.json(data, { status: backendRes.status })
+  const responseBody = await backendRes.text()
+
+  const response = new NextResponse(responseBody, {
+    status: backendRes.status,
+    headers: backendRes.headers
+  })
+
+  return response
 }
 
 export async function GET(
