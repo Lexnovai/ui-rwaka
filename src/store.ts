@@ -5,7 +5,6 @@ import {
   type PlaygroundChatMessage,
   type SessionEntry
 } from '@/types/playground'
-import { getBaseUrl } from './lib/getBaseUrl'
 
 interface Agent {
   value: string
