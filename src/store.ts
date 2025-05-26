@@ -89,7 +89,7 @@ export const usePlaygroundStore = create<PlaygroundStore>()(
       hasStorage: false,
       setHasStorage: (hasStorage) => set(() => ({ hasStorage })),
       chatInputRef: { current: null },
-      selectedEndpoint: `${getBaseUrl()}/api/proxy/chat`,
+      selectedEndpoint: `https://ask.rwaka.rw/api/proxy/chat`,
       setSelectedEndpoint: (selectedEndpoint) =>
         set(() => ({ selectedEndpoint })),
       agents: [],
