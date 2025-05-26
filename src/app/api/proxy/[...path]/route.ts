@@ -25,19 +25,9 @@ async function handle(req: NextRequest, path: string[]) {
     body,
     credentials: 'include'
   })
-  const resHeaders = new Headers()
-  backendRes.headers.forEach((value, key) => {
-    if (key.toLowerCase() === 'set-cookie') {
-      resHeaders.append('set-cookie', value)
-    } else {
-      resHeaders.set(key, value)
-    }
-  })
+
   const data = await backendRes.json()
-  return NextResponse.json(data, {
-    status: backendRes.status,
-    headers: resHeaders
-  })
+  return NextResponse.json(data, { status: backendRes.status })
 }
 
 export async function GET(

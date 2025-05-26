@@ -110,10 +110,17 @@ export const usePlaygroundStore = create<PlaygroundStore>()(
     {
       name: 'endpoint-storage',
       storage: createJSONStorage(() => localStorage),
+      // onRehydrateStorage: () => (state) => {
+      //   state?.setHydrated?.()
+      // },
       partialize: (state) => ({
         selectedEndpoint: state.selectedEndpoint
       }),
       onRehydrateStorage: () => (state) => {
+        if (state?.selectedEndpoint?.includes('chatapi.rwaka.rw')) {
+          state.setSelectedEndpoint('https://ask.rwaka.rw/api/proxy/chat')
+        }
+
         state?.setHydrated?.()
       }
     }
