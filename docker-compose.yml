@@ -1,5 +1,5 @@
-version: "3"
- 
+version: '3'
+
 services:
   next-app:
     build:
@@ -7,17 +7,17 @@ services:
       dockerfile: Dockerfile
     restart: always
     ports:
-      - 3017
+      - 3019
     volumes:
       - ./public:/public
     networks:
       - dokploy-network
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.lunaroot.rule=Host(`ask.rwaka.rw`)"
-      - "traefik.http.routers.lunaroot.entrypoints=websecure"
-      - "traefik.http.routers.lunaroot.tls.certResolver=letsencrypt"
-      - "traefik.http.services.lunaroot.loadbalancer.server.port=3017"
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.lunaroot.rule=Host(`search.rwaka.rw`)'
+      - 'traefik.http.routers.lunaroot.entrypoints=websecure'
+      - 'traefik.http.routers.lunaroot.tls.certResolver=letsencrypt'
+      - 'traefik.http.services.lunaroot.loadbalancer.server.port=3019'
 
 networks:
   dokploy-network:
