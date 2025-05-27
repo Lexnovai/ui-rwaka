@@ -102,12 +102,12 @@ const Sidebar = () => {
       loading: 'Loading profile...',
       success: (res) => {
         console.log('Profile success:', res)
-        setProfile(res.data)
+        setProfile(res.payload)
         return 'Profile loaded!'
       },
       error: (err) => {
         console.error('Profile error:', err)
-        return err.response?.data?.message || 'Error loading profile!'
+        return err.response?.message || 'Error loading profile!'
       }
     })
   }, [])
