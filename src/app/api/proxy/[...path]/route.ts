@@ -9,6 +9,11 @@ async function handle(req: NextRequest, path: string[]) {
     'Content-Type': 'application/json'
   }
 
+  const token = req.nextUrl.searchParams.get('token')
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`
+  }
+
   const auth = req.headers.get('authorization')
   if (auth) headers['Authorization'] = auth
 
