@@ -42,3 +42,12 @@ export const getJsonMarkdown = (content: object = {}) => {
 
   return jsonBlock
 }
+
+export function getAuthToken(): string | null {
+  if (typeof window === 'undefined') return null
+  const params = new URLSearchParams(window.location.search)
+  const token = params.get('token')
+  if (token) return token
+
+  return localStorage.getItem('accessToken')
+}
