@@ -9,8 +9,12 @@ import { constructEndpointUrl } from '@/lib/constructEndpointUrl'
 import useAIResponseStream from './useAIResponseStream'
 import { ToolCall } from '@/types/playground'
 import { useQueryState } from 'nuqs'
-import { getAuthToken, getJsonMarkdown } from '@/lib/utils'
+import { getJsonMarkdown } from '@/lib/utils'
 
+/**
+ * useAIChatStreamHandler is responsible for making API calls and handling the stream response.
+ * For now, it only streams message content and updates the messages state.
+ */
 const useAIChatStreamHandler = () => {
   const setMessages = usePlaygroundStore((state) => state.setMessages)
   const { addMessage, focusChatInput } = useChatActions()
@@ -37,10 +41,14 @@ const useAIChatStreamHandler = () => {
   }, [setMessages])
 
   const handleStreamResponse = useCallback(
-    async (input: string) => {
+    async (input: string | FormData) => {
       setIsStreaming(true)
 
-      const message = input
+      const formData = input instanceof FormData ? input : new FormData()
+      if (typeof input === 'string') {
+        formData.append('message', input)
+      }
+
       setMessages((prevMessages) => {
         if (prevMessages.length >= 2) {
           const lastMessage = prevMessages[prevMessages.length - 1]
@@ -58,7 +66,7 @@ const useAIChatStreamHandler = () => {
 
       addMessage({
         role: 'user',
-        content: message,
+        content: formData.get('message') as string,
         created_at: Math.floor(Date.now() / 1000)
       })
 
@@ -74,27 +82,19 @@ const useAIChatStreamHandler = () => {
       let newSessionId = sessionId
       try {
         const endpointUrl = constructEndpointUrl(selectedEndpoint)
-        if (!agentId) return
 
+        if (!agentId) return
         const playgroundRunUrl = APIRoutes.AgentRun(endpointUrl).replace(
           '{agent_id}',
           agentId
         )
 
-        const token = getAuthToken?.() // if defined
-        const requestBody = {
-          input: message,
-          stream: true,
-          session_id: sessionId ?? ''
-        }
+        formData.append('stream', 'true')
+        formData.append('session_id', sessionId ?? '')
 
         await streamResponse({
           apiUrl: playgroundRunUrl,
-          requestBody,
-          headers: {
-            'Content-Type': 'application/json',
-            ...(token ? { Authorization: `Bearer ${token}` } : {})
-          },
+          requestBody: formData,
           onChunk: (chunk: RunResponse) => {
             if (
               chunk.event === RunEvent.RunStarted ||
@@ -109,7 +109,7 @@ const useAIChatStreamHandler = () => {
               ) {
                 const sessionData = {
                   session_id: chunk.session_id as string,
-                  title: message,
+                  title: formData.get('message') as string,
                   created_at: chunk.created_at
                 }
                 setSessionsData((prevSessionsData) => {

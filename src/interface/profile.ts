@@ -5,5 +5,5 @@ export interface UserProfile {
 }
 export interface ApiResponse<T = void> {
   message: string
-  data: T
+  payload: T
 }
