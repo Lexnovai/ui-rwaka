@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
 import { type RunResponse } from '@/types/playground'
+import apiFetch from '@/api/apiFetch'
 
 /**
  * Processes a single JSON chunk by passing it to the provided callback.
@@ -117,7 +118,7 @@ export default function useAIResponseStream() {
       let buffer = ''
 
       try {
-        const response = await fetch(apiUrl, {
+        const response = await apiFetch(apiUrl, {
           method: 'POST',
           headers: {
             // Set content-type only for non-FormData requests.
@@ -126,10 +127,7 @@ export default function useAIResponseStream() {
             }),
             ...headers
           },
-          body:
-            requestBody instanceof FormData
-              ? requestBody
-              : JSON.stringify(requestBody)
+          body: requestBody instanceof FormData ? requestBody : JSON.stringify(requestBody)
         })
 
         if (!response.ok) {
