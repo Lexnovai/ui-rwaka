@@ -22,11 +22,25 @@ async function handle(req: NextRequest, path: string[]) {
   const backendRes = await fetch(url, {
     method,
     headers,
-    body
+    body,
+    credentials: 'include'
   })
 
-  const data = await backendRes.json()
-  return NextResponse.json(data, { status: backendRes.status })
+  const responseBody = await backendRes.text()
+
+  const resHeaders = new Headers()
+  backendRes.headers.forEach((value, key) => {
+    if (key.toLowerCase() === 'set-cookie') {
+      resHeaders.append('set-cookie', value)
+    } else {
+      resHeaders.set(key, value)
+    }
+  })
+
+  return new NextResponse(responseBody, {
+    status: backendRes.status,
+    headers: resHeaders
+  })
 }
 
 export async function GET(
