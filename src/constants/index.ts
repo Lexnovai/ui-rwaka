@@ -66,7 +66,7 @@ export const LEGAL_CATEGORIES = [
     ]
   },
   {
-    name: 'USERS LEGAL EXPERT',
+    name: 'GENERAL LEGAL EXPERT',
     ability: {
       can: 'Answer general legal questions across multiple domains based on the knowledge',
       cannot:
