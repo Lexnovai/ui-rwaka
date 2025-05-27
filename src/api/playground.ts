@@ -11,9 +11,6 @@ export const getPlaygroundAgentsAPI = async (
   const url = APIRoutes.GetPlaygroundAgents(endpoint)
   const token = getAuthToken()
 
-  console.log('Fetching agents from:', url)
-  console.log('Auth token:', token)
-
   try {
     const response = await fetch(url, {
       method: 'GET',
@@ -28,7 +25,6 @@ export const getPlaygroundAgentsAPI = async (
     }
 
     const data = await response.json()
-    console.log('Agent data received:', data)
 
     if (!Array.isArray(data.payload)) {
       console.error('Expected array at data.payload but got:', data)

@@ -96,18 +96,22 @@ const Sidebar = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null)
 
   useEffect(() => {
+    console.log('Starting profile fetch...')
+
     toast.promise(getProfile(), {
       loading: 'Loading profile...',
       success: (res) => {
+        console.log('Profile success:', res)
         setProfile(res.data)
         return 'Profile loaded!'
       },
       error: (err) => {
-        if (err.response.data.message) return err.response.data.message
-        return 'Error Signing up!'
+        console.error('Profile error:', err)
+        return err.response?.data?.message || 'Error loading profile!'
       }
     })
   }, [])
+
   return (
     <>
       {isMobile && !isCollapsed && (
