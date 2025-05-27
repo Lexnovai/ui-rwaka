@@ -30,13 +30,13 @@ export const getPlaygroundAgentsAPI = async (
     const data = await response.json()
     console.log('Agent data received:', data)
 
-    if (!Array.isArray(data)) {
-      console.error('Expected array but got:', data)
+    if (!Array.isArray(data.payload)) {
+      console.error('Expected array at data.payload but got:', data)
       toast.error('Unexpected response format for agents.')
       return []
     }
 
-    const agents: ComboboxAgent[] = data.map((item: Agent) => ({
+    const agents: ComboboxAgent[] = data.payload.map((item: Agent) => ({
       value: item.agent_id || '',
       label: item.name || '',
       model: item.model || '',
