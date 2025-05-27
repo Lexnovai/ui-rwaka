@@ -10,25 +10,42 @@ export const getPlaygroundAgentsAPI = async (
 ): Promise<ComboboxAgent[]> => {
   const url = APIRoutes.GetPlaygroundAgents(endpoint)
   const token = getAuthToken()
+
+  console.log('Fetching agents from:', url)
+  console.log('Auth token:', token)
+
   try {
     const response = await fetch(url, {
       method: 'GET',
       credentials: 'include',
       headers: token ? { Authorization: `Bearer ${token}` } : {}
     })
+
     if (!response.ok) {
+      console.error('Error response:', response.status, response.statusText)
       toast.error(`Failed to fetch playground agents: ${response.statusText}`)
       return []
     }
+
     const data = await response.json()
+    console.log('Agent data received:', data)
+
+    if (!Array.isArray(data)) {
+      console.error('Expected array but got:', data)
+      toast.error('Unexpected response format for agents.')
+      return []
+    }
+
     const agents: ComboboxAgent[] = data.map((item: Agent) => ({
       value: item.agent_id || '',
       label: item.name || '',
       model: item.model || '',
       storage: item.storage || false
     }))
+
     return agents
-  } catch {
+  } catch (err) {
+    console.error('Fetch failed:', err)
     toast.error('Error fetching playground agents')
     return []
   }
@@ -60,7 +77,6 @@ export const getAllPlaygroundSessionsAPI = async (
     )
     if (!response.ok) {
       if (response.status === 404) {
-        // Return empty array when storage is not enabled
         return []
       }
       throw new Error(`Failed to fetch sessions: ${response.statusText}`)
