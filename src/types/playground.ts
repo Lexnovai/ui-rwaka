@@ -94,10 +94,6 @@ export interface ResponseAudio {
   channels?: number
   sample_rate?: number
 }
-export interface OuterResponse {
-  message: string
-  payload: string
-}
 export interface RunResponse {
   content?: string | object
   content_type: string
