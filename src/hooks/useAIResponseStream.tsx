@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { type RunResponse } from '@/types/playground'
+import { OuterResponse, type RunResponse } from '@/types/playground'
 
 /**
  * Processes a single JSON chunk by passing it to the provided callback.
@@ -7,10 +7,16 @@ import { type RunResponse } from '@/types/playground'
  * @param onChunk - Callback to handle the chunk.
  */
 function processChunk(
-  chunk: RunResponse,
+  chunk: OuterResponse,
   onChunk: (chunk: RunResponse) => void
 ) {
-  onChunk(chunk)
+  if (chunk.payload) {
+    // payload is a string of concatenated JSON objects — parse them
+    parseBuffer(chunk.payload, onChunk)
+  } else {
+    // If no payload, maybe it's already a RunResponse? Cast carefully:
+    onChunk(chunk as unknown as RunResponse)
+  }
 }
 
 /**
@@ -66,7 +72,7 @@ function parseBuffer(
     if (jsonEndIndex !== -1) {
       const jsonString = buffer.slice(jsonStartIndex, jsonEndIndex + 1)
       try {
-        const parsed = JSON.parse(jsonString) as RunResponse
+        const parsed = JSON.parse(jsonString) as OuterResponse
         processChunk(parsed, onChunk)
       } catch {
         // Skip invalid JSON, continue accumulating
