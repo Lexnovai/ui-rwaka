@@ -22,6 +22,7 @@ const AgentMessage = ({ message }: MessageProps) => {
   const { streamingErrorMessage } = usePlaygroundStore()
   const { handleStreamResponse } = useAIChatStreamHandler()
 
+  console.log('AgentMessage received:', message)
   let messageContent
   if (message.streamingError) {
     messageContent = (
@@ -34,7 +35,7 @@ const AgentMessage = ({ message }: MessageProps) => {
         )}
       </p>
     )
-  } else if (message.content) {
+  } else if (message.content && message.content.trim().length > 0) {
     messageContent = (
       <div className="flex w-full flex-col gap-4">
         <MarkdownRenderer>{message.content}</MarkdownRenderer>
@@ -82,6 +83,7 @@ const AgentMessage = ({ message }: MessageProps) => {
     (message.response_audio && !message.response_audio.transcript)
 
   const handleCopy = () => {
+    if (!message.content) return
     navigator.clipboard.writeText(message.content).then(() => {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
