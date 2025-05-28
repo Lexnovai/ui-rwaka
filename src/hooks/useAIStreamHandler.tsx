@@ -10,12 +10,14 @@ import useAIResponseStream from './useAIResponseStream'
 import { ToolCall } from '@/types/playground'
 import { useQueryState } from 'nuqs'
 import { getJsonMarkdown } from '@/lib/utils'
+import { getAuthToken } from '@/lib/utils'
 
 /**
  * useAIChatStreamHandler is responsible for making API calls and handling the stream response.
  * For now, it only streams message content and updates the messages state.
  */
 const useAIChatStreamHandler = () => {
+  const token = getAuthToken()
   const setMessages = usePlaygroundStore((state) => state.setMessages)
   const { addMessage, focusChatInput } = useChatActions()
   const [agentId] = useQueryState('agent')
@@ -98,7 +100,8 @@ const useAIChatStreamHandler = () => {
           apiUrl: playgroundRunUrl,
           requestBody,
           headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
+            'Content-Type': 'application/x-www-form-urlencoded',
+            Authorization: `Bearer ${token}`
           },
           onChunk: (chunk: RunResponse) => {
             if (
