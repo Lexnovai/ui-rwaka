@@ -99,6 +99,8 @@ const AgentMessage = ({ message }: MessageProps) => {
       )
     }
   }
+
+  console.log(message)
   return (
     <div className="font-geist flex flex-row items-start gap-4">
       <div className="rounded-md bg-[#49EA99]/90 p-0.5">
