@@ -2,8 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 
 const AUTH_BACKEND_URL = process.env.BACKEND_API!
 
-async function handle(req: NextRequest, path: string[]) {
+export async function handle(req: NextRequest, path: string[]) {
   const url = `${AUTH_BACKEND_URL}/${path.join('/')}`
+
+  const incomingCookies = req.headers.get('cookie')
+  console.log('🍪 Incoming cookies from client:', incomingCookies)
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json'
@@ -11,6 +14,14 @@ async function handle(req: NextRequest, path: string[]) {
 
   const auth = req.headers.get('authorization')
   if (auth) headers['Authorization'] = auth
+
+  const cookie = req.headers.get('cookie')
+  if (cookie) {
+    headers['cookie'] = cookie
+    console.log('🍪 Forwarding cookies to backend:', cookie)
+  } else {
+    console.log('❌ No cookies to forward!')
+  }
 
   const method = req.method
   const body =
@@ -22,57 +33,22 @@ async function handle(req: NextRequest, path: string[]) {
     body,
     credentials: 'include'
   })
-  console.log('Set-Cookie headers:', backendRes.headers.get('set-cookie'))
 
   const responseBody = await backendRes.text()
 
+  // ✅ FIXED: Actually copy all headers from backend response
   const resHeaders = new Headers()
-  const setCookieHeader = backendRes.headers.get('set-cookie')
-  if (setCookieHeader) {
-    resHeaders.set('Set-Cookie', setCookieHeader)
-  }
+  backendRes.headers.forEach((value, key) => {
+    if (key.toLowerCase() === 'set-cookie') {
+      console.log('🍪 Backend setting cookies:', value)
+      resHeaders.append('set-cookie', value) // ← This was missing!
+    } else {
+      resHeaders.set(key, value)
+    }
+  })
 
   return new NextResponse(responseBody, {
     status: backendRes.status,
     headers: resHeaders
   })
-}
-
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ path: string[] }> }
-) {
-  const resolvedParams = await params
-  return handle(req, resolvedParams.path)
-}
-
-export async function POST(
-  req: NextRequest,
-  { params }: { params: Promise<{ path: string[] }> }
-) {
-  const resolvedParams = await params
-  return handle(req, resolvedParams.path)
-}
-
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: Promise<{ path: string[] }> }
-) {
-  const resolvedParams = await params
-  return handle(req, resolvedParams.path)
-}
-
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: Promise<{ path: string[] }> }
-) {
-  const resolvedParams = await params
-  return handle(req, resolvedParams.path)
-}
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: Promise<{ path: string[] }> }
-) {
-  const resolvedParams = await params
-  return handle(req, resolvedParams.path)
 }
