@@ -12,9 +12,6 @@ async function handle(req: NextRequest, path: string[]) {
   const auth = req.headers.get('authorization')
   if (auth) headers['Authorization'] = auth
 
-  const cookie = req.headers.get('cookie')
-  if (cookie) headers['cookie'] = cookie
-
   const method = req.method
   const body =
     method === 'GET' || method === 'HEAD' ? undefined : await req.text()
@@ -30,13 +27,10 @@ async function handle(req: NextRequest, path: string[]) {
   const responseBody = await backendRes.text()
 
   const resHeaders = new Headers()
-  backendRes.headers.forEach((value, key) => {
-    if (key.toLowerCase() === 'set-cookie') {
-      resHeaders.append('set-cookie', value)
-    } else {
-      resHeaders.set(key, value)
-    }
-  })
+  const setCookieHeader = backendRes.headers.get('set-cookie')
+  if (setCookieHeader) {
+    resHeaders.set('Set-Cookie', setCookieHeader)
+  }
 
   return new NextResponse(responseBody, {
     status: backendRes.status,
