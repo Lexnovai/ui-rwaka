@@ -75,7 +75,9 @@ export const getAllPlaygroundSessionsAPI = async (
       if (response.status === 404) {
         return []
       }
-      throw new Error(`Failed to fetch sessions: ${response.statusText}`)
+      toast.error(`Failed to fetch sessions: ${response.statusText}`)
+    } else {
+      toast.error('Error getting sessions')
     }
     return response.json()
   } catch {
@@ -97,6 +99,14 @@ export const getPlaygroundSessionAPI = async (
       headers: token ? { Authorization: `Bearer ${token}` } : {}
     }
   )
+  if (!response.ok) {
+    if (response.status === 404) {
+      return []
+    }
+    toast.error(`Failed to fetch sessions: ${response.statusText}`)
+  } else {
+    toast.error('Error getting session')
+  }
   return response.json()
 }
 
