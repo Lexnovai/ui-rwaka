@@ -6,7 +6,8 @@ import {
   Agent,
   ComboboxAgent,
   GetSessionsResponse,
-  SessionEntry
+  SessionEntry,
+  SessionResponse
 } from '@/types/playground'
 import { getAuthToken } from '@/lib/utils'
 
@@ -105,7 +106,7 @@ export const getPlaygroundSessionAPI = async (
   base: string,
   agentId: string,
   sessionId: string
-) => {
+): Promise<SessionResponse | null> => {
   const token = getAuthToken()
   try {
     const response = await fetch(
@@ -125,20 +126,19 @@ export const getPlaygroundSessionAPI = async (
       )
 
       if (response.status === 404) {
-        return []
+        return null
       }
 
       toast.error(`Failed to fetch session: ${response.statusText}`)
-      return []
+      return null
     }
 
     const json = await response.json()
-    console.log('Fetched session:', json)
-    return json
+    return json.payload ?? null
   } catch (err) {
     console.error('Fetch error in getPlaygroundSessionAPI:', err)
     toast.error('Network error while fetching session.')
-    return []
+    return null
   }
 }
 
