@@ -71,16 +71,28 @@ export const getAllPlaygroundSessionsAPI = async (
         headers: token ? { Authorization: `Bearer ${token}` } : {}
       }
     )
+
     if (!response.ok) {
+      console.error(
+        'Failed to fetch sessions:',
+        response.status,
+        response.statusText
+      )
+
       if (response.status === 404) {
         return []
       }
+
       toast.error(`Failed to fetch sessions: ${response.statusText}`)
-    } else {
-      toast.error('Error getting sessions')
+      return []
     }
-    return response.json()
-  } catch {
+
+    const json = await response.json()
+    console.log('Fetched sessions:', json)
+    return json
+  } catch (err) {
+    console.error('Fetch error in getAllPlaygroundSessionsAPI:', err)
+    toast.error('Network error while fetching sessions.')
     return []
   }
 }
@@ -91,23 +103,39 @@ export const getPlaygroundSessionAPI = async (
   sessionId: string
 ) => {
   const token = getAuthToken()
-  const response = await fetch(
-    APIRoutes.GetPlaygroundSession(base, agentId, sessionId),
-    {
-      method: 'GET',
-      credentials: 'include',
-      headers: token ? { Authorization: `Bearer ${token}` } : {}
-    }
-  )
-  if (!response.ok) {
-    if (response.status === 404) {
+  try {
+    const response = await fetch(
+      APIRoutes.GetPlaygroundSession(base, agentId, sessionId),
+      {
+        method: 'GET',
+        credentials: 'include',
+        headers: token ? { Authorization: `Bearer ${token}` } : {}
+      }
+    )
+
+    if (!response.ok) {
+      console.error(
+        'Failed to fetch session:',
+        response.status,
+        response.statusText
+      )
+
+      if (response.status === 404) {
+        return []
+      }
+
+      toast.error(`Failed to fetch session: ${response.statusText}`)
       return []
     }
-    toast.error(`Failed to fetch sessions: ${response.statusText}`)
-  } else {
-    toast.error('Error getting session')
+
+    const json = await response.json()
+    console.log('Fetched session:', json)
+    return json
+  } catch (err) {
+    console.error('Fetch error in getPlaygroundSessionAPI:', err)
+    toast.error('Network error while fetching session.')
+    return []
   }
-  return response.json()
 }
 
 export const deletePlaygroundSessionAPI = async (
