@@ -2,7 +2,12 @@ import { toast } from 'sonner'
 
 import { APIRoutes } from './routes'
 
-import { Agent, ComboboxAgent, SessionEntry } from '@/types/playground'
+import {
+  Agent,
+  ComboboxAgent,
+  GetSessionsResponse,
+  SessionEntry
+} from '@/types/playground'
 import { getAuthToken } from '@/lib/utils'
 
 export const getPlaygroundAgentsAPI = async (
@@ -87,9 +92,8 @@ export const getAllPlaygroundSessionsAPI = async (
       return []
     }
 
-    const json = await response.json()
-    console.log('Fetched sessions:', json)
-    return json
+    const json: GetSessionsResponse = await response.json()
+    return json.payload ?? []
   } catch (err) {
     console.error('Fetch error in getAllPlaygroundSessionsAPI:', err)
     toast.error('Network error while fetching sessions.')
