@@ -199,6 +199,10 @@ export interface Reference {
   name: string
 }
 
+export interface GetSessionsResponse {
+  payload: SessionEntry[]
+}
+
 export interface SessionEntry {
   session_id: string
   title: string
