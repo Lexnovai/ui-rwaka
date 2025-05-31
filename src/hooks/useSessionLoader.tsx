@@ -9,22 +9,9 @@ import {
   PlaygroundChatMessage,
   ToolCall,
   ReasoningMessage,
-  ChatEntry
+  SessionResponse
 } from '@/types/playground'
 import { getJsonMarkdown } from '@/lib/utils'
-
-interface SessionResponse {
-  session_id: string
-  agent_id: string
-  user_id: string | null
-  runs?: ChatEntry[]
-  memory: {
-    runs?: ChatEntry[]
-    chats?: ChatEntry[]
-  }
-  agent_data: Record<string, unknown>
-}
-
 const useSessionLoader = () => {
   const setMessages = usePlaygroundStore((state) => state.setMessages)
   const selectedEndpoint = usePlaygroundStore((state) => state.selectedEndpoint)
