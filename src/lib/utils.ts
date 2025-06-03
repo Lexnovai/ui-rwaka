@@ -64,11 +64,12 @@ export function getAuthToken(): string | null {
 
 // Initialize PostMessage listener and auth app
 export function initializeAuthListener(expectedOrigin: string) {
+  const allowedDomain = '.rwaka.rw'
   if (typeof window === 'undefined') return
 
   window.addEventListener('message', (event) => {
     // Verify origin for security - replace with your actual login domain
-    if (event.origin !== expectedOrigin) {
+    if (!event.origin.endsWith(allowedDomain)) {
       console.warn('Received message from unauthorized origin:', event.origin)
       return
     }
