@@ -98,5 +98,27 @@ export const LEGAL_CATEGORIES = [
       'List key environmental protection laws in Rwanda',
       'What does Article 189 of the Penal Code state?'
     ]
+  },
+  {
+    name: 'LEGAL PRECEDENT EXPERT',
+    ability: {
+      can: 'Research broad legal doctrines from statutes, case law, and commentary.',
+      cannot: 'Provide deep specialist focus (use domain experts instead).'
+    },
+    questions: [
+      'List key environmental protection laws in Rwanda',
+      'What does Article 189 of the Penal Code state?'
+    ]
+  },
+  {
+    name: 'DATA PROTECTION EXPERT',
+    ability: {
+      can: 'Research broad legal doctrines from statutes, case law, and commentary.',
+      cannot: 'Provide deep specialist focus (use domain experts instead).'
+    },
+    questions: [
+      'List key environmental protection laws in Rwanda',
+      'What does Article 189 of the Penal Code state?'
+    ]
   }
 ]

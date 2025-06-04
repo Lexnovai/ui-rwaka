@@ -58,7 +58,9 @@ const ProfileMenu = () => {
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator className="border-border" />
         <DropdownMenuGroup>
-          <DropdownMenuItem>Help</DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <a href="mailto:info@rwaka.rw">Help</a>
+          </DropdownMenuItem>
           <DropdownMenuItem>Settings</DropdownMenuItem>
           <DropdownMenuItem>Pricing Plans</DropdownMenuItem>
           <DropdownMenuItem>Manage Team</DropdownMenuItem>

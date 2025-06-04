@@ -108,6 +108,9 @@ const AgentMessage = ({ message }: MessageProps) => {
       </div>
       <div className="flex flex-col gap-2">
         {messageContent}
+        <p className="text-muted-foreground mt-3 text-xs">
+          This is not a legal advice, consult with the licensed legal Advisor
+        </p>
         <div className="mt-3 flex flex-row gap-2">
           <Button
             variant="outline"
