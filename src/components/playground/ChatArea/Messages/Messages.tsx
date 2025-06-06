@@ -1,7 +1,5 @@
 import type { PlaygroundChatMessage } from '@/types/playground'
-
 import { AgentMessage, UserMessage } from './MessageItem'
-import Tooltip from '@/components/ui/tooltip'
 import { memo } from 'react'
 import {
   ToolCallProps,
@@ -13,6 +11,11 @@ import {
 import React, { type FC } from 'react'
 import ChatBlankState from './ChatBlankState'
 import Icon from '@/components/ui/icon'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger
+} from '@/components/ui/tooltip'
 
 interface MessageListProps {
   messages: PlaygroundChatMessage[]
@@ -64,12 +67,13 @@ const AgentMessageWrapper = ({ message }: MessageWrapperProps) => {
       {message.extra_data?.reasoning_steps &&
         message.extra_data.reasoning_steps.length > 0 && (
           <div className="flex items-start gap-4">
-            <Tooltip
-              delayDuration={0}
-              content={<p className="text-accent">Reasoning</p>}
-              side="top"
-            >
-              <Icon type="reasoning" size="sm" />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Icon type="reasoning" size="sm" />
+              </TooltipTrigger>
+              <TooltipContent side="top" sideOffset={0}>
+                <p className="text-accent">Reasoning</p>
+              </TooltipContent>
             </Tooltip>
             <div className="flex flex-col gap-3">
               <p className="text-xs uppercase">Reasoning</p>
@@ -80,12 +84,13 @@ const AgentMessageWrapper = ({ message }: MessageWrapperProps) => {
       {message.extra_data?.references &&
         message.extra_data.references.length > 0 && (
           <div className="flex items-start gap-4">
-            <Tooltip
-              delayDuration={0}
-              content={<p className="text-accent">References</p>}
-              side="top"
-            >
-              <Icon type="references" size="sm" />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Icon type="references" size="sm" />
+              </TooltipTrigger>
+              <TooltipContent side="top" sideOffset={0}>
+                <p className="text-accent">References</p>
+              </TooltipContent>
             </Tooltip>
             <div className="flex flex-col gap-3">
               <References references={message.extra_data.references} />
@@ -94,19 +99,19 @@ const AgentMessageWrapper = ({ message }: MessageWrapperProps) => {
         )}
       {message.tool_calls && message.tool_calls.length > 0 && (
         <div className="flex items-center gap-3">
-          <Tooltip
-            delayDuration={0}
-            content={<p className="text-accent">Tool Calls</p>}
-            side="top"
-          >
-            <Icon
-              type="hammer"
-              className="bg-background-secondary rounded-lg p-1"
-              size="sm"
-              color="secondary"
-            />
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Icon
+                type="hammer"
+                className="bg-background-secondary rounded-lg p-1"
+                size="sm"
+                color="secondary"
+              />
+            </TooltipTrigger>
+            <TooltipContent side="top" sideOffset={0}>
+              <p className="text-accent">Tool Calls</p>
+            </TooltipContent>
           </Tooltip>
-
           <div className="flex flex-wrap gap-2">
             {message.tool_calls.map((toolCall, index) => (
               <ToolComponent
