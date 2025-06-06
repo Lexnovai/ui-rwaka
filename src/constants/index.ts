@@ -91,34 +91,36 @@ export const LEGAL_CATEGORIES = [
   {
     name: 'COMPANY LAW EXPERT',
     ability: {
-      can: 'Research broad legal doctrines from statutes, case law, and commentary.',
-      cannot: 'Provide deep specialist focus (use domain experts instead).'
+      can: 'Advise on company formation, corporate governance, mergers & acquisitions, compliance, and dissolution under Rwandan company law',
+      cannot: 'Provide tax, criminal, or land-specific guidance.'
     },
     questions: [
-      'List key environmental protection laws in Rwanda',
-      'What does Article 189 of the Penal Code state?'
+      'What steps are required to register a private limited company in Rwanda?',
+      'Which corporate governance standards apply to public companies?',
+      'How is a merger between two Rwandan companies legally effected?'
     ]
   },
   {
     name: 'LEGAL PRECEDENT EXPERT',
     ability: {
-      can: 'Research broad legal doctrines from statutes, case law, and commentary.',
-      cannot: 'Provide deep specialist focus (use domain experts instead).'
+      can: 'Summarize and analyze Rwandan judicial decisions and case law.',
+      cannot: 'Interpret statutes without precedent or draft documents.'
     },
     questions: [
-      'List key environmental protection laws in Rwanda',
-      'What does Article 189 of the Penal Code state?'
+      'What precedent exists for contract disputes in Kigali High Court?',
+      "Summarize the Supreme Court's ruling on land disputes case XYZ."
     ]
   },
   {
     name: 'DATA PROTECTION EXPERT',
     ability: {
-      can: 'Research broad legal doctrines from statutes, case law, and commentary.',
-      cannot: 'Provide deep specialist focus (use domain experts instead).'
+      can: 'Interpret and explain Rwandan data protection and privacy regulations, data subject rights, breach notification requirements, and compliance obligations',
+      cannot: 'Provide legal guidance outside of data protection law'
     },
     questions: [
-      'List key environmental protection laws in Rwanda',
-      'What does Article 189 of the Penal Code state?'
+      'What rights do data subjects have under Rwanda’s data protection framework?',
+      'How should an organization respond to a personal data breach under Rwandan law?',
+      'What are the compliance requirements for cross-border data transfers?'
     ]
   }
 ]
