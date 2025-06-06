@@ -21,7 +21,7 @@ import { Ellipsis, LogOut, UserCircle } from 'lucide-react'
 import useIsMobile from '@/hooks/useIsMobile'
 import { UserProfile } from '@/interface/profile'
 import { toast } from 'sonner'
-import { getProfile } from '@/service/profile.service'
+import { getProfile, logout } from '@/service/profile.service'
 const SidebarHeader = () => (
   <Icon type="rwaka" size="default" className="w-48" />
 )
@@ -45,6 +45,19 @@ const NewChatButton = ({
 )
 
 const ProfileMenu = () => {
+  const handleLogout = async () => {
+    toast.promise(logout(), {
+      loading: 'Logging out...',
+      success: () => {
+        window.location.href = 'https://rwaka.rw'
+        return 'Logged out successfully!'
+      },
+      error: (err) => {
+        console.error('Logout error:', err)
+        return err.response?.message || 'Error logging out!'
+      }
+    })
+  }
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -66,7 +79,10 @@ const ProfileMenu = () => {
           <DropdownMenuItem>Manage Team</DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="flex justify-between font-semibold">
+        <DropdownMenuItem
+          onClick={handleLogout}
+          className="flex justify-between font-semibold"
+        >
           Log out
           <LogOut className="text-[#49EA99]" />
         </DropdownMenuItem>
