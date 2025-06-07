@@ -22,6 +22,7 @@ import useIsMobile from '@/hooks/useIsMobile'
 import { UserProfile } from '@/interface/profile'
 import { toast } from 'sonner'
 import { getProfile, logout } from '@/service/profile.service'
+import Link from 'next/link'
 const SidebarHeader = () => (
   <Icon type="rwaka" size="default" className="w-48" />
 )
@@ -64,24 +65,36 @@ const ProfileMenu = () => {
         <Ellipsis className="cursor-pointer" />
       </DropdownMenuTrigger>
       <DropdownMenuContent
-        className="bg-background-secondary mb-4 w-60 border-none"
+        className="bg-background-secondary mb-4 w-60 cursor-pointer border-none"
         align="end"
         forceMount
       >
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuLabel asChild>
+          <a href="mailto:info@rwaka.rw">Help</a>
+        </DropdownMenuLabel>
         <DropdownMenuSeparator className="border-border" />
         <DropdownMenuGroup>
-          <DropdownMenuItem asChild>
-            <a href="mailto:info@rwaka.rw">Help</a>
+          <Link
+            href="/settings"
+            passHref
+            legacyBehavior
+            className="cursor-pointer"
+          >
+            <DropdownMenuItem asChild>
+              <a>Settings</a>
+            </DropdownMenuItem>
+          </Link>
+          <DropdownMenuItem className="cursor-pointer">
+            Pricing Plans
           </DropdownMenuItem>
-          <DropdownMenuItem>Settings</DropdownMenuItem>
-          <DropdownMenuItem>Pricing Plans</DropdownMenuItem>
-          <DropdownMenuItem>Manage Team</DropdownMenuItem>
+          <DropdownMenuItem className="cursor-pointer">
+            Manage Team
+          </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={handleLogout}
-          className="flex justify-between font-semibold"
+          className="flex cursor-pointer justify-between font-semibold"
         >
           Log out
           <LogOut className="text-[#49EA99]" />
