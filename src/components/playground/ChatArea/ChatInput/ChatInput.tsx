@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { TextArea } from '@/components/ui/textarea'
+import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { usePlaygroundStore } from '@/store'
 import useAIChatStreamHandler from '@/hooks/useAIStreamHandler'
@@ -34,7 +34,7 @@ const ChatInput = () => {
 
   return (
     <div className="font-geist fixed relative mx-auto mb-2 flex w-full max-w-2xl items-end justify-center gap-x-2">
-      <TextArea
+      <Textarea
         placeholder={'Ask anything'}
         value={inputMessage}
         onChange={(e) => setInputMessage(e.target.value)}
