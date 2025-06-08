@@ -5,6 +5,8 @@ import {
   type PlaygroundChatMessage,
   type SessionEntry
 } from '@/types/playground'
+import { UserProfile } from './interface/profile'
+import { getProfile } from './service/profile.service'
 
 interface Agent {
   value: string
@@ -59,6 +61,13 @@ interface PlaygroundStore {
   ) => void
   isSessionsLoading: boolean
   setIsSessionsLoading: (isSessionsLoading: boolean) => void
+}
+
+interface ProfileState {
+  profile: UserProfile | null
+  loading: boolean
+  error: string | null
+  fetchProfile: () => Promise<void>
 }
 
 export const usePlaygroundStore = create<PlaygroundStore>()(
@@ -126,3 +135,24 @@ export const usePlaygroundStore = create<PlaygroundStore>()(
     }
   )
 )
+
+export const useProfileStore = create<ProfileState>((set) => ({
+  profile: null,
+  loading: false,
+  error: null,
+
+  fetchProfile: async () => {
+    set({ loading: true, error: null })
+    try {
+      const response = await getProfile()
+      set({ profile: response.payload, loading: false })
+    } catch (error) {
+      console.error('Failed to fetch profile', error)
+      set({
+        error:
+          error instanceof Error ? error.message : 'Failed to load profile',
+        loading: false
+      })
+    }
+  }
+}))
