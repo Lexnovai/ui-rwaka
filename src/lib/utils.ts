@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from 'clsx'
+import { cookies } from 'next/headers'
 import { twMerge } from 'tailwind-merge'
 
 export function cn(...inputs: ClassValue[]) {
@@ -44,68 +45,18 @@ export const getJsonMarkdown = (content: object = {}) => {
 }
 
 export function getAuthToken(): string | null {
-  if (typeof window === 'undefined') return null
-  const params = new URLSearchParams(window.location.search)
-  const token = params.get('token')
-  if (token) return token
+  // if (typeof window === 'undefined') return null
+  // const params = new URLSearchParams(window.location.search)
+  // const token = params.get('token')
+  // if (token) return token
+  // return localStorage.getItem('accessToken')
+  if (typeof document === 'undefined') return null
 
-  return localStorage.getItem('accessToken')
+  const match = document.cookie.match(/(?:^|;\s*)accessToken=([^;]*)/)
+  return match ? decodeURIComponent(match[1]) : null
 }
-// export function getAuthToken(): string | null {
-//   if (typeof window === 'undefined') return null
 
-//   // First check sessionStorage (from PostMessage)
-//   const sessionToken = sessionStorage.getItem('accessToken')
-//   if (sessionToken) return sessionToken
-
-//   // Fallback to localStorage for backward compatibility
-//   return localStorage.getItem('accessToken')
-// }
-
-// // Initialize PostMessage listener and auth app
-// export function initializeAuthListener(expectedOrigin: string) {
-//   const allowedDomain = '.rwaka.rw'
-//   if (typeof window === 'undefined') return
-
-//   window.addEventListener('message', (event) => {
-//     // Verify origin for security - replace with your actual login domain
-//     if (!event.origin.endsWith(allowedDomain)) {
-//       console.warn('Received message from unauthorized origin:', event.origin)
-//       return
-//     }
-
-//     if (event.data.type === 'AUTH_TOKEN') {
-//       const token = event.data.token
-
-//       // Store in sessionStorage (more secure than localStorage for tokens)
-//       sessionStorage.setItem('accessToken', token)
-
-//       // Clean URL if there are any leftover query params
-//       const url = new URL(window.location.href)
-//       url.searchParams.delete('token') // Remove any old token params
-//       window.history.replaceState({}, document.title, url.pathname + url.search)
-
-//       // Close the communication window if it was a popup
-//       if (window.opener) {
-//         window.opener.postMessage({ type: 'AUTH_SUCCESS' }, expectedOrigin)
-//       }
-
-//       // Proceed with authenticated app
-//       initializeAuthenticatedApp(token)
-
-//       // Optionally reload the page or update UI state
-//       window.location.reload()
-//     }
-//   })
-// }
-
-// function initializeAuthenticatedApp(token: string) {
-//   // Set up your authenticated requests with the token
-//   // Configure axios/fetch interceptors, etc.
-//   console.log('User authenticated successfully')
-
-//   // You can dispatch events or update global state here
-//   window.dispatchEvent(
-//     new CustomEvent('authTokenReceived', { detail: { token } })
-//   )
-// }
+export async function getServerAuthToken(): Promise<string | null> {
+  const token = (await cookies()).get('accessToken')?.value
+  return token || null
+}
