@@ -44,13 +44,10 @@ export const getJsonMarkdown = (content: object = {}) => {
 }
 
 export function getAuthToken(): string | null {
-  // if (typeof window === 'undefined') return null
-  // const params = new URLSearchParams(window.location.search)
-  // const token = params.get('token')
-  // if (token) return token
-  // return localStorage.getItem('accessToken')
-  if (typeof document === 'undefined') return null
+  if (typeof window === 'undefined') return null
+  const params = new URLSearchParams(window.location.search)
+  const token = params.get('token')
+  if (token) return token
 
-  const match = document.cookie.match(/(?:^|;\s*)accessToken=([^;]*)/)
-  return match ? decodeURIComponent(match[1]) : null
+  return localStorage.getItem('accessToken')
 }
