@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { TextArea } from '@/components/ui/textarea'
+import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { usePlaygroundStore } from '@/store'
 import useAIChatStreamHandler from '@/hooks/useAIStreamHandler'
@@ -33,8 +33,8 @@ const ChatInput = () => {
   }
 
   return (
-    <div className="relative mx-auto mb-1 flex w-full max-w-2xl items-end justify-center gap-x-2 font-geist">
-      <TextArea
+    <div className="font-geist fixed relative mx-auto mb-2 flex w-full max-w-2xl items-end justify-center gap-x-2">
+      <Textarea
         placeholder={'Ask anything'}
         value={inputMessage}
         onChange={(e) => setInputMessage(e.target.value)}
@@ -49,7 +49,7 @@ const ChatInput = () => {
             handleSubmit()
           }
         }}
-        className="w-full border border-accent bg-primaryAccent px-4 text-sm text-primary focus:border-accent"
+        className="border-accent bg-primaryAccent text-primary focus:border-accent w-full border px-4 text-sm"
         disabled={!selectedAgent}
         ref={chatInputRef}
       />
@@ -57,9 +57,9 @@ const ChatInput = () => {
         onClick={handleSubmit}
         disabled={!selectedAgent || !inputMessage.trim() || isStreaming}
         size="icon"
-        className="rounded-xl bg-primary p-5 text-primaryAccent"
+        className="text-primary rounded-xl bg-[#0C555D] p-5"
       >
-        <Icon type="send" color="primaryAccent" />
+        <Icon type="send" color="#49EA99" />
       </Button>
     </div>
   )

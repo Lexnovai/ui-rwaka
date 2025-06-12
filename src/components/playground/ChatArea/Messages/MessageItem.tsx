@@ -1,3 +1,5 @@
+'use client'
+
 import Icon from '@/components/ui/icon'
 import MarkdownRenderer from '@/components/ui/typography/MarkdownRenderer'
 import { usePlaygroundStore } from '@/store'
@@ -5,8 +7,12 @@ import type { PlaygroundChatMessage } from '@/types/playground'
 import Videos from './Multimedia/Videos'
 import Images from './Multimedia/Images'
 import Audios from './Multimedia/Audios'
-import { memo } from 'react'
+import { memo, useState } from 'react'
 import AgentThinkingLoader from './AgentThinkingLoader'
+import { Check, ClipboardCheck, Copy } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import useAIChatStreamHandler from '@/hooks/useAIStreamHandler'
+import { toast } from 'sonner'
 
 interface MessageProps {
   message: PlaygroundChatMessage
@@ -14,6 +20,8 @@ interface MessageProps {
 
 const AgentMessage = ({ message }: MessageProps) => {
   const { streamingErrorMessage } = usePlaygroundStore()
+  const { handleStreamResponse } = useAIChatStreamHandler()
+
   let messageContent
   if (message.streamingError) {
     messageContent = (
@@ -67,13 +75,65 @@ const AgentMessage = ({ message }: MessageProps) => {
       </div>
     )
   }
+  const [copied, setCopied] = useState(false)
 
+  const loading =
+    (!message.content && !message.streamingError) ||
+    (message.response_audio && !message.response_audio.transcript)
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(message.content).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
+  }
+
+  const handleSummarize = async () => {
+    try {
+      await handleStreamResponse('Summarize')
+    } catch (error) {
+      toast.error(
+        `Error in handleSubmit: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      )
+    }
+  }
+
+  console.log(message)
   return (
-    <div className="flex flex-row items-start gap-4 font-geist">
-      <div className="flex-shrink-0">
-        <Icon type="agent" size="sm" />
+    <div className="font-geist flex flex-row items-start gap-4">
+      <div className="rounded-md bg-[#49EA99]/90 p-0.5">
+        <Icon type="rwaka-chat" size="sm" />
       </div>
-      {messageContent}
+      <div className="flex flex-col gap-2">
+        {messageContent}
+        <p className="text-muted-foreground mt-3 text-xs">
+          This is not a legal advice, consult with the licensed legal Advisor
+        </p>
+        <div className="mt-3 flex flex-row gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-border flex items-center gap-1 rounded-xl border text-sm"
+            onClick={handleCopy}
+            disabled={loading}
+          >
+            {copied ? <Check /> : <Copy />}
+            {copied ? 'Copied' : 'Copy'}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-border rounded-xl border text-sm"
+            onClick={handleSummarize}
+            disabled={loading}
+          >
+            <ClipboardCheck />
+            Summarize
+          </Button>
+        </div>
+      </div>
     </div>
   )
 }
@@ -82,10 +142,10 @@ const UserMessage = memo(({ message }: MessageProps) => {
   return (
     <div className="flex items-start pt-4 text-start max-md:break-words">
       <div className="flex flex-row gap-x-3">
-        <p className="flex items-center gap-x-2 text-sm font-medium text-muted">
+        <p className="text-muted flex items-center gap-x-2 text-sm font-medium">
           <Icon type="user" size="sm" />
         </p>
-        <div className="text-md rounded-lg py-1 font-geist text-secondary">
+        <div className="text-md font-geist text-secondary rounded-lg py-1">
           {message.content}
         </div>
       </div>

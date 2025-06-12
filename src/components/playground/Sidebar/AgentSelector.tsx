@@ -69,10 +69,13 @@ export function AgentSelector() {
             key={`${agent.value}-${index}`}
             value={agent.value}
           >
-            <div className="flex items-center gap-3 text-xs font-medium uppercase">
-              <Icon type={'agent'} size="xs" />
-              {agent.label}
-            </div>
+        <div className="flex items-center gap-3 text-xs font-medium uppercase">
+          <Icon type="rwaka-chat" size="sm" />
+          <span className="truncate overflow-hidden text-ellipsis whitespace-nowrap">
+            {agent.label}
+          </span>
+        </div>
+
           </SelectItem>
         ))}
         {agents.length === 0 && (

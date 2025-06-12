@@ -199,12 +199,27 @@ export interface Reference {
   name: string
 }
 
+export interface GetSessionsResponse {
+  payload: SessionEntry[]
+}
+
 export interface SessionEntry {
   session_id: string
   title: string
   created_at: number
 }
 
+export interface SessionResponse {
+  session_id: string
+  agent_id: string
+  user_id: string | null
+  runs?: ChatEntry[]
+  memory: {
+    runs?: ChatEntry[]
+    chats?: ChatEntry[]
+  }
+  agent_data: Record<string, unknown>
+}
 export interface ChatEntry {
   message: {
     role: 'user' | 'system' | 'tool' | 'assistant'

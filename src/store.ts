@@ -5,6 +5,8 @@ import {
   type PlaygroundChatMessage,
   type SessionEntry
 } from '@/types/playground'
+import { UserProfile } from './interface/profile'
+import { getProfile } from './service/profile.service'
 
 interface Agent {
   value: string
@@ -61,6 +63,13 @@ interface PlaygroundStore {
   setIsSessionsLoading: (isSessionsLoading: boolean) => void
 }
 
+interface ProfileState {
+  profile: UserProfile | null
+  loading: boolean
+  error: string | null
+  fetchProfile: () => Promise<void>
+}
+
 export const usePlaygroundStore = create<PlaygroundStore>()(
   persist(
     (set) => ({
@@ -88,7 +97,7 @@ export const usePlaygroundStore = create<PlaygroundStore>()(
       hasStorage: false,
       setHasStorage: (hasStorage) => set(() => ({ hasStorage })),
       chatInputRef: { current: null },
-      selectedEndpoint: 'http://localhost:7777',
+      selectedEndpoint: `https://ask.rwaka.rw/api/proxy/chat`,
       setSelectedEndpoint: (selectedEndpoint) =>
         set(() => ({ selectedEndpoint })),
       agents: [],
@@ -110,12 +119,40 @@ export const usePlaygroundStore = create<PlaygroundStore>()(
     {
       name: 'endpoint-storage',
       storage: createJSONStorage(() => localStorage),
+      // onRehydrateStorage: () => (state) => {
+      //   state?.setHydrated?.()
+      // },
       partialize: (state) => ({
         selectedEndpoint: state.selectedEndpoint
       }),
       onRehydrateStorage: () => (state) => {
+        if (state?.selectedEndpoint?.includes('chatapi.rwaka.rw')) {
+          state.setSelectedEndpoint('https://ask.rwaka.rw/api/proxy/chat')
+        }
+
         state?.setHydrated?.()
       }
     }
   )
 )
+
+export const useProfileStore = create<ProfileState>((set) => ({
+  profile: null,
+  loading: false,
+  error: null,
+
+  fetchProfile: async () => {
+    set({ loading: true, error: null })
+    try {
+      const response = await getProfile()
+      set({ profile: response.payload, loading: false })
+    } catch (error) {
+      console.error('Failed to fetch profile', error)
+      set({
+        error:
+          error instanceof Error ? error.message : 'Failed to load profile',
+        loading: false
+      })
+    }
+  }
+}))

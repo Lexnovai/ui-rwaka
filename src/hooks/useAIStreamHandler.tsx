@@ -10,12 +10,14 @@ import useAIResponseStream from './useAIResponseStream'
 import { ToolCall } from '@/types/playground'
 import { useQueryState } from 'nuqs'
 import { getJsonMarkdown } from '@/lib/utils'
+import { getAuthToken } from '@/lib/utils'
 
 /**
  * useAIChatStreamHandler is responsible for making API calls and handling the stream response.
  * For now, it only streams message content and updates the messages state.
  */
 const useAIChatStreamHandler = () => {
+  const token = getAuthToken()
   const setMessages = usePlaygroundStore((state) => state.setMessages)
   const { addMessage, focusChatInput } = useChatActions()
   const [agentId] = useQueryState('agent')
@@ -41,13 +43,13 @@ const useAIChatStreamHandler = () => {
   }, [setMessages])
 
   const handleStreamResponse = useCallback(
-    async (input: string | FormData) => {
+    async (input: string) => {
       setIsStreaming(true)
 
-      const formData = input instanceof FormData ? input : new FormData()
-      if (typeof input === 'string') {
-        formData.append('message', input)
-      }
+      const params = new URLSearchParams()
+      params.append('message', input)
+      params.append('session_id', sessionId ?? '')
+      params.append('stream', 'true')
 
       setMessages((prevMessages) => {
         if (prevMessages.length >= 2) {
@@ -66,7 +68,7 @@ const useAIChatStreamHandler = () => {
 
       addMessage({
         role: 'user',
-        content: formData.get('message') as string,
+        content: input,
         created_at: Math.floor(Date.now() / 1000)
       })
 
@@ -89,12 +91,18 @@ const useAIChatStreamHandler = () => {
           agentId
         )
 
-        formData.append('stream', 'true')
-        formData.append('session_id', sessionId ?? '')
-
+        const requestBody = {
+          message: input,
+          session_id: sessionId ?? '',
+          stream: true
+        }
         await streamResponse({
           apiUrl: playgroundRunUrl,
-          requestBody: formData,
+          requestBody,
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            Authorization: `Bearer ${token}`
+          },
           onChunk: (chunk: RunResponse) => {
             if (
               chunk.event === RunEvent.RunStarted ||
@@ -109,7 +117,7 @@ const useAIChatStreamHandler = () => {
               ) {
                 const sessionData = {
                   session_id: chunk.session_id as string,
-                  title: formData.get('message') as string,
+                  title: input,
                   created_at: chunk.created_at
                 }
                 setSessionsData((prevSessionsData) => {
