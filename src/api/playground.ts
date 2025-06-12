@@ -9,19 +9,16 @@ import {
   SessionEntry,
   SessionResponse
 } from '@/types/playground'
-import { getAuthToken } from '@/lib/utils'
 
 export const getPlaygroundAgentsAPI = async (
   endpoint: string
 ): Promise<ComboboxAgent[]> => {
   const url = APIRoutes.GetPlaygroundAgents(endpoint)
-  const token = getAuthToken()
 
   try {
     const response = await fetch(url, {
       method: 'GET',
-      credentials: 'include',
-      headers: token ? { Authorization: `Bearer ${token}` } : {}
+      credentials: 'include'
     })
 
     if (!response.ok) {
@@ -54,11 +51,9 @@ export const getPlaygroundAgentsAPI = async (
 }
 
 export const getPlaygroundStatusAPI = async (base: string): Promise<number> => {
-  const token = getAuthToken()
   const response = await fetch(APIRoutes.PlaygroundStatus(base), {
     method: 'GET',
-    credentials: 'include',
-    headers: token ? { Authorization: `Bearer ${token}` } : {}
+    credentials: 'include'
   })
   return response.status
 }
@@ -67,14 +62,12 @@ export const getAllPlaygroundSessionsAPI = async (
   base: string,
   agentId: string
 ): Promise<SessionEntry[]> => {
-  const token = getAuthToken()
   try {
     const response = await fetch(
       APIRoutes.GetPlaygroundSessions(base, agentId),
       {
         method: 'GET',
-        credentials: 'include',
-        headers: token ? { Authorization: `Bearer ${token}` } : {}
+        credentials: 'include'
       }
     )
 
@@ -107,14 +100,12 @@ export const getPlaygroundSessionAPI = async (
   agentId: string,
   sessionId: string
 ): Promise<SessionResponse | null> => {
-  const token = getAuthToken()
   try {
     const response = await fetch(
       APIRoutes.GetPlaygroundSession(base, agentId, sessionId),
       {
         method: 'GET',
-        credentials: 'include',
-        headers: token ? { Authorization: `Bearer ${token}` } : {}
+        credentials: 'include'
       }
     )
 
@@ -147,13 +138,11 @@ export const deletePlaygroundSessionAPI = async (
   agentId: string,
   sessionId: string
 ) => {
-  const token = getAuthToken()
   const response = await fetch(
     APIRoutes.DeletePlaygroundSession(base, agentId, sessionId),
     {
       method: 'DELETE',
-      credentials: 'include',
-      headers: token ? { Authorization: `Bearer ${token}` } : {}
+      credentials: 'include'
     }
   )
   return response

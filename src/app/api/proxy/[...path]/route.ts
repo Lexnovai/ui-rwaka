@@ -1,30 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAuthToken } from '@/lib/utils'
 
 const AUTH_BACKEND_URL = process.env.BACKEND_API!
-const token = getAuthToken()
 
 async function handle(req: NextRequest, path: string[]) {
   const url = `${AUTH_BACKEND_URL}/${path.join('/')}`
 
-  const incomingCookies = req.headers.get('cookie')
-  console.log('🍪 Incoming cookies from client:', incomingCookies)
+  const incomingCookies = req.cookies
+  const accessToken = incomingCookies.get('accessToken')?.value
+  // const refreshToken = incomingCookies.get('refreshToken')?.value
+
+  console.log('Incoming cookies from client:', incomingCookies)
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json'
   }
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`
-  } else {
-    const auth = req.headers.get('authorization')
-    if (auth) headers['Authorization'] = auth
+
+  // Attach Authorization header if accessToken is present
+  if (accessToken) {
+    headers['Authorization'] = `Bearer ${accessToken}`
   }
 
-  const auth = req.headers.get('authorization')
-  if (auth) headers['Authorization'] = auth
-
+  // Include original cookie string to forward refreshToken
   const cookie = req.headers.get('cookie')
-  if (cookie) headers['cookie'] = cookie
+  if (cookie) {
+    headers['cookie'] = cookie
+  }
 
   const method = req.method
   const body =
@@ -41,6 +41,7 @@ async function handle(req: NextRequest, path: string[]) {
 
   const resHeaders = new Headers()
   backendRes.headers.forEach((value, key) => {
+    // Preserve Set-Cookie headers from backend
     if (key.toLowerCase() === 'set-cookie') {
       resHeaders.append('set-cookie', value)
     } else {
