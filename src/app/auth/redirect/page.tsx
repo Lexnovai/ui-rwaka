@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 export default function RedirectHandler() {
   useEffect(() => {
     function handleMessage(event: MessageEvent) {
-      if (event.origin !== 'https://rwaka.rw') return
+      if (event.origin !== 'https://ask.rwaka.rw') return
       const { type, token } = event.data
 
       if (type === 'AUTH_TOKEN' && token) {
