@@ -1,5 +1,4 @@
 import { clsx, type ClassValue } from 'clsx'
-import { cookies } from 'next/headers'
 import { twMerge } from 'tailwind-merge'
 
 export function cn(...inputs: ClassValue[]) {
@@ -54,9 +53,4 @@ export function getAuthToken(): string | null {
 
   const match = document.cookie.match(/(?:^|;\s*)accessToken=([^;]*)/)
   return match ? decodeURIComponent(match[1]) : null
-}
-
-export async function getServerAuthToken(): Promise<string | null> {
-  const token = (await cookies()).get('accessToken')?.value
-  return token || null
 }

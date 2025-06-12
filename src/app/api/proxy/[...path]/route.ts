@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerAuthToken } from '@/lib/utils'
+import { getAuthToken } from '@/lib/utils'
 
 const AUTH_BACKEND_URL = process.env.BACKEND_API!
-const token = getServerAuthToken()
+const token = getAuthToken()
 
 async function handle(req: NextRequest, path: string[]) {
   const url = `${AUTH_BACKEND_URL}/${path.join('/')}`
