@@ -23,7 +23,7 @@ WORKDIR /app
 
 # Set environment variables
 ENV NODE_ENV=production \
-    PORT=3019
+    PORT=3023
 
 # Don't run production as root
 RUN addgroup --system --gid 1001 nodejs && \
