@@ -4,7 +4,6 @@ import { useQueryState } from 'nuqs'
 import Link from 'next/link'
 import Icon from '@/components/ui/icon'
 
-
 const SessionBlankState = () => {
   const { selectedEndpoint, isEndpointActive, hasStorage } =
     usePlaygroundStore()
@@ -24,7 +23,7 @@ const SessionBlankState = () => {
             Connect{' '}
             <Link
               className="underline"
-              href={'https://docs.agno.com/storage'}
+              href={'https://rwaka.rw'}
               target="_blank"
             >
               storage
@@ -40,17 +39,15 @@ const SessionBlankState = () => {
   return (
     <div className="bg-background-secondary/50 mt-1 flex items-center justify-center rounded-lg pb-6 pt-4">
       <div className="flex flex-col items-center gap-4">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="rotate-[-16deg] translate-y-2">
+        <div className="mb-6 flex items-center gap-3">
+          <div className="translate-y-2 rotate-[-16deg]">
             <Icon type="user" size="lg" />
           </div>
 
-          <div className="rounded-md bg-[#49EA99]/90 p-0.5 rotate-[6deg] -translate-y-2">
+          <div className="-translate-y-2 rotate-[6deg] rounded-md bg-[#49EA99]/90 p-0.5">
             <Icon type="rwaka-chat" size="sm" />
           </div>
         </div>
-
-
 
         <div className="flex flex-col items-center gap-2">
           <h3 className="text-primary text-sm font-medium">No Session found</h3>
