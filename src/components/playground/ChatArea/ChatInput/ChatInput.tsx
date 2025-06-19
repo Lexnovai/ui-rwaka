@@ -33,7 +33,7 @@ const ChatInput = () => {
   }
 
   return (
-    <div className="font-geist fixed relative mx-auto mb-2 flex w-full max-w-2xl items-end justify-center gap-x-2">
+    <div className="font-geist fixed bottom-0 left-0 right-0 mx-auto mb-4 flex w-full max-w-2xl items-end justify-center gap-x-2 px-4">
       <TextArea
         placeholder={'Ask anything'}
         value={inputMessage}

@@ -86,7 +86,7 @@ export const usePlaygroundStore = create<PlaygroundStore>()(
             typeof messages === 'function' ? messages(state.messages) : messages
         })),
       hasStorage: false,
-      setHasStorage: (hasStorage) => set(() => ({ hasStorage })),
+      setHasStorage: () => set(() => ({ hasStorage: true })),
       chatInputRef: { current: null },
       selectedEndpoint: 'https://chatapinor.rwaka.rw/v1/playground',
       setSelectedEndpoint: (selectedEndpoint) =>
@@ -110,17 +110,15 @@ export const usePlaygroundStore = create<PlaygroundStore>()(
     {
       name: 'endpoint-storage',
       storage: createJSONStorage(() => localStorage),
-      // onRehydrateStorage: () => (state) => {
-      //   state?.setHydrated?.()
-      // },
+
       partialize: (state) => ({
-        selectedEndpoint: state.selectedEndpoint
+        selectedEndpoint: state.selectedEndpoint,
+        hydrated: state.hydrated
       }),
       onRehydrateStorage: () => (state) => {
-        if (state?.selectedEndpoint?.includes('chatapi.rwaka.rw')) {
-          state.setSelectedEndpoint('https://ask.rwaka.rw/api/proxy/chat')
+        if (state?.selectedEndpoint?.includes('ask.rwaka.rw')) {
+          state.setSelectedEndpoint('https://chatapinor.rwaka.rw/v1/playground')
         }
-
         state?.setHydrated?.()
       }
     }
