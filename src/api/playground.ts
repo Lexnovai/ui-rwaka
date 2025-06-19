@@ -12,13 +12,15 @@ export const getPlaygroundAgentsAPI = async (
 ): Promise<ComboboxAgent[]> => {
   const url = APIRoutes.GetPlaygroundAgents(endpoint)
   try {
-    const response = await fetch(url, { method: 'GET', credentials: 'include' })
+    const response = await apiFetch(url, {
+      method: 'GET',
+      credentials: 'include'
+    })
     if (!response.ok) {
       toast.error(`Failed to fetch playground agents: ${response.statusText}`)
       return []
     }
     const data = await response.json()
-    // Transform the API response into the expected shape.
     const agents: ComboboxAgent[] = data.map((item: Agent) => ({
       value: item.agent_id || '',
       label: item.name || '',
@@ -33,7 +35,7 @@ export const getPlaygroundAgentsAPI = async (
 }
 
 export const getPlaygroundStatusAPI = async (base: string): Promise<number> => {
-  const response = await fetch(APIRoutes.PlaygroundStatus(base), {
+  const response = await apiFetch(APIRoutes.PlaygroundStatus(base), {
     method: 'GET',
     credentials: 'include'
   })
