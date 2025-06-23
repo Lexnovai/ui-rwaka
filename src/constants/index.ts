@@ -84,8 +84,8 @@ export const LEGAL_CATEGORIES = [
       cannot: 'Provide deep specialist focus (use domain experts instead).'
     },
     questions: [
-      'List key environmental protection laws in Rwanda',
-      'What does Article 189 of the Penal Code state?'
+      'Criminal laws in Rwanda',
+      'Someone is trying not to payback my money, what can I do?'
     ]
   },
   {
