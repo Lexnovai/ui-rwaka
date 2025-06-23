@@ -7,9 +7,6 @@ const token = getAuthToken()
 async function handle(req: NextRequest, path: string[]) {
   const url = `${AUTH_BACKEND_URL}/${path.join('/')}`
 
-  const incomingCookies = req.headers.get('cookie')
-  console.log('🍪 Incoming cookies from client:', incomingCookies)
-
   const headers: Record<string, string> = {
     'Content-Type': 'application/json'
   }
@@ -19,12 +16,6 @@ async function handle(req: NextRequest, path: string[]) {
     const auth = req.headers.get('authorization')
     if (auth) headers['Authorization'] = auth
   }
-
-  const auth = req.headers.get('authorization')
-  if (auth) headers['Authorization'] = auth
-
-  const cookie = req.headers.get('cookie')
-  if (cookie) headers['cookie'] = cookie
 
   const method = req.method
   const body =
