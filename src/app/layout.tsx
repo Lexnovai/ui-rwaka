@@ -41,7 +41,7 @@ export default function RootLayout({
         <Script
           defer
           src="https://analytics.rwaka.rw/script.js"
-          data-website-id="c78a3f85-1967-425c-88e9-3c99e0513f7a"
+          data-website-id="67ea61db-949b-4227-a9d1-65f95db92b45"
         />
         <NuqsAdapter>{children}</NuqsAdapter>
         <Toaster />
