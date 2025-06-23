@@ -7,17 +7,17 @@ services:
       dockerfile: Dockerfile
     restart: always
     ports:
-      - 3023
+      - 3027
     volumes:
       - ./public:/public
     networks:
       - dokploy-network
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.lunaroot.rule=Host(`norway.rwaka.rw`)'
-      - 'traefik.http.routers.lunaroot.entrypoints=websecure'
-      - 'traefik.http.routers.lunaroot.tls.certResolver=letsencrypt'
-      - 'traefik.http.services.lunaroot.loadbalancer.server.port=3023'
+      - 'traefik.http.routers.rwakademo.rule=Host(`demo.rwaka.rw`)'
+      - 'traefik.http.routers.rwakademo.entrypoints=websecure'
+      - 'traefik.http.routers.rwakademo.tls.certResolver=letsencrypt'
+      - 'traefik.http.services.rwakademo.loadbalancer.server.port=3027'
 
 networks:
   dokploy-network:
