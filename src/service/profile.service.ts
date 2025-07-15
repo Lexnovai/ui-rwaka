@@ -6,7 +6,9 @@ import {
 import axios from '@/lib/axios'
 
 export const getProfile = async (): Promise<ApiResponse<UserProfile>> => {
-  const response = await axios.get('/users/profile')
+  const response = await axios.get('/users/profile', {
+    withCredentials: true
+  })
   return response.data
 }
 export const logout = async (): Promise<ApiResponse<void>> => {
