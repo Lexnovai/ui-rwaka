@@ -16,8 +16,7 @@ async function handle(req: NextRequest, path: string[]) {
   const backendRes = await fetch(url, {
     method,
     headers,
-    body,
-    credentials: 'include'
+    body
   })
 
   const responseBody = await backendRes.text()
