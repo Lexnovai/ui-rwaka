@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAuthToken } from '@/lib/utils'
 
 const AUTH_BACKEND_URL = process.env.BACKEND_API!
-const token = getAuthToken()
 
 async function handle(req: NextRequest, path: string[]) {
   const url = `${AUTH_BACKEND_URL}/${path.join('/')}`
@@ -10,13 +8,6 @@ async function handle(req: NextRequest, path: string[]) {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json'
   }
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`
-  } else {
-    const auth = req.headers.get('authorization')
-    if (auth) headers['Authorization'] = auth
-  }
-
   const method = req.method
   const body =
     method === 'GET' || method === 'HEAD' ? undefined : await req.text()
