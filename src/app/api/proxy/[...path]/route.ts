@@ -6,7 +6,8 @@ async function handle(req: NextRequest, path: string[]) {
   const url = `${AUTH_BACKEND_URL}/${path.join('/')}`
 
   const headers: Record<string, string> = {
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    cookie: req.headers.get('cookie') || ''
   }
   const method = req.method
   const body =
