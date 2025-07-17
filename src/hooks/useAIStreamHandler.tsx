@@ -109,6 +109,7 @@ const useAIChatStreamHandler = () => {
               ) {
                 const sessionData = {
                   session_id: chunk.session_id as string,
+                  session_name: formData.get('message') as string,
                   title: formData.get('message') as string,
                   created_at: chunk.created_at
                 }
