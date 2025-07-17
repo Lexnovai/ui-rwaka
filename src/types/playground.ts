@@ -201,7 +201,6 @@ export interface Reference {
 
 export interface SessionEntry {
   session_id: string
-  session_name: string
   title: string
   created_at: number
 }
