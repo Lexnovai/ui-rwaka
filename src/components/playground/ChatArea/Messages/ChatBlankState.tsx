@@ -100,8 +100,7 @@ const ChatBlankState = () => {
       await handleStreamResponse(query)
     } catch (error) {
       toast.error(
-        `Error in handling query: ${
-          error instanceof Error ? error.message : String(error)
+        `Error in handling query: ${error instanceof Error ? error.message : String(error)
         }`
       )
     }
@@ -109,10 +108,9 @@ const ChatBlankState = () => {
 
   return (
     <section
-      className="font-geist flex flex-col items-center text-center"
-      aria-label="Welcome message"
+      className="font-geist flex overflow-hidden static flex-col justify-center items-center"
     >
-      <div className="flex max-w-3xl flex-col gap-y-6 md:max-w-4xl lg:max-w-6xl">
+      <div className="flex flex-col gap-y-6">
         <div className="mx-auto flex w-fit items-center justify-center gap-3 rounded-xl bg-[#0C555D] px-5 py-2 text-sm shadow-lg ring-1 ring-white/10 backdrop-blur-md">
           <span className="font-semibold text-white">Free Plan</span>
           <Link

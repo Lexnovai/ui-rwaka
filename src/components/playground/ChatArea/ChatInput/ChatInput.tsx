@@ -7,8 +7,9 @@ import { usePlaygroundStore } from '@/store'
 import useAIChatStreamHandler from '@/hooks/useAIStreamHandler'
 import { useQueryState } from 'nuqs'
 import Icon from '@/components/ui/icon'
+import { cn } from '@/lib/utils'
 
-const ChatInput = () => {
+const ChatInput = ({ className }: { className: string }) => {
   const { chatInputRef } = usePlaygroundStore()
 
   const { handleStreamResponse } = useAIChatStreamHandler()
@@ -25,43 +26,45 @@ const ChatInput = () => {
       await handleStreamResponse(currentMessage)
     } catch (error) {
       toast.error(
-        `Error in handleSubmit: ${
-          error instanceof Error ? error.message : String(error)
+        `Error in handleSubmit: ${error instanceof Error ? error.message : String(error)
         }`
       )
     }
   }
 
   return (
-    <div className="font-geist fixed bottom-0 left-0 right-0 mx-auto mb-4 flex w-full max-w-2xl items-end justify-center gap-x-2 px-4">
-      <TextArea
-        placeholder={'Ask anything'}
-        value={inputMessage}
-        onChange={(e) => setInputMessage(e.target.value)}
-        onKeyDown={(e) => {
-          if (
-            e.key === 'Enter' &&
-            !e.nativeEvent.isComposing &&
-            !e.shiftKey &&
-            !isStreaming
-          ) {
-            e.preventDefault()
-            handleSubmit()
-          }
-        }}
-        className="border-accent bg-primaryAccent text-primary focus:border-accent w-full border px-4 text-sm"
-        disabled={!selectedAgent}
-        ref={chatInputRef}
-      />
-      <Button
-        onClick={handleSubmit}
-        disabled={!selectedAgent || !inputMessage.trim() || isStreaming}
-        size="icon"
-        className="text-primary rounded-xl bg-[#0C555D] p-5"
-      >
-        <Icon type="send" color="#49EA99" />
-      </Button>
-    </div>
+    <div className={cn("fixed bottom-0 left-0 right-0 flex justify-center px-4 pb-2 bg-background", className)}>
+
+      <div className="flex w-full max-w-3xl items-end justify-center gap-x-2 mx-auto">
+        <TextArea
+          placeholder={'Ask anything...'}
+          value={inputMessage}
+          onChange={(e) => setInputMessage(e.target.value)}
+          onKeyDown={(e) => {
+            if (
+              e.key === 'Enter' &&
+              !e.nativeEvent.isComposing &&
+              !e.shiftKey &&
+              !isStreaming
+            ) {
+              e.preventDefault()
+              handleSubmit()
+            }
+          }}
+          className="border-accent bg-primaryAccent text-primary focus:border-accent w-full border px-4 text-sm"
+          disabled={!selectedAgent}
+          ref={chatInputRef}
+        />
+        <Button
+          onClick={handleSubmit}
+          disabled={!selectedAgent || !inputMessage.trim() || isStreaming}
+          size="icon"
+          className="text-primary rounded-xl bg-[#0C555D] p-5"
+        >
+          <Icon type="send" color="#49EA99" />
+        </Button>
+      </div>
+    </div >
   )
 }
 
