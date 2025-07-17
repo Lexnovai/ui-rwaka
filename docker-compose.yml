@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     restart: always
     ports:
-      - 3023
+      - 3027
     volumes:
       - ./public:/public
     networks:

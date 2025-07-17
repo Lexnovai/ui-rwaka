@@ -37,6 +37,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          defer
+          src="https://analytics.rwaka.rw/script.js"
+          data-website-id="bb0ccd95-e310-4faf-bd66-52d7b9db22ba"
+        ></script>
+      </head>
       <body className={`${geistSans.variable} ${dmMono.variable} antialiased`}>
         <Script
           defer

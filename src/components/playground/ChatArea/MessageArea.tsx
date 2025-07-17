@@ -10,12 +10,12 @@ const MessageArea = () => {
 
   return (
     <StickToBottom
-      className="mb-4 flex flex-grow flex-col items-center justify-center"
+      className="mb-4 flex flex-col"
       resize="smooth"
       initial="smooth"
     >
-      <StickToBottom.Content className="flex min-h-full flex-col justify-center">
-        <div className="mx-auto w-full max-w-2xl space-y-9 px-4 pb-4">
+      <StickToBottom.Content className="flex flex-col">
+        <div className="w-full space-y-9 px-4 pb-4">
           <Messages messages={messages} />
         </div>
       </StickToBottom.Content>

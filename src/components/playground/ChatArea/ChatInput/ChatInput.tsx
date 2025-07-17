@@ -7,8 +7,9 @@ import { usePlaygroundStore } from '@/store'
 import useAIChatStreamHandler from '@/hooks/useAIStreamHandler'
 import { useQueryState } from 'nuqs'
 import Icon from '@/components/ui/icon'
+import { cn } from '@/lib/utils'
 
-const ChatInput = () => {
+const ChatInput = ({ className }: { className: string }) => {
   const { chatInputRef } = usePlaygroundStore()
 
   const { handleStreamResponse } = useAIChatStreamHandler()
