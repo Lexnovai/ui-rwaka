@@ -89,6 +89,28 @@ export const LEGAL_CATEGORIES = [
     ]
   },
   {
+    name: 'LEGAL PRECEDENT EXPERT',
+    ability: {
+      can: 'Research broad legal doctrines from statutes, case law, and commentary.',
+      cannot: 'Provide deep specialist focus (use domain experts instead).'
+    },
+    questions: [
+      'Criminal laws in Rwanda',
+      'Someone is trying not to payback my money, what can I do?'
+    ]
+  },
+  {
+    name: 'LEGAL PRECEDENT EXPERT',
+    ability: {
+      can: 'Locate and analyze judicial precedents relevant to specific legal issues in Rwanda; summarize holdings and reasoning for legal argument support.',
+      cannot: 'Provide definitive legal representation or strategy advice beyond precedent summaries.'
+    },
+    questions: [
+      'Which Supreme Court decisions define negligence in Rwanda?',
+      'Summarize the precedent set in the Court of Appeal regarding land expropriation.'
+    ]
+  },
+  {
     name: 'COMPANY LAW EXPERT',
     ability: {
       can: 'Research broad legal doctrines from statutes, case law, and commentary.',
@@ -97,6 +119,18 @@ export const LEGAL_CATEGORIES = [
     questions: [
       'List key environmental protection laws in Rwanda',
       'What does Article 189 of the Penal Code state?'
+    ]
+  },
+  {
+    name: 'DATA PROTECTION EXPERT',
+    ability: {
+      can: "Interpret Rwanda's data protection and privacy law; advise on lawful collection, processing, storage, and cross-border transfer of personal data.",
+      cannot:
+        'Provide technical cybersecurity implementation or IT system audits.'
+    },
+    questions: [
+      "What are the consent requirements under Rwanda's data protection law?",
+      'Can personal data be transferred outside Rwanda and under what conditions?'
     ]
   }
 ]
