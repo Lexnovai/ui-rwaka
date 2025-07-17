@@ -9,5 +9,5 @@ export const LEGAL_CATEGORIES = [
       'What defenses exist for homicide under Norwegian law?',
       'Describe penalties for theft and robbery in Norway'
     ]
-  },
-
+  }
+]
