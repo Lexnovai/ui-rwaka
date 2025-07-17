@@ -6,9 +6,9 @@ import { Suspense } from 'react'
 export default function Home() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <div className="bg-background/80 flex h-full flex-col md:flex-row">
-        <Sidebar />
-        <ChatArea />
+      <div className="bg-background flex min-h-screen flex-col md:flex-row">
+        <Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
+        <ChatArea isCollapsed={isCollapsed} />
       </div>
     </Suspense>
   )

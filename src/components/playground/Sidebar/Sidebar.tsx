@@ -73,9 +73,14 @@ const ProfileMenu = () => {
   )
 }
 
-const Sidebar = () => {
+const Sidebar = ({
+  isCollapsed,
+  setIsCollapsed
+}: {
+  isCollapsed: boolean
+  setIsCollapsed: (v: boolean) => void
+}) => {
   const isMobile = useIsMobile()
-  const [isCollapsed, setIsCollapsed] = useState(false)
   const { clearChat, focusChatInput, initializePlayground } = useChatActions()
   const {
     messages,

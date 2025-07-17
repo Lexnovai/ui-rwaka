@@ -145,7 +145,7 @@ const Reasonings: FC<ReasoningProps> = ({ reasoning }) => (
 )
 
 const ToolComponent = memo(({ tools }: ToolCallProps) => (
-  <div className="bg-accent cursor-default rounded-full px-2 py-1.5 text-xs">
+  <div className="bg-accent cursor-default rounded-lg px-2 py-1.5 text-xs">
     <p className="font-dmmono text-primary/80 uppercase">{tools.tool_name}</p>
   </div>
 ))
