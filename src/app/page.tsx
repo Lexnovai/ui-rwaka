@@ -10,9 +10,6 @@ export default function Home() {
       <div className="bg-background flex min-h-screen flex-col md:flex-row">
         <Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
         <ChatArea isCollapsed={isCollapsed} />
-      <div className="bg-background flex flex-col md:flex-row min-h-screen">
-        <Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
-        <ChatArea isCollapsed={isCollapsed} />
       </div>
     </Suspense>
   )
