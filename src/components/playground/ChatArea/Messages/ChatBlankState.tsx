@@ -9,6 +9,13 @@ import { ChevronDown, ExternalLink } from 'lucide-react'
 import useAIChatStreamHandler from '@/hooks/useAIStreamHandler'
 import { usePlaygroundStore } from '@/store'
 import { useSearchParams } from 'next/navigation'
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu"
+
 
 const USER_ROLES = [
   'Lawyers',
@@ -20,43 +27,10 @@ const USER_ROLES = [
   'Mediators'
 ]
 
-interface ActionButtonProps {
-  href?: string
-  variant?: 'primary'
-  text: React.ReactNode
-  isFocused?: boolean
-  onClick?: () => void
-  onFocus?: () => void
-}
-
-const ActionButton = ({
-  variant,
-  text,
-  isFocused,
-  onClick,
-  onFocus
-}: ActionButtonProps) => {
-  const baseStyles =
-    'px-4 py-2 text-sm transition-colors font-dmmono tracking-tight'
-  const variantStyles = {
-    primary: 'border border-border hover:bg-neutral-800 rounded-xl'
-  }
-
-  return (
-    <button
-      onClick={onClick}
-      onFocus={onFocus}
-      className={`${baseStyles} ${variant ? variantStyles[variant] : ''} ${isFocused ? 'bg-neutral-800' : ''}`}
-    >
-      {text}
-    </button>
-  )
-}
-
 const ChatBlankState = () => {
   const { handleStreamResponse } = useAIChatStreamHandler()
   const [currentRoleIndex, setCurrentRoleIndex] = useState(0)
-  const [activeCategory, setActiveCategory] = useState<string | null>(null)
+  const [, setActiveCategory] = useState<string | null>(null)
   const { agents } = usePlaygroundStore()
   const searchParams = useSearchParams()
   const agentId = searchParams?.get('agent')
@@ -108,7 +82,7 @@ const ChatBlankState = () => {
 
   return (
     <section
-      className="font-geist flex overflow-hidden static flex-col justify-center items-center"
+      className="font-geist flex flex-col justify-center items-center"
     >
       <div className="flex flex-col gap-y-6">
         <div className="mx-auto flex w-fit items-center justify-center gap-3 rounded-xl bg-[#0C555D] px-5 py-2 text-sm shadow-lg ring-1 ring-white/10 backdrop-blur-md">
@@ -192,43 +166,30 @@ const ChatBlankState = () => {
           transition={{ duration: 0.5, delay: 0.5 }}
           className="relative flex w-full flex-wrap justify-center gap-3 px-4"
         >
-          <ActionButton
-            key={matchedCategory?.name}
-            variant="primary"
-            text={
-              <div className="items-centert flex gap-2 text-sm">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                className="px-4 py-2 text-sm font-dmmono tracking-tight border border-border hover:bg-neutral-800 rounded-xl flex items-center gap-2 max-w-md mx-auto"
+              >
                 <span>VIEW SAMPLE {matchedCategory?.name} QUESTIONS</span>
-                <ChevronDown />
-              </div>
-            }
-            onClick={() => setActiveCategory(matchedCategory?.name ?? null)}
-          />
-
-          {activeCategory && (
-            <div
-              ref={dropdownRef}
-              className="border-border top-full z-10 mt-4 w-full rounded-xl border bg-neutral-900 p-3 shadow-xl sm:absolute sm:left-1/2 sm:-translate-x-1/2"
-            >
-              {matchedCategory && (
-                <div className="mx-auto max-h-60 w-full max-w-2xl space-y-2 overflow-y-auto">
-                  {matchedCategory.questions.map((q, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => handleQuery(q)}
-                      className="group relative flex w-full items-center justify-between rounded px-3 py-2 text-left text-sm text-gray-200 hover:bg-neutral-800"
-                    >
-                      <span>{q}</span>
-                      <ExternalLink
-                        className="text-gray-400 opacity-0 transition-opacity group-hover:opacity-100"
-                        size={16}
-                      />
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
+                <ChevronDown size={16} />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="border-border">
+              {matchedCategory?.questions.map((q, idx) => (
+                <DropdownMenuItem
+                  key={idx}
+                  onClick={() => handleQuery(q)}
+                  className="flex justify-between"
+                >
+                  <span>{q}</span>
+                  <ExternalLink size={16} className="text-gray-400" />
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </motion.div>
+
       </div>
     </section>
   )
