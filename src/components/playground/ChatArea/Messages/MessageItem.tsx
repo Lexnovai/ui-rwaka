@@ -137,12 +137,12 @@ const AgentMessage = ({ message }: MessageProps) => {
 
 const UserMessage = memo(({ message }: MessageProps) => {
   return (
-    <div className="flex items-start pt-4 text-start max-md:break-words">
+    <div className="flex items-start pt-4 text-start">
       <div className="flex flex-row gap-x-3">
-        <p className="text-muted flex items-center gap-x-2 text-sm font-medium">
+        <p className="text-muted flex items-center gap-x-2 text-base font-medium">
           <Icon type="user" size="sm" />
         </p>
-        <div className="text-md font-geist text-secondary rounded-lg py-1">
+        <div className="text-base font-geist text-secondary rounded-lg py-1">
           {message.content}
         </div>
       </div>

@@ -85,7 +85,7 @@ const ChatBlankState = () => {
       className="font-geist flex flex-col justify-center items-center"
     >
       <div className="flex flex-col gap-y-6">
-        <div className="mx-auto flex w-fit items-center justify-center gap-3 rounded-xl bg-[#0C555D] px-5 py-2 text-sm shadow-lg ring-1 ring-white/10 backdrop-blur-md">
+        <div className="mx-auto flex w-fit items-center justify-center gap-3 rounded-xl bg-[#0C555D] px-5 py-2 text-base shadow-lg ring-1 ring-white/10 backdrop-blur-md">
           <span className="font-semibold text-white">Free Plan</span>
           <Link
             href="/upgrade"
@@ -144,7 +144,7 @@ const ChatBlankState = () => {
               </span>
             )}
           </div>
-          <div className="mt-4 flex w-full flex-col gap-3 px-4 text-center text-[15px] leading-tight sm:text-[16px]">
+          <div className="mt-4 flex w-full flex-col gap-3 px-4 text-center text-base leading-tight">
             <p className="align-top">
               Can:{' '}
               <span className="align-top font-light">
@@ -167,9 +167,9 @@ const ChatBlankState = () => {
           className="relative flex w-full flex-wrap justify-center gap-3 px-4"
         >
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger asChild className="">
               <button
-                className="px-4 py-2 text-sm font-dmmono tracking-tight border border-border hover:bg-neutral-800 rounded-xl flex items-center gap-2 max-w-md mx-auto"
+                className="px-4 py-2 text-sm font-dmmono tracking-tight border border-border hover:bg-neutral-800 rounded-xl flex items-center gap-2 "
               >
                 <span>VIEW SAMPLE {matchedCategory?.name} QUESTIONS</span>
                 <ChevronDown size={16} />
@@ -182,7 +182,7 @@ const ChatBlankState = () => {
                   onClick={() => handleQuery(q)}
                   className="flex justify-between"
                 >
-                  <span>{q}</span>
+                  <span className='break-words max-w-[300px] md:max-w-[500px]'>{q}</span>
                   <ExternalLink size={16} className="text-gray-400" />
                 </DropdownMenuItem>
               ))}

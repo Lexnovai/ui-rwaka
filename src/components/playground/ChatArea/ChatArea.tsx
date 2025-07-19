@@ -9,7 +9,7 @@ const ChatArea = (
   }
 ) => {
   return (
-    <main className={cn("min-h-screen w-full relative flex flex-col justify-center items-center overflow-y-auto", "md:pl-[16rem]", isCollapsed && 'md:pl-[2.3rem]')}>
+    <main className={cn("min-h-screen w-full relative flex flex-col justify-center items-center overflow-y-auto break-words overflow-x-auto", "md:pl-[16rem]", isCollapsed && 'md:pl-[2.3rem]')}>
       <div className="max-w-4xl mx-auto pb-16">
         <MessageArea />
         <ChatInput
