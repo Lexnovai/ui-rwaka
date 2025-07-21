@@ -4,6 +4,7 @@ import {
   getAllPlaygroundSessionsAPI
 } from '@/api/playground'
 import { usePlaygroundStore } from '../store'
+import { useUserStore } from '@/stores/userStore' // Add this import
 import { toast } from 'sonner'
 import {
   PlaygroundChatMessage,
@@ -32,29 +33,42 @@ const useSessionLoader = () => {
     (state) => state.setIsSessionsLoading
   )
   const setSessionsData = usePlaygroundStore((state) => state.setSessionsData)
+  const { userId } = useUserStore() // Get userId from store
 
   const getSessions = useCallback(
     async (agentId: string) => {
-      if (!agentId || !selectedEndpoint) return
+      if (!agentId || !selectedEndpoint || !userId) {
+        console.warn('Missing required parameters for getSessions:', { agentId, selectedEndpoint, userId })
+        return
+      }
+
       try {
         setIsSessionsLoading(true)
         const sessions = await getAllPlaygroundSessionsAPI(
           selectedEndpoint,
-          agentId
+          agentId,
+          userId // Add userId parameter
         )
         setSessionsData(sessions)
-      } catch {
+      } catch (error) {
+        console.error('Error loading sessions:', error)
         toast.error('Error loading sessions')
       } finally {
         setIsSessionsLoading(false)
       }
     },
-    [selectedEndpoint, setSessionsData, setIsSessionsLoading]
+    [selectedEndpoint, setSessionsData, setIsSessionsLoading, userId] // Add userId to dependencies
   )
 
   const getSession = useCallback(
     async (sessionId: string, agentId: string) => {
-      if (!sessionId || !agentId || !selectedEndpoint) {
+      if (!sessionId || !agentId || !selectedEndpoint || !userId) {
+        console.warn('Missing required parameters for getSession:', {
+          sessionId,
+          agentId,
+          selectedEndpoint,
+          userId
+        })
         return null
       }
 
@@ -62,7 +76,8 @@ const useSessionLoader = () => {
         const response = (await getPlaygroundSessionAPI(
           selectedEndpoint,
           agentId,
-          sessionId
+          sessionId,
+          userId // Add userId parameter
         )) as SessionResponse
 
         if (response && response.memory) {
@@ -148,14 +163,26 @@ const useSessionLoader = () => {
             return processedMessages
           }
         }
-      } catch {
+      } catch (error) {
+        console.error('Error loading session:', error)
+        toast.error('Error loading session')
         return null
       }
     },
-    [selectedEndpoint, setMessages]
+    [selectedEndpoint, setMessages, userId] // Add userId to dependencies
   )
 
-  return { getSession, getSessions }
+  // Helper function to check if user is authenticated
+  const isAuthenticated = useCallback(() => {
+    return Boolean(userId)
+  }, [userId])
+
+  return {
+    getSession,
+    getSessions,
+    isAuthenticated, // Expose authentication status
+    userId // Expose userId for debugging
+  }
 }
 
 export default useSessionLoader

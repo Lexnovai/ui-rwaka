@@ -1,29 +1,38 @@
-// Centralized wrapper around the native fetch API that automatically
-// attaches the Basic-Authentication header using credentials provided
-// through environment variables.  This avoids scattering auth logic
-// across the codebase and keeps credentials out of the source.
+import { useUserStore } from '@/stores/userStore'
 
-// NOTE: The credentials **must** be exposed to the browser because all
-// requests are executed client-side.  Use the `NEXT_PUBLIC_` prefix so
-// that Next.js exposes them during build-time.
+// Get access token from cookies (Whop stores it there)
+const getAccessTokenFromCookies = (): string | null => {
+  if (typeof window === 'undefined') return null
 
-const username = process.env.NEXT_PUBLIC_API_USERNAME ?? ''
-const password = process.env.NEXT_PUBLIC_API_PASSWORD ?? ''
+  const cookies = document.cookie.split(';')
+  for (const cookie of cookies) {
+    const [name, value] = cookie.trim().split('=')
+    // Try common token cookie names
+    if (
+      name === 'access_token' ||
+      name === 'whop_token' ||
+      name === 'authToken'
+    ) {
+      return decodeURIComponent(value)
+    }
+  }
+  return null
+}
 
-// Build `Authorization: Basic <base64(user:pass)>` header if credentials
-// are available; otherwise return an empty object so unauthenticated
-// requests continue to work (e.g. CDN asset downloads).
+// Build Authorization header with Bearer token
 const buildAuthHeader = (): Record<string, string> => {
-  if (!username || !password) return {}
+  // First try to get token from cookies
+  let token = getAccessTokenFromCookies()
 
-  // Works both in the browser and in Node/Edge runtimes used by Next.js
-  // during server-side rendering.
-  const encoded =
-    typeof window === 'undefined'
-      ? Buffer.from(`${username}:${password}`, 'utf-8').toString('base64')
-      : btoa(`${username}:${password}`)
+  // If not in cookies, try Zustand store (client-side only)
+  if (!token && typeof window !== 'undefined') {
+    const state = useUserStore.getState()
+    token = state.accessToken
+  }
 
-  return { Authorization: `Basic ${encoded}` }
+  if (!token) return {}
+
+  return { Authorization: `Bearer ${token}` }
 }
 
 export default async function apiFetch(
@@ -31,12 +40,57 @@ export default async function apiFetch(
   init: RequestInit = {}
 ): Promise<Response> {
   const headers = new Headers(init.headers || {})
-  // Attach / override with Basic Auth header
+
+  // Attach Bearer token auth header
   Object.entries(buildAuthHeader()).forEach(([key, value]) => {
     headers.set(key, value)
   })
 
+  // Set default content type if not already set
+  if (!headers.has('Content-Type')) {
+    headers.set('Content-Type', 'application/json')
+  }
+
+  // Ensure credentials are included for cross-domain requests
+  const defaultOptions: RequestInit = {
+    credentials: 'include',
+    ...init,
+    headers
+  }
+
+  try {
+    const response = await fetch(input, defaultOptions)
+
+    // Handle token refresh if 401 Unauthorized
+    if (response.status === 401) {
+      console.warn('API request failed with 401 - token may be expired')
+      // You can add token refresh logic here if needed
+      // For now, we'll clear the user state
+      if (typeof window !== 'undefined') {
+        useUserStore.getState().clearUser()
+      }
+    }
+
+    return response
+  } catch (error) {
+    console.error('API fetch error:', error)
+    throw error
+  }
+}
+
+// Alternative version that explicitly takes a token (useful for server-side)
+export async function apiFetchWithToken(
+  input: RequestInfo | URL,
+  token: string,
+  init: RequestInit = {}
+): Promise<Response> {
+  const headers = new Headers(init.headers || {})
+
+  headers.set('Authorization', `Bearer ${token}`)
+  headers.set('Content-Type', 'application/json')
+
   return fetch(input, {
+    credentials: 'include',
     ...init,
     headers
   })

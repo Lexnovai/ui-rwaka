@@ -1,8 +1,8 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import ChatInput from './ChatInput'
 import MessageArea from './MessageArea'
+import ChatInput from './ChatInput'
 const ChatArea = ({ isCollapsed }: { isCollapsed: boolean }) => {
   return (
     <main
