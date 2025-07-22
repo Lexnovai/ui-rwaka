@@ -46,9 +46,6 @@ const useAIChatStreamHandler = () => {
       setIsStreaming(true)
 
       const formData = input instanceof FormData ? input : new FormData()
-      // if (typeof input === 'string') {
-      //   formData.append('message', input)
-      // }
       if (!(input instanceof FormData)) {
         formData.append('message', input)
       }

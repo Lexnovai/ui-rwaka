@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { AgentSelector } from '@/components/playground/Sidebar/AgentSelector'
 import useChatActions from '@/hooks/useChatActions'
 import { usePlaygroundStore } from '@/store'
+import { useUserStore } from '@/stores/userStore'
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import Icon from '@/components/ui/icon'
@@ -19,9 +20,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Ellipsis, LogOut, UserCircle } from 'lucide-react'
 import useIsMobile from '@/hooks/useIsMobile'
-import { UserProfile } from '@/interface/profile'
-import { toast } from 'sonner'
-import { getProfile } from '@/service/profile.service'
+
 const SidebarHeader = () => (
   <Icon type="rwaka" size="default" className="w-48" />
 )
@@ -89,30 +88,19 @@ const Sidebar = ({
     hydrated,
     isEndpointLoading
   } = usePlaygroundStore()
+  const { user, isLoading: isUserLoading } = useUserStore()
   const [isMounted, setIsMounted] = useState(false)
+
   useEffect(() => {
     setIsMounted(true)
     if (hydrated) initializePlayground()
   }, [selectedEndpoint, initializePlayground, hydrated])
+
   const handleNewChat = () => {
     clearChat()
     focusChatInput()
   }
-  const [profile, setProfile] = useState<UserProfile | null>(null)
 
-  useEffect(() => {
-    toast.promise(getProfile(), {
-      loading: 'Loading profile...',
-      success: (res) => {
-        setProfile(res.data)
-        return 'Profile loaded!'
-      },
-      error: (err) => {
-        if (err.response.data.message) return err.response.data.message
-        return 'Error Signing up!'
-      }
-    })
-  }, [])
   return (
     <>
       {isMobile && !isCollapsed && (
@@ -204,12 +192,21 @@ const Sidebar = ({
               <div className="flex items-center gap-2">
                 <UserCircle size={24} />
                 <div className="flex flex-col">
-                  <div className="text-secondary-foreground text-[12px] font-semibold">
-                    {profile?.name}
-                  </div>
-                  <div className="text-accent-foreground text-[10px]">
-                    {profile?.email}
-                  </div>
+                  {isUserLoading ? (
+                    <>
+                      <Skeleton className="h-3 w-20" />
+                      <Skeleton className="h-2 w-32 mt-1" />
+                    </>
+                  ) : (
+                    <>
+                      <div className="text-secondary-foreground text-[12px] font-semibold">
+                        {user?.name || user?.username || 'User'}
+                      </div>
+                      <div className="text-accent-foreground text-[10px]">
+                        {user?.email || 'No email'}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
               <ProfileMenu />

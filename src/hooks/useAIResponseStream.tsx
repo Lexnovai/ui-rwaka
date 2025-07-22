@@ -113,12 +113,6 @@ export default function useAIResponseStream() {
         onError,
         onComplete
       } = options
-      console.log('Body is FormData:', requestBody instanceof FormData)
-      if (requestBody instanceof FormData) {
-        console.log('Body keys:', [...requestBody.entries()])
-      } else {
-        console.log('Body payload (JSON):', requestBody)
-      }
       // Buffer to accumulate partial JSON data.
       let buffer = ''
 

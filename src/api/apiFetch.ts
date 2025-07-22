@@ -17,7 +17,6 @@ const getAccessToken = (): string | null => {
 
 const hasValidAccessToken = (): boolean => {
   const token = getAccessToken()
-  console.log('Access token:', token)
   return !!token
 }
 
@@ -40,10 +39,9 @@ export default async function apiFetch(
   init: RequestInit = {}
 ): Promise<Response> {
   if (!hasValidAccessToken()) {
-    console.warn('No valid access token found. Redirecting to homepage...')
-    // if (typeof window !== 'undefined') {
-    //   window.location.href = 'https://rwaka.rw'
-    // }
+    if (typeof window !== 'undefined') {
+      window.location.href = 'https://rwaka.rw'
+    }
     // Return a never-resolving promise to stop execution
     return new Promise(() => {})
   }
