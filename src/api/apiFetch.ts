@@ -41,9 +41,9 @@ export default async function apiFetch(
 ): Promise<Response> {
   if (!hasValidAccessToken()) {
     console.warn('No valid access token found. Redirecting to homepage...')
-    if (typeof window !== 'undefined') {
-      window.location.href = 'https://rwaka.rw'
-    }
+    // if (typeof window !== 'undefined') {
+    //   window.location.href = 'https://rwaka.rw'
+    // }
     // Return a never-resolving promise to stop execution
     return new Promise(() => {})
   }
