@@ -1,13 +1,13 @@
 export const getAccessTokenFromCookies = (): string | null => {
   if (typeof window === 'undefined') return null
 
-  const cookies = document.cookie.split(';')
-  for (const cookie of cookies) {
-    const [name, value] = cookie.trim().split('=')
-    if (name === 'whop_access_token') {
-      return decodeURIComponent(value)
-    }
+  const cookies = document.cookie
+  const match = cookies.match(/(?:^|;\s*)whop_access_token=([^;]*)/)
+
+  if (match) {
+    return decodeURIComponent(match[1])
   }
+
   return null
 }
 
