@@ -1,5 +1,3 @@
-import { useUserStore } from '@/stores/userStore'
-
 export const getAccessTokenFromCookies = (): string | null => {
   if (typeof window === 'undefined') return null
 
@@ -14,10 +12,7 @@ export const getAccessTokenFromCookies = (): string | null => {
 }
 
 const getAccessToken = (): string | null => {
-  let token = getAccessTokenFromCookies()
-  if (!token && typeof window !== 'undefined') {
-    token = useUserStore.getState().accessToken
-  }
+  const token = getAccessTokenFromCookies()
   return token
 }
 
