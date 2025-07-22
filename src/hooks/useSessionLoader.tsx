@@ -4,7 +4,7 @@ import {
   getAllPlaygroundSessionsAPI
 } from '@/api/playground'
 import { usePlaygroundStore } from '../store'
-import { useUserStore } from '@/stores/userStore' // Add this import
+import { useUserStore } from '@/stores/userStore'
 import { toast } from 'sonner'
 import {
   PlaygroundChatMessage,
@@ -33,7 +33,7 @@ const useSessionLoader = () => {
     (state) => state.setIsSessionsLoading
   )
   const setSessionsData = usePlaygroundStore((state) => state.setSessionsData)
-  const { userId } = useUserStore() // Get userId from store
+  const { userId } = useUserStore()
 
   const getSessions = useCallback(
     async (agentId: string) => {
@@ -47,7 +47,7 @@ const useSessionLoader = () => {
         const sessions = await getAllPlaygroundSessionsAPI(
           selectedEndpoint,
           agentId,
-          userId // Add userId parameter
+          userId
         )
         setSessionsData(sessions)
       } catch (error) {
