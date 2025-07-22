@@ -1,14 +1,8 @@
+import Cookies from 'js-cookie'
+
 export const getAccessTokenFromCookies = (): string | null => {
   if (typeof window === 'undefined') return null
-
-  const cookies = document.cookie
-  const match = cookies.match(/(?:^|;\s*)whop_access_token=([^;]*)/)
-
-  if (match) {
-    return decodeURIComponent(match[1])
-  }
-
-  return null
+  return Cookies.get('whop_access_token') || null
 }
 
 const getAccessToken = (): string | null => {
