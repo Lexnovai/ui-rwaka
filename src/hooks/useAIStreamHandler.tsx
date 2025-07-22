@@ -29,7 +29,10 @@ const useAIChatStreamHandler = () => {
   const setSessionsData = usePlaygroundStore((state) => state.setSessionsData)
   const hasStorage = usePlaygroundStore((state) => state.hasStorage)
   const { streamResponse } = useAIResponseStream()
-  const { userId } = useUserStore()
+
+  // Get userId from user store
+  const userId = useUserStore((state) => state.userId)
+
   const updateMessagesWithErrorState = useCallback(() => {
     setMessages((prevMessages) => {
       const newMessages = [...prevMessages]
@@ -43,14 +46,32 @@ const useAIChatStreamHandler = () => {
 
   const handleStreamResponse = useCallback(
     async (input: string | FormData) => {
+      // Check if we have required data
+      if (!agentId) {
+        console.error('Agent ID is required')
+        return
+      }
+
+      if (!userId) {
+        console.error('User ID is required')
+        setStreamingErrorMessage('User not authenticated')
+        return
+      }
+
       setIsStreaming(true)
 
       const formData = input instanceof FormData ? input : new FormData()
       if (typeof input === 'string') {
         formData.append('message', input)
       }
-      if (userId) {
-        formData.append('user_id', userId)
+
+      // Validate message content
+      const messageContent = formData.get('message') as string
+      if (!messageContent || messageContent.trim() === '') {
+        console.error('Message content is required')
+        setStreamingErrorMessage('Message content cannot be empty')
+        setIsStreaming(false)
+        return
       }
 
       setMessages((prevMessages) => {
@@ -70,7 +91,7 @@ const useAIChatStreamHandler = () => {
 
       addMessage({
         role: 'user',
-        content: formData.get('message') as string,
+        content: messageContent,
         created_at: Math.floor(Date.now() / 1000)
       })
 
@@ -84,17 +105,26 @@ const useAIChatStreamHandler = () => {
 
       let lastContent = ''
       let newSessionId = sessionId
+
       try {
         const endpointUrl = constructEndpointUrl(selectedEndpoint)
-
-        if (!agentId) return
         const playgroundRunUrl = APIRoutes.AgentRun(endpointUrl).replace(
           '{agent_id}',
           agentId
         )
 
-        formData.append('stream', 'true')
-        formData.append('session_id', sessionId ?? '')
+        // Set all required fields according to Swagger
+        formData.set('message', messageContent) // Ensure it's set correctly
+        formData.set('stream', 'true')
+        formData.set('session_id', sessionId || '') // Can be empty string
+        formData.set('user_id', userId) // Required field
+
+        // Debug logging
+        console.log('Making request to:', playgroundRunUrl)
+        console.log('Form data:')
+        for (const [key, value] of formData.entries()) {
+          console.log(`  ${key}: ${value}`)
+        }
 
         await streamResponse({
           apiUrl: playgroundRunUrl,
@@ -113,8 +143,8 @@ const useAIChatStreamHandler = () => {
               ) {
                 const sessionData = {
                   session_id: chunk.session_id as string,
-                  session_name: formData.get('message') as string,
-                  title: formData.get('message') as string,
+                  session_name: messageContent,
+                  title: messageContent,
                   created_at: chunk.created_at
                 }
                 setSessionsData((prevSessionsData) => {
@@ -248,6 +278,7 @@ const useAIChatStreamHandler = () => {
             }
           },
           onError: (error) => {
+            console.error('Stream error:', error)
             updateMessagesWithErrorState()
             setStreamingErrorMessage(error.message)
             if (hasStorage && newSessionId) {
@@ -259,9 +290,12 @@ const useAIChatStreamHandler = () => {
               )
             }
           },
-          onComplete: () => { }
+          onComplete: () => {
+            console.log('Stream completed successfully')
+          }
         })
       } catch (error) {
+        console.error('Request error:', error)
         updateMessagesWithErrorState()
         setStreamingErrorMessage(
           error instanceof Error ? error.message : String(error)
@@ -286,14 +320,14 @@ const useAIChatStreamHandler = () => {
       selectedEndpoint,
       streamResponse,
       agentId,
+      userId, // Add userId to dependencies
       setStreamingErrorMessage,
       setIsStreaming,
       focusChatInput,
       setSessionsData,
       sessionId,
       setSessionId,
-      hasStorage,
-      userId
+      hasStorage
     ]
   )
 
