@@ -31,7 +31,7 @@ const useAIChatStreamHandler = () => {
   const { streamResponse } = useAIResponseStream()
 
   // Get userId from user store
-  const userId = useUserStore((state) => state.userId)
+  const { userId } = useUserStore()
 
   const updateMessagesWithErrorState = useCallback(() => {
     setMessages((prevMessages) => {
