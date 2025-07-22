@@ -13,9 +13,8 @@ import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu"
-
+  DropdownMenuItem
+} from '@/components/ui/dropdown-menu'
 
 const USER_ROLES = [
   'Lawyers',
@@ -81,9 +80,7 @@ const ChatBlankState = () => {
   }
 
   return (
-    <section
-      className="font-geist flex flex-col justify-center items-center"
-    >
+    <section className="font-geist flex flex-col items-center justify-center">
       <div className="flex flex-col gap-y-6">
         <div className="mx-auto flex w-fit items-center justify-center gap-3 rounded-xl bg-[#0C555D] px-5 py-2 text-base shadow-lg ring-1 ring-white/10 backdrop-blur-md">
           <span className="font-semibold text-white">Free Plan</span>
@@ -189,7 +186,6 @@ const ChatBlankState = () => {
             </DropdownMenuContent>
           </DropdownMenu>
         </motion.div>
-
       </div>
     </section>
   )

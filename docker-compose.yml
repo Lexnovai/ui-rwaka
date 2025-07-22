@@ -14,10 +14,10 @@ services:
       - dokploy-network
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.rwakademo.rule=Host(`demo.rwaka.rw`)'
-      - 'traefik.http.routers.rwakademo.entrypoints=websecure'
-      - 'traefik.http.routers.rwakademo.tls.certResolver=letsencrypt'
-      - 'traefik.http.services.rwakademo.loadbalancer.server.port=3027'
+      - 'traefik.http.routers.rwakanorwy.rule=Host(`norway.rwaka.rw`)'
+      - 'traefik.http.routers.rwakanorwy.entrypoints=websecure'
+      - 'traefik.http.routers.rwakanorwy.tls.certResolver=letsencrypt'
+      - 'traefik.http.services.rwakanorwy.loadbalancer.server.port=3023'
 
 networks:
   dokploy-network:

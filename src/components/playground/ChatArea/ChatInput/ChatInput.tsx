@@ -26,16 +26,21 @@ const ChatInput = ({ className }: { className: string }) => {
       await handleStreamResponse(currentMessage)
     } catch (error) {
       toast.error(
-        `Error in handleSubmit: ${error instanceof Error ? error.message : String(error)
+        `Error in handleSubmit: ${
+          error instanceof Error ? error.message : String(error)
         }`
       )
     }
   }
 
   return (
-    <div className={cn("fixed bottom-0 left-0 right-0 flex justify-center px-4 pb-2 bg-background", className)}>
-
-      <div className="flex w-full max-w-3xl items-end justify-center gap-x-2 mx-auto">
+    <div
+      className={cn(
+        'bg-background fixed bottom-0 left-0 right-0 flex justify-center px-4 pb-2',
+        className
+      )}
+    >
+      <div className="mx-auto flex w-full max-w-3xl items-end justify-center gap-x-2">
         <TextArea
           placeholder={'Ask anything...'}
           value={inputMessage}
@@ -64,7 +69,7 @@ const ChatInput = ({ className }: { className: string }) => {
           <Icon type="send" color="#49EA99" />
         </Button>
       </div>
-    </div >
+    </div>
   )
 }
 

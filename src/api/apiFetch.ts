@@ -1,23 +1,32 @@
-// Centralized wrapper around the native fetch API that automatically
-// attaches the Basic-Authentication header using credentials provided
-// through environment variables.  This avoids scattering auth logic
-// across the codebase and keeps credentials out of the source.
+export const getAccessTokenFromCookies = (): string | null => {
+  if (typeof window === 'undefined') return null
 
-// NOTE: The credentials **must** be exposed to the browser because all
-// requests are executed client-side.  Use the `NEXT_PUBLIC_` prefix so
-// that Next.js exposes them during build-time.
+  const cookies = document.cookie
+  const match = cookies.match(/(?:^|;\s*)whop_access_token=([^;]*)/)
+
+  if (match) {
+    return decodeURIComponent(match[1])
+  }
+
+  return null
+}
+const getAccessToken = (): string | null => {
+  const token = getAccessTokenFromCookies()
+  return token
+}
+
+const hasValidAccessToken = (): boolean => {
+  const token = getAccessToken()
+  console.log('Access token:', token)
+  return !!token
+}
 
 const username = process.env.NEXT_PUBLIC_API_USERNAME ?? ''
 const password = process.env.NEXT_PUBLIC_API_PASSWORD ?? ''
 
-// Build `Authorization: Basic <base64(user:pass)>` header if credentials
-// are available; otherwise return an empty object so unauthenticated
-// requests continue to work (e.g. CDN asset downloads).
-const buildAuthHeader = (): Record<string, string> => {
+const buildBasicAuthHeader = (): Record<string, string> => {
   if (!username || !password) return {}
 
-  // Works both in the browser and in Node/Edge runtimes used by Next.js
-  // during server-side rendering.
   const encoded =
     typeof window === 'undefined'
       ? Buffer.from(`${username}:${password}`, 'utf-8').toString('base64')
@@ -30,14 +39,36 @@ export default async function apiFetch(
   input: RequestInfo | URL,
   init: RequestInit = {}
 ): Promise<Response> {
+  if (!hasValidAccessToken()) {
+    console.warn('No valid access token found. Redirecting to homepage...')
+    // if (typeof window !== 'undefined') {
+    //   window.location.href = 'https://rwaka.rw'
+    // }
+    // Return a never-resolving promise to stop execution
+    return new Promise(() => {})
+  }
+
   const headers = new Headers(init.headers || {})
-  // Attach / override with Basic Auth header
-  Object.entries(buildAuthHeader()).forEach(([key, value]) => {
+
+  Object.entries(buildBasicAuthHeader()).forEach(([key, value]) => {
     headers.set(key, value)
   })
 
-  return fetch(input, {
+  if (!(init.body instanceof FormData) && !headers.has('Content-Type')) {
+    headers.set('Content-Type', 'application/json')
+  }
+
+  const defaultOptions: RequestInit = {
+    credentials: 'include',
     ...init,
     headers
-  })
+  }
+
+  try {
+    const response = await fetch(input, defaultOptions)
+    return response
+  } catch (error) {
+    console.error('API fetch error:', error)
+    throw error
+  }
 }

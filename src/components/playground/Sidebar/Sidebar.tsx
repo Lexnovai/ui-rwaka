@@ -73,8 +73,11 @@ const ProfileMenu = () => {
   )
 }
 
-const Sidebar = ({ isCollapsed, setIsCollapsed }: {
-  isCollapsed: boolean,
+const Sidebar = ({
+  isCollapsed,
+  setIsCollapsed
+}: {
+  isCollapsed: boolean
   setIsCollapsed: (v: boolean) => void
 }) => {
   const isMobile = useIsMobile()

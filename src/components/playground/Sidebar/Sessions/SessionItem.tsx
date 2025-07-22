@@ -4,6 +4,7 @@ import { Button } from '../../../ui/button'
 import useSessionLoader from '@/hooks/useSessionLoader'
 import { deletePlaygroundSessionAPI } from '@/api/playground'
 import { usePlaygroundStore } from '@/store'
+import { useUserStore } from '@/stores/userStore' // Add this import
 import { toast } from 'sonner'
 import Icon from '@/components/ui/icon'
 import { useState } from 'react'
@@ -15,6 +16,7 @@ type SessionItemProps = SessionEntry & {
   isSelected: boolean
   onSessionClick: () => void
 }
+
 const SessionItem = ({
   title,
   session_id,
@@ -24,9 +26,10 @@ const SessionItem = ({
   const [agentId] = useQueryState('agent')
   const { getSession } = useSessionLoader()
   const [, setSessionId] = useQueryState('session')
-  const { selectedEndpoint, sessionsData, setSessionsData } =
-    usePlaygroundStore()
+  const { selectedEndpoint, sessionsData, setSessionsData } = usePlaygroundStore()
+  const { userId } = useUserStore()
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
   const { clearChat } = useChatActions()
 
   const handleGetSession = async () => {
@@ -38,29 +41,46 @@ const SessionItem = ({
   }
 
   const handleDeleteSession = async () => {
-    if (agentId) {
-      try {
-        const response = await deletePlaygroundSessionAPI(
-          selectedEndpoint,
-          agentId,
-          session_id
-        )
-        if (response.status === 200 && sessionsData) {
+    if (!agentId || !userId) {
+      toast.error('Missing required information to delete session')
+      return
+    }
+
+    try {
+      setIsDeleting(true)
+      const response = await deletePlaygroundSessionAPI(
+        selectedEndpoint,
+        agentId,
+        session_id,
+        userId
+      )
+
+      if (response.ok) {
+        if (sessionsData) {
           setSessionsData(
             sessionsData.filter((session) => session.session_id !== session_id)
           )
-          clearChat()
-          toast.success('Session deleted')
-        } else {
-          toast.error('Failed to delete session')
         }
-      } catch {
-        toast.error('Failed to delete session')
-      } finally {
+        clearChat()
+        toast.success('Session deleted successfully')
         setIsDeleteModalOpen(false)
+      } else {
+        const errorText = await response.text()
+        console.error('Delete session failed:', errorText)
+        toast.error(`Failed to delete session: ${response.statusText}`)
       }
+    } catch (error) {
+      console.error('Delete session error:', error)
+      toast.error('Failed to delete session. Please try again.')
+    } finally {
+      setIsDeleting(false)
     }
   }
+
+  if (!userId) {
+    return null
+  }
+
   return (
     <>
       <div
@@ -87,6 +107,7 @@ const SessionItem = ({
             e.stopPropagation()
             setIsDeleteModalOpen(true)
           }}
+          disabled={isDeleting}
         >
           <Icon type="trash" size="xs" />
         </Button>
@@ -95,7 +116,7 @@ const SessionItem = ({
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         onDelete={handleDeleteSession}
-        isDeleting={false}
+        isDeleting={isDeleting}
       />
     </>
   )

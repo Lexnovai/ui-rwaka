@@ -10,6 +10,7 @@ import useAIResponseStream from './useAIResponseStream'
 import { ToolCall } from '@/types/playground'
 import { useQueryState } from 'nuqs'
 import { getJsonMarkdown } from '@/lib/utils'
+import { useUserStore } from '@/stores/userStore'
 
 /**
  * useAIChatStreamHandler is responsible for making API calls and handling the stream response.
@@ -28,7 +29,7 @@ const useAIChatStreamHandler = () => {
   const setSessionsData = usePlaygroundStore((state) => state.setSessionsData)
   const hasStorage = usePlaygroundStore((state) => state.hasStorage)
   const { streamResponse } = useAIResponseStream()
-
+  const { userId } = useUserStore()
   const updateMessagesWithErrorState = useCallback(() => {
     setMessages((prevMessages) => {
       const newMessages = [...prevMessages]
@@ -45,8 +46,15 @@ const useAIChatStreamHandler = () => {
       setIsStreaming(true)
 
       const formData = input instanceof FormData ? input : new FormData()
-      if (typeof input === 'string') {
+      // if (typeof input === 'string') {
+      //   formData.append('message', input)
+      // }
+      if (!(input instanceof FormData)) {
         formData.append('message', input)
+      }
+      if (!formData.has('message')) {
+        console.error('Missing required field: message')
+        return
       }
 
       setMessages((prevMessages) => {
@@ -91,6 +99,7 @@ const useAIChatStreamHandler = () => {
 
         formData.append('stream', 'true')
         formData.append('session_id', sessionId ?? '')
+        formData.append('user_id', userId ?? '')
 
         await streamResponse({
           apiUrl: playgroundRunUrl,
@@ -109,6 +118,7 @@ const useAIChatStreamHandler = () => {
               ) {
                 const sessionData = {
                   session_id: chunk.session_id as string,
+                  session_name: formData.get('message') as string,
                   title: formData.get('message') as string,
                   created_at: chunk.created_at
                 }
@@ -254,7 +264,7 @@ const useAIChatStreamHandler = () => {
               )
             }
           },
-          onComplete: () => {}
+          onComplete: () => { }
         })
       } catch (error) {
         updateMessagesWithErrorState()
@@ -287,7 +297,8 @@ const useAIChatStreamHandler = () => {
       setSessionsData,
       sessionId,
       setSessionId,
-      hasStorage
+      hasStorage,
+      userId
     ]
   )
 

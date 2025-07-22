@@ -7,7 +7,7 @@ export default function Home() {
   const [isCollapsed, setIsCollapsed] = useState(false)
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <div className="bg-background flex flex-col md:flex-row min-h-screen">
+      <div className="bg-background flex min-h-screen flex-col md:flex-row">
         <Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
         <ChatArea isCollapsed={isCollapsed} />
       </div>

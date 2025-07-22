@@ -1,11 +1,7 @@
 import { toast } from 'sonner'
-
 import { APIRoutes } from './routes'
-
 import { Agent, ComboboxAgent, SessionEntry } from '@/types/playground'
 import apiFetch from './apiFetch'
-
-// Local stub removed; using centralized helper
 
 export const getPlaygroundAgentsAPI = async (
   endpoint: string
@@ -14,7 +10,10 @@ export const getPlaygroundAgentsAPI = async (
   try {
     const response = await apiFetch(url, {
       method: 'GET',
-      credentials: 'include'
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json'
+      }
     })
     if (!response.ok) {
       toast.error(`Failed to fetch playground agents: ${response.statusText}`)
@@ -44,11 +43,12 @@ export const getPlaygroundStatusAPI = async (base: string): Promise<number> => {
 
 export const getAllPlaygroundSessionsAPI = async (
   base: string,
-  agentId: string
+  agentId: string,
+  userId: string
 ): Promise<SessionEntry[]> => {
   try {
     const response = await apiFetch(
-      APIRoutes.GetPlaygroundSessions(base, agentId),
+      APIRoutes.GetPlaygroundSessions(base, agentId, userId),
       {
         method: 'GET',
         credentials: 'include'
@@ -56,7 +56,6 @@ export const getAllPlaygroundSessionsAPI = async (
     )
     if (!response.ok) {
       if (response.status === 404) {
-        // Return empty array when storage is not enabled
         return []
       }
       throw new Error(`Failed to fetch sessions: ${response.statusText}`)
@@ -70,10 +69,11 @@ export const getAllPlaygroundSessionsAPI = async (
 export const getPlaygroundSessionAPI = async (
   base: string,
   agentId: string,
-  sessionId: string
+  sessionId: string,
+  userId: string
 ) => {
   const response = await apiFetch(
-    APIRoutes.GetPlaygroundSession(base, agentId, sessionId),
+    APIRoutes.GetPlaygroundSession(base, agentId, sessionId, userId),
     {
       method: 'GET',
       credentials: 'include'
@@ -85,10 +85,11 @@ export const getPlaygroundSessionAPI = async (
 export const deletePlaygroundSessionAPI = async (
   base: string,
   agentId: string,
-  sessionId: string
+  sessionId: string,
+  userId: string
 ) => {
   const response = await apiFetch(
-    APIRoutes.DeletePlaygroundSession(base, agentId, sessionId),
+    APIRoutes.DeletePlaygroundSession(base, agentId, sessionId, userId),
     {
       method: 'DELETE',
       credentials: 'include'
