@@ -116,7 +116,7 @@ export const usePlaygroundStore = create<PlaygroundStore>()(
         hydrated: state.hydrated
       }),
       onRehydrateStorage: () => (state) => {
-        if (state?.selectedEndpoint?.includes('ask.rwaka.rw')) {
+        if (state?.selectedEndpoint?.includes('chatapi.rwaka.rw')) {
           state.setSelectedEndpoint('https://chatapinor.rwaka.rw/v1/playground')
         }
         state?.setHydrated?.()

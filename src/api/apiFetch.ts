@@ -8,11 +8,7 @@ const getAccessTokenFromCookies = (): string | null => {
   for (const cookie of cookies) {
     const [name, value] = cookie.trim().split('=')
     // Try common token cookie names
-    if (
-      name === 'access_token' ||
-      name === 'whop_token' ||
-      name === 'authToken'
-    ) {
+    if (name === 'whop_access_token') {
       return decodeURIComponent(value)
     }
   }
