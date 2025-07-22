@@ -1,6 +1,6 @@
 import { useUserStore } from '@/stores/userStore'
 
-const getAccessTokenFromCookies = (): string | null => {
+export const getAccessTokenFromCookies = (): string | null => {
   if (typeof window === 'undefined') return null
 
   const cookies = document.cookie.split(';')
@@ -13,11 +13,17 @@ const getAccessTokenFromCookies = (): string | null => {
   return null
 }
 
-const hasValidAccessToken = (): boolean => {
+const getAccessToken = (): string | null => {
   let token = getAccessTokenFromCookies()
   if (!token && typeof window !== 'undefined') {
     token = useUserStore.getState().accessToken
   }
+  return token
+}
+
+const hasValidAccessToken = (): boolean => {
+  const token = getAccessToken()
+  console.log('Access token:', token)
   return !!token
 }
 
