@@ -54,7 +54,7 @@ export default async function apiFetch(
     headers.set(key, value)
   })
 
-  if (!headers.has('Content-Type')) {
+  if (!(init.body instanceof FormData) && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json')
   }
 
