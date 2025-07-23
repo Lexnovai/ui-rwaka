@@ -21,23 +21,25 @@ export function UserStoreHydration() {
             }
 
             setAccessToken(token)
+            const store = useUserStore.getState()
 
-            const { userId } = await whopSdk.verifyUserToken(token)
-            // const user = await whopSdk.users.getCurrentUser()
+            if (!store.userId) {
+                const { userId } = await whopSdk.verifyUserToken(token)
+                const user = await whopSdk.users.getUser({ userId: userId });
 
-            if (userId) {
-                useUserStore.setState({ userId })
-                // useUserStore.getState().setUser(userId, user, token)
+                if (userId) {
+                    store.setUser(userId, user, token)
+                } else {
+                    console.warn('Token verification succeeded but no userId returned')
+                    clearUser()
+                }
             } else {
-                console.warn('Token verification succeeded but no userId returned')
-                clearUser()
+                console.log('User ID found in store, skipping verification.')
             }
 
         } catch (error) {
             console.error('Failed to initialize user:', error)
-
             clearUser()
-
         } finally {
             setLoading(false)
         }
