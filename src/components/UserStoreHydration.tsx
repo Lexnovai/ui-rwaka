@@ -29,7 +29,8 @@ export function UserStoreHydration() {
             const user = await whopSdk.users.getCurrentUser()
 
             if (userId) {
-                useUserStore.setState({ userId, user })
+                useUserStore.setState({ userId })
+                useUserStore.setState({ user })
                 console.log('User initialized successfully:', { userId })
             } else {
                 console.warn('Token verification succeeded but no userId returned')
