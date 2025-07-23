@@ -1,6 +1,20 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 
+// Simple JWT decoder to extract payload without verification
+function decodeJWT(token: string) {
+  try {
+    const parts = token.split('.')
+    if (parts.length !== 3) return null
+    
+    const payload = parts[1]
+    const decoded = Buffer.from(payload, 'base64url').toString('utf8')
+    return JSON.parse(decoded)
+  } catch {
+    return null
+  }
+}
+
 // GET /api/auth/me – returns the currently authenticated Whop user
 export async function GET() {
   try {
@@ -12,14 +26,22 @@ export async function GET() {
       return NextResponse.json({ error: 'No access token found' }, { status: 401 })
     }
 
-    // 2. Use the access token directly with Whop's GraphQL API
-    // This is the correct approach for production apps running outside whop.com
+    // 2. Decode the JWT token to extract user ID
+    const tokenPayload = decodeJWT(accessToken)
+    if (!tokenPayload || !tokenPayload.sub) {
+      return NextResponse.json({ error: 'Invalid token format' }, { status: 401 })
+    }
+
+    const userId = tokenPayload.sub
+
+    // 3. Use App API Key with x-on-behalf-of header to get user details
     const response = await fetch('https://api.whop.com/public-graphql', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${accessToken}`,
+        'Authorization': `Bearer ${process.env.WHOP_API_KEY}`,
         'Content-Type': 'application/json',
-        'x-app-id': process.env.NEXT_PUBLIC_WHOP_APP_ID!,
+        'x-on-behalf-of': userId,
+        'x-company-id': process.env.NEXT_PUBLIC_WHOP_COMPANY_ID!,
       },
       body: JSON.stringify({
         query: `
@@ -54,7 +76,7 @@ export async function GET() {
       return NextResponse.json({ error: 'No user data returned' }, { status: 401 })
     }
 
-    // 3. Return user data to the client
+    // 4. Return user data to the client
     return NextResponse.json({ 
       userId: user.id, 
       user: user,
