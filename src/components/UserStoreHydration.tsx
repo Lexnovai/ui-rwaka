@@ -33,6 +33,7 @@ export function UserStoreHydration() {
                 useUserStore.setState({ userId })
                 console.log('User initialized successfully:', { userId })
             } else {
+                window.location.href = 'https://rwaka.rw'
                 console.warn('Token verification succeeded but no userId returned')
                 clearUser()
             }
