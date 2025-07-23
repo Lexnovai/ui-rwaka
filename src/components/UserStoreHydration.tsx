@@ -1,15 +1,13 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 'use client'
 
 import { useEffect, useCallback } from 'react'
 import { useUserStore } from '@/stores/userStore'
 import { getAccessTokenFromCookies } from '@/api/apiFetch'
 import { whopSdk } from '@/lib/whop-sdk'
-import { headers } from "next/headers";
 
-export async function UserStoreHydration() {
+export function UserStoreHydration() {
     const { setAccessToken, setLoading, clearUser } = useUserStore()
-    const headersList = await headers();
+
     const initializeUser = useCallback(async () => {
         try {
             setLoading(true)
@@ -26,16 +24,19 @@ export async function UserStoreHydration() {
             const store = useUserStore.getState()
 
             if (!store.userId) {
-                const { userId } = await whopSdk.verifyUserToken(headersList)
+                // Only verify if you don't already have a userId
+                const { userId } = await whopSdk.verifyUserToken(token)
                 const user = await whopSdk.users.getUser({ userId: userId });
 
                 if (userId) {
+                    // Use your official setUser so you persist everything consistently
                     store.setUser(userId, user, token)
                 } else {
                     console.warn('Token verification succeeded but no userId returned')
                     clearUser()
                 }
             } else {
+                // You already have a userId — nothing to do!
                 console.log('User ID found in store, skipping verification.')
             }
 
@@ -45,7 +46,7 @@ export async function UserStoreHydration() {
         } finally {
             setLoading(false)
         }
-    }, [setAccessToken, setLoading, clearUser, headersList])
+    }, [setAccessToken, setLoading, clearUser])
 
     useEffect(() => {
         initializeUser()
