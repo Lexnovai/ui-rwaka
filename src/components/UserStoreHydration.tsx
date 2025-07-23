@@ -23,25 +23,23 @@ export function UserStoreHydration() {
 
             setAccessToken(token)
 
-            // Log the full response to debug
             const tokenResponse = await whopSdk.verifyUserToken(token)
             console.log('Token verification response:', tokenResponse)
 
-            // Try different possible property names for userId
             const userId = tokenResponse.userId
 
             if (!userId) {
-                console.error('No user ID found in token response:', tokenResponse)
+                console.warn('Token verification succeeded but no userId returned')
                 clearUser()
                 return
             }
 
-            // Only fetch user details if we have a valid userId
-            const user = await whopSdk.users.getUser({ userId: userId })
-            console.log('User details:', user)
+            const userData = await whopSdk.users.getUser({ userId: userId })
+            console.log('User data fetched:', userData)
 
-            // Set user in store - remove the redundant setState call
-            setUser(userId, user, token)
+            setUser(userId, userData, token)
+
+            console.log('User initialized successfully:', { userId, userData })
 
         } catch (error) {
             console.error('Failed to initialize user:', error)
