@@ -23,7 +23,7 @@ WORKDIR /app
 
 # Set environment variables
 ENV NODE_ENV=production \
-    PORT=3027
+    PORT=3028
 
 # Don't run production as root
 RUN addgroup --system --gid 1001 nodejs && \
@@ -39,6 +39,6 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 
 USER nextjs
 
-EXPOSE 3027
+EXPOSE 3028
 
 CMD ["node", "server.js"]
