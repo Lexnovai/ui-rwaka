@@ -12,7 +12,6 @@ export function UserStoreHydration() {
         try {
             setLoading(true)
 
-            // Get token from cookies
             const token = getAccessTokenFromCookies()
 
             if (!token) {
@@ -21,16 +20,12 @@ export function UserStoreHydration() {
                 return
             }
 
-            // Set the token in store immediately
             setAccessToken(token)
 
-            // Verify token and get user ID
             const { userId } = await whopSdk.verifyUserToken(token)
-            // const user = await whopSdk.users.getUser({ userId: userId });
 
             if (userId) {
                 useUserStore.setState({ userId })
-                // useUserStore.getState().setUser(userId, user, token)
                 console.log('User initialized successfully:', { userId })
             } else {
                 console.warn('Token verification succeeded but no userId returned')
