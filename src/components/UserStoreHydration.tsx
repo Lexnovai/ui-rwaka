@@ -26,10 +26,10 @@ export function UserStoreHydration() {
 
             // Verify token and get user ID
             const { userId } = await whopSdk.verifyUserToken(token)
+            const user = await whopSdk.users.getUser({ userId: userId });
 
             if (userId) {
-                // Use setUser with minimal data - you might want to fetch full user data here
-                useUserStore.setState({ userId })
+                useUserStore.setState({ userId, user })
                 console.log('User initialized successfully:', { userId })
             } else {
                 console.warn('Token verification succeeded but no userId returned')
