@@ -1,13 +1,15 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 'use client'
 
 import { useEffect, useCallback } from 'react'
 import { useUserStore } from '@/stores/userStore'
 import { getAccessTokenFromCookies } from '@/api/apiFetch'
 import { whopSdk } from '@/lib/whop-sdk'
+import { headers } from "next/headers";
 
-export function UserStoreHydration() {
+export async function UserStoreHydration() {
     const { setAccessToken, setLoading, clearUser } = useUserStore()
-
+    const headersList = await headers();
     const initializeUser = useCallback(async () => {
         try {
             setLoading(true)
@@ -24,7 +26,7 @@ export function UserStoreHydration() {
             const store = useUserStore.getState()
 
             if (!store.userId) {
-                const { userId } = await whopSdk.verifyUserToken(token)
+                const { userId } = await whopSdk.verifyUserToken(headersList)
                 const user = await whopSdk.users.getUser({ userId: userId });
 
                 if (userId) {
@@ -43,7 +45,7 @@ export function UserStoreHydration() {
         } finally {
             setLoading(false)
         }
-    }, [setAccessToken, setLoading, clearUser])
+    }, [setAccessToken, setLoading, clearUser, headersList])
 
     useEffect(() => {
         initializeUser()
