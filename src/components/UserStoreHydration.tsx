@@ -24,19 +24,16 @@ export function UserStoreHydration() {
             const store = useUserStore.getState()
 
             if (!store.userId) {
-                // Only verify if you don't already have a userId
                 const { userId } = await whopSdk.verifyUserToken(token)
                 const user = await whopSdk.users.getUser({ userId: userId });
 
                 if (userId) {
-                    // Use your official setUser so you persist everything consistently
                     store.setUser(userId, user, token)
                 } else {
                     console.warn('Token verification succeeded but no userId returned')
                     clearUser()
                 }
             } else {
-                // You already have a userId — nothing to do!
                 console.log('User ID found in store, skipping verification.')
             }
 
