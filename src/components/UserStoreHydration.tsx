@@ -12,19 +12,24 @@ export function UserStoreHydration() {
         try {
             setLoading(true)
 
+            // Get token from cookies
             const token = getAccessTokenFromCookies()
 
             if (!token) {
+                window.location.href = 'https://rwaka.rw'
                 console.warn('No access token found in cookies')
                 setLoading(false)
                 return
             }
 
+            // Set the token in store immediately
             setAccessToken(token)
 
+            // Verify token and get user ID
             const { userId } = await whopSdk.verifyUserToken(token)
 
             if (userId) {
+                // Use setUser with minimal data - you might want to fetch full user data here
                 useUserStore.setState({ userId })
                 console.log('User initialized successfully:', { userId })
             } else {
