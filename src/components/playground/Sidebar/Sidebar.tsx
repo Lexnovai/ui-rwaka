@@ -203,7 +203,7 @@ const Sidebar = ({
                         {user?.name || user?.username || 'User'}
                       </div>
                       <div className="text-accent-foreground text-[10px]">
-                        {user?.email || 'No email'}
+                        {user?.email || 'Email'}
                       </div>
                     </>
                   )}
