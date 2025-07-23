@@ -88,7 +88,7 @@ export const usePlaygroundStore = create<PlaygroundStore>()(
       hasStorage: false,
       setHasStorage: () => set(() => ({ hasStorage: true })),
       chatInputRef: { current: null },
-      selectedEndpoint: 'https://chatapinor.rwaka.rw/v1/playground',
+      selectedEndpoint: 'https://chatapi.rwaka.rw/v1/playground',
       setSelectedEndpoint: (selectedEndpoint) =>
         set(() => ({ selectedEndpoint })),
       agents: [],
@@ -116,8 +116,8 @@ export const usePlaygroundStore = create<PlaygroundStore>()(
         hydrated: state.hydrated
       }),
       onRehydrateStorage: () => (state) => {
-        if (state?.selectedEndpoint?.includes('chatapi.rwaka.rw')) {
-          state.setSelectedEndpoint('https://chatapinor.rwaka.rw/v1/playground')
+        if (state?.selectedEndpoint?.includes('chatapinor.rwaka.rw')) {
+          state.setSelectedEndpoint('https://chatapi.rwaka.rw/v1/playground')
         }
         state?.setHydrated?.()
       }
