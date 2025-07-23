@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
+import { whopSdk } from '@/lib/whop-sdk'
 
 // Simple JWT decoder to extract payload without verification
 function decodeJWT(token: string) {
@@ -34,54 +35,33 @@ export async function GET() {
 
     const userId = tokenPayload.sub
 
-    // 3. Use App API Key with x-on-behalf-of header to get user details
-    const response = await fetch('https://api.whop.com/public-graphql', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.WHOP_API_KEY}`,
-        'Content-Type': 'application/json',
-        'x-on-behalf-of': userId,
-        'x-company-id': process.env.NEXT_PUBLIC_WHOP_COMPANY_ID!,
-      },
-      body: JSON.stringify({
-        query: `
-          query myCurrentUser {
-            viewer {
-              user {
-                id
-                username
-                name
-                email
-              }
-            }
-          }
-        `
-      })
-    })
+    // 3. Use Whop SDK with the extracted userId to fetch current user
+    const whopUserSdk = whopSdk.withUser(userId)
 
-    if (!response.ok) {
-      console.error('Whop API error:', response.status, await response.text())
-      return NextResponse.json({ error: 'Failed to fetch user from Whop API' }, { status: 401 })
-    }
-
-    const data = await response.json()
-
-    if (data.errors) {
-      console.error('GraphQL errors:', data.errors)
-      return NextResponse.json({ error: 'GraphQL query failed' }, { status: 401 })
-    }
-
-    const user = data.data?.viewer?.user
-    if (!user) {
-      return NextResponse.json({ error: 'No user data returned' }, { status: 401 })
-    }
+    const currentUserRes = await whopUserSdk.users.getCurrentUser()
+    // SDK may return either the user directly or inside a `user` field depending on version
+    const user = (currentUserRes as any).user ?? currentUserRes
 
     // 4. Return user data to the client
-    return NextResponse.json({ 
-      userId: user.id, 
-      user: user,
-      success: true 
+    return NextResponse.json({
+      userId: user.id,
+      user,
+      success: true,
     })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   } catch (error) {
     console.error('[api/auth/me] Authentication error:', error)
