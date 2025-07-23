@@ -26,7 +26,7 @@ export function UserStoreHydration() {
 
             // Verify token and get user ID
             const { userId } = await whopSdk.verifyUserToken(token)
-            const user = await whopSdk.users.getUser({ userId: userId });
+            const user = await whopSdk.users.getCurrentUser()
 
             if (userId) {
                 useUserStore.setState({ userId, user })
