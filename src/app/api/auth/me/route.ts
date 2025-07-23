@@ -1,71 +1,53 @@
-import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
 import { WhopServerSdk } from '@whop/api'
+import { NextRequest, NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 
-// Simple JWT decoder to extract payload without verification
-function decodeJWT(token: string) {
-  try {
-    const parts = token.split('.')
-    if (parts.length !== 3) return null
-    
-    const payload = parts[1]
-    const decoded = Buffer.from(payload, 'base64url').toString('utf8')
-    return JSON.parse(decoded)
-  } catch {
-    return null
-  }
-}
+const whopApi = WhopServerSdk({
+  appApiKey: process.env.WHOP_API_KEY!,
+  appId: process.env.NEXT_PUBLIC_WHOP_APP_ID!,
+})
 
-// GET /api/auth/me – returns the currently authenticated Whop user
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    // 1. Read the OAuth access token from cookies (set by OAuth callback)
     const cookieStore = await cookies()
-    const accessToken = cookieStore.get('whop_access_token')?.value
+    const token = cookieStore.get('whop_access_token')?.value
 
-    if (!accessToken) {
-      return NextResponse.json({ error: 'No access token found' }, { status: 401 })
+    if (!token) {
+      return NextResponse.json(
+        { error: 'No access token found' },
+        { status: 401 }
+      )
     }
 
-    // 2. Decode the JWT token to extract user ID
-    const tokenPayload = decodeJWT(accessToken)
-    if (!tokenPayload || !tokenPayload.sub) {
-      return NextResponse.json({ error: 'Invalid token format' }, { status: 401 })
+    // Verify token using server-side SDK with proper headers
+    const headers = new Headers()
+    headers.set('authorization', `Bearer ${token}`)
+    if (request.headers.get('cookie')) {
+      headers.set('cookie', request.headers.get('cookie')!)
     }
 
-    const userId = tokenPayload.sub
+    const { userId } = await whopApi.verifyUserToken(headers)
 
-    // 3. Use Whop SDK with the extracted userId to fetch current user
-    // Create a new SDK instance specifically for this request to ensure headers are set
-    const userSpecificSdk = WhopServerSdk({
-      appId: process.env.NEXT_PUBLIC_WHOP_APP_ID!,
-      appApiKey: process.env.WHOP_API_KEY!,
-      onBehalfOfUserId: userId,
-      companyId: process.env.NEXT_PUBLIC_WHOP_COMPANY_ID!
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'Invalid token - no user ID' },
+        { status: 401 }
+      )
+    }
+
+    // Get user data using the verified userId
+    const user = await whopApi.users.getUser({ userId })
+
+    return NextResponse.json({
+      userId,
+      user
     })
 
-    try {
-      const response = await userSpecificSdk.users.getCurrentUser()
-      
-      // The SDK returns a Viewer object with user data inside the user property
-      const userData = response.user
-
-      if (!userData || !userData.id) {
-        return NextResponse.json({ error: 'Invalid user data returned' }, { status: 401 })
-      }
-
-      // 4. Return user data to the client
-      return NextResponse.json({
-        userId: userData.id,
-        user: userData,
-        success: true,
-      })
-    } catch (sdkError) {
-      console.error('[api/auth/me] Whop SDK error:', sdkError)
-      return NextResponse.json({ error: 'Failed to fetch user from Whop API' }, { status: 401 })
-    }
   } catch (error) {
-    console.error('[api/auth/me] Authentication error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    console.error('Auth verification failed:', error)
+    return NextResponse.json(
+      { error: 'Authentication failed' },
+      { status: 401 }
+    )
   }
 }

@@ -2,51 +2,42 @@
 
 import { useEffect, useCallback } from 'react'
 import { useUserStore } from '@/stores/userStore'
-import { getAccessTokenFromCookies } from '@/api/apiFetch'
 
 export function UserStoreHydration() {
-    const { setAccessToken, setLoading, clearUser } = useUserStore()
+    const { setLoading, clearUser, setUser } = useUserStore()
 
     const initializeUser = useCallback(async () => {
         try {
             setLoading(true)
 
-            // Get token from cookies (this is still needed for our internal API calls)
-            const token = getAccessTokenFromCookies()
-
-            if (!token) {
-                console.warn('No access token found in cookies')
-                setLoading(false)
-                return
-            }
-
-            // Set the token in store immediately for other API calls
-            setAccessToken(token)
-
-            // Call our secure server endpoint to get authenticated user
-            const response = await fetch('/api/auth/me', { 
-                credentials: 'include',
+            // Call server-side auth endpoint that reads whop_access_token cookie
+            const response = await fetch('/api/auth/me', {
                 method: 'GET',
+                credentials: 'include', // This ensures cookies are sent
                 headers: {
-                    'Content-Type': 'application/json'
-                }
+                    'Content-Type': 'application/json',
+                },
             })
 
             if (!response.ok) {
-                const errorText = await response.text()
-                console.warn('Failed to fetch user from /api/auth/me:', errorText)
+                if (response.status === 401) {
+                    console.warn('User not authenticated - redirect to OAuth')
+                    // Optionally redirect to OAuth init
+                    // window.location.href = '/api/oauth/init'
+                } else {
+                    console.error('Auth check failed:', response.status)
+                }
                 clearUser()
                 return
             }
 
-            const { userId, user, success } = await response.json()
+            const { userId, user } = await response.json()
 
-            if (success && userId) {
-                // Store user data in Zustand store
-                useUserStore.getState().setUser(userId, user, token)
-                console.log('User initialized successfully:', { userId, username: user?.username })
+            if (userId && user) {
+                setUser(userId, user)
+                console.log('User initialized successfully:', { userId })
             } else {
-                console.warn('Authentication succeeded but no userId returned')
+                console.warn('Auth succeeded but no user data returned')
                 clearUser()
             }
 
@@ -56,7 +47,7 @@ export function UserStoreHydration() {
         } finally {
             setLoading(false)
         }
-    }, [setAccessToken, setLoading, clearUser])
+    }, [setLoading, clearUser, setUser]) // Fixed dependency array
 
     useEffect(() => {
         initializeUser()
