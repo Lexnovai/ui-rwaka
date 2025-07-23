@@ -4,7 +4,7 @@ import { Button } from '../../../ui/button'
 import useSessionLoader from '@/hooks/useSessionLoader'
 import { deletePlaygroundSessionAPI } from '@/api/playground'
 import { usePlaygroundStore } from '@/store'
-import { useUserStore } from '@/stores/userStore' // Add this import
+import { useUserStore } from '@/stores/userStore'
 import { toast } from 'sonner'
 import Icon from '@/components/ui/icon'
 import { useState } from 'react'

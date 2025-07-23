@@ -15,7 +15,6 @@ export function UserStoreHydration() {
             const token = getAccessTokenFromCookies()
 
             if (!token) {
-                console.warn('No access token found in cookies')
                 clearUser()
                 setLoading(false)
                 return
@@ -29,7 +28,6 @@ export function UserStoreHydration() {
             const userId = tokenResponse.userId
 
             if (!userId) {
-                console.warn('Token verification succeeded but no userId returned')
                 clearUser()
                 return
             }

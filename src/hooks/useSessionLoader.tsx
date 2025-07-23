@@ -57,7 +57,7 @@ const useSessionLoader = () => {
         setIsSessionsLoading(false)
       }
     },
-    [selectedEndpoint, setSessionsData, setIsSessionsLoading, userId] // Add userId to dependencies
+    [selectedEndpoint, setSessionsData, setIsSessionsLoading, userId]
   )
 
   const getSession = useCallback(
@@ -77,7 +77,7 @@ const useSessionLoader = () => {
           selectedEndpoint,
           agentId,
           sessionId,
-          userId // Add userId parameter
+          userId
         )) as SessionResponse
 
         if (response && response.memory) {
@@ -169,10 +169,9 @@ const useSessionLoader = () => {
         return null
       }
     },
-    [selectedEndpoint, setMessages, userId] // Add userId to dependencies
+    [selectedEndpoint, setMessages, userId]
   )
 
-  // Helper function to check if user is authenticated
   const isAuthenticated = useCallback(() => {
     return Boolean(userId)
   }, [userId])
@@ -181,7 +180,7 @@ const useSessionLoader = () => {
     getSession,
     getSessions,
     isAuthenticated, // Expose authentication status
-    userId // Expose userId for debugging
+    userId
   }
 }
 
