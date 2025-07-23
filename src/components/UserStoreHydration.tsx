@@ -16,7 +16,6 @@ export function UserStoreHydration() {
             const token = getAccessTokenFromCookies()
 
             if (!token) {
-                window.location.href = 'https://rwaka.rw'
                 console.warn('No access token found in cookies')
                 setLoading(false)
                 return
@@ -33,16 +32,14 @@ export function UserStoreHydration() {
                 useUserStore.setState({ userId })
                 console.log('User initialized successfully:', { userId })
             } else {
-                window.location.href = 'https://rwaka.rw'
                 console.warn('Token verification succeeded but no userId returned')
                 clearUser()
             }
 
         } catch (error) {
             console.error('Failed to initialize user:', error)
-
+            window.location.href = 'https://rwaka.rw'
             clearUser()
-
         } finally {
             setLoading(false)
         }
