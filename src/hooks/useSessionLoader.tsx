@@ -35,6 +35,7 @@ const useSessionLoader = () => {
   const setSessionsData = usePlaygroundStore((state) => state.setSessionsData)
   const { userId } = useUserStore()
 
+
   const getSessions = useCallback(
     async (agentId: string) => {
       if (!agentId || !selectedEndpoint || !userId) {
