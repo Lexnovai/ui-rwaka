@@ -6,7 +6,7 @@ import { getAccessTokenFromCookies } from '@/api/apiFetch'
 import { whopSdk } from '@/lib/whop-sdk'
 
 export function UserStoreHydration() {
-    const { setAccessToken, setLoading, clearUser, setUser } = useUserStore()
+    const { setAccessToken, setLoading, clearUser } = useUserStore()
 
     const initializeUser = useCallback(async () => {
         try {
@@ -26,11 +26,11 @@ export function UserStoreHydration() {
 
             // Verify token and get user ID
             const { userId } = await whopSdk.verifyUserToken(token)
-            const userData = await whopSdk.users.getUser({ userId: userId })
 
             if (userId) {
-                setUser(userId, userData, token)
-                console.log('User data fetched:', userData)
+                // Use setUser with minimal data - you might want to fetch full user data here
+                useUserStore.setState({ userId })
+                console.log('User initialized successfully:', { userId })
             } else {
                 console.warn('Token verification succeeded but no userId returned')
                 clearUser()
@@ -44,7 +44,7 @@ export function UserStoreHydration() {
         } finally {
             setLoading(false)
         }
-    }, [setAccessToken, setLoading, clearUser, setUser])
+    }, [setAccessToken, setLoading, clearUser])
 
     useEffect(() => {
         initializeUser()
