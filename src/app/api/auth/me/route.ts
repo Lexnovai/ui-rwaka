@@ -40,7 +40,8 @@ export async function GET() {
 
     const currentUserRes = await whopUserSdk.users.getCurrentUser()
     // SDK may return either the user directly or inside a `user` field depending on version
-    const user = (currentUserRes as any).user ?? currentUserRes
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const user = (currentUserRes as any).user ?? (currentUserRes as unknown)
 
     // 4. Return user data to the client
     return NextResponse.json({
