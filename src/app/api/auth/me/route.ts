@@ -48,21 +48,6 @@ export async function GET() {
       user,
       success: true,
     })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   } catch (error) {
     console.error('[api/auth/me] Authentication error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
