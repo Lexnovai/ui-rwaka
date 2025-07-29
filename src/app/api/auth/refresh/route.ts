@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
                 `whop_access_token=${tokenData.access_token}`,
                 "Path=/",
                 "SameSite=None",
-                "Max-Age=86400" // 24 hours
+                "Max-Age=300" // 5 minutes to match token expiry
               ];
               
               if (process.env.NODE_ENV === "production") {
