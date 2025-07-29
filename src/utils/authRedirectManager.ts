@@ -41,7 +41,7 @@ class AuthRedirectManager {
     // Set a timeout to reset the flag in case something goes wrong
     this.redirectTimeout = setTimeout(() => {
       this.isRedirecting = false;
-    }, 5000);
+    }, 10000);
 
     if (typeof window !== 'undefined') {
       const currentUrl = encodeURIComponent(window.location.href);

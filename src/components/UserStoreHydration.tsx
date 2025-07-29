@@ -30,11 +30,11 @@ export function UserStoreHydration() {
                     const hasOAuthParams = urlParams.has('code') || urlParams.has('state')
                     
                     if (hasOAuthParams) {
-                        console.log('Just came from OAuth, waiting a bit longer for cookies...')
-                        // Wait a bit longer and try again
+                        console.log('Just came from OAuth, waiting 5 seconds for cookies...')
+                        // Wait 5 seconds and try again
                         setTimeout(() => {
                             initializeUser()
-                        }, 3000)
+                        }, 5000)
                         return
                     }
                     
