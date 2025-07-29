@@ -41,10 +41,10 @@ export class TokenManager {
       this.checkTokenValidity();
     }, 5 * 60 * 1000);
 
-    // Wait 5 seconds before first check to allow cookies to be set after redirect
+    // Wait 10 seconds before first check to allow initial auth to complete
     setTimeout(() => {
       this.checkTokenValidity();
-    }, 5000);
+    }, 10000);
   }
 
   private async checkTokenValidity() {
@@ -53,6 +53,15 @@ export class TokenManager {
     // Don't check if we're already redirecting
     if (authRedirectManager.isCurrentlyRedirecting()) {
       return;
+    }
+    
+    // Don't check if we just came from OAuth (has code or state params)
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has('code') || urlParams.has('state')) {
+        console.log('Skipping token validation - just came from OAuth');
+        return;
+      }
     }
     
     this.isChecking = true;

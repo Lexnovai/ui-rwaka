@@ -48,6 +48,13 @@ export default async function apiFetch(
 ): Promise<Response> {
   if (!hasValidAccessToken()) {
     if (typeof window !== 'undefined') {
+      // Don't redirect if we're in OAuth flow
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has('code') || urlParams.has('state')) {
+        console.log('In OAuth flow, not redirecting for missing token');
+        // Return a rejected promise instead of redirecting
+        return Promise.reject(new Error('No token available during OAuth flow'));
+      }
       authRedirectManager.redirectToAuth('apiFetch_no_token')
     }
     // Return a never-resolving promise to stop execution

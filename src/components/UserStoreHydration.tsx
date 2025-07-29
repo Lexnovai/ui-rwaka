@@ -52,6 +52,8 @@ export function UserStoreHydration() {
             if (userId && user) {
                 setUser(userId, user)
                 console.log('User initialized successfully:', { userId })
+                // Clear any redirect timestamps since auth was successful
+                authRedirectManager.reset()
             } else {
                 console.warn('Auth succeeded but no user data returned')
                 clearUser()

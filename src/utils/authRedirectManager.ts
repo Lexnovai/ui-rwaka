@@ -28,6 +28,17 @@ class AuthRedirectManager {
         console.log('Already on auth page, not redirecting');
         return;
       }
+      
+      // Check if we've redirected recently (within last 30 seconds)
+      const lastRedirect = sessionStorage.getItem('lastAuthRedirect');
+      const now = Date.now();
+      if (lastRedirect && (now - parseInt(lastRedirect)) < 30000) {
+        console.log('Recent redirect detected, preventing loop. Last redirect was', (now - parseInt(lastRedirect)) / 1000, 'seconds ago');
+        return;
+      }
+      
+      // Store this redirect timestamp
+      sessionStorage.setItem('lastAuthRedirect', now.toString());
     }
 
     console.log(`Initiating auth redirect due to: ${reason}`);
@@ -70,6 +81,10 @@ class AuthRedirectManager {
     if (this.redirectTimeout) {
       clearTimeout(this.redirectTimeout);
       this.redirectTimeout = null;
+    }
+    // Clear redirect timestamp on reset
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('lastAuthRedirect');
     }
   }
 }
