@@ -63,15 +63,18 @@ export async function POST(request: NextRequest) {
       })
       
       debug.log('Token refresh - Silent refresh response status:', silentResponse.status)
+      debug.log('Token refresh - Response headers:', Object.fromEntries(silentResponse.headers.entries()))
       
       // If we get a redirect with a code, extract it
-      if (silentResponse.status === 302 || silentResponse.status === 301) {
+      if (silentResponse.status === 302 || silentResponse.status === 301 || silentResponse.status === 308) {
         const location = silentResponse.headers.get('location')
         debug.log('Token refresh - Got redirect to:', location)
         
         if (location && location.includes('code=')) {
           const urlParams = new URLSearchParams(location.split('?')[1])
           const code = urlParams.get('code')
+          
+          debug.log('Token refresh - Extracted code:', code ? 'present' : 'missing')
           
           if (code) {
             debug.log('Token refresh - Got authorization code, exchanging for token...')
@@ -115,8 +118,16 @@ export async function POST(request: NextRequest) {
             } else {
               debug.log('Token refresh - Token exchange failed:', await tokenResponse.text())
             }
+          } else {
+            debug.log('Token refresh - No authorization code found in redirect')
           }
+        } else {
+          debug.log('Token refresh - Redirect location does not contain code parameter')
         }
+      } else {
+        debug.log('Token refresh - No redirect received, status:', silentResponse.status)
+        const responseText = await silentResponse.text()
+        debug.log('Token refresh - Response body:', responseText.substring(0, 200) + '...')
       }
     } catch (error) {
       debug.log('Token refresh - Silent refresh failed:', error)
