@@ -31,7 +31,7 @@ export class TokenManager {
   }
 
   startTokenMonitoring() {
-    console.log('TokenManager.startTokenMonitoring() - Starting with 2-minute intervals');
+    console.log('TokenManager.startTokenMonitoring() - Starting with 1-minute intervals');
     
     // Clear existing timer
     if (this.refreshTimer) {
@@ -39,10 +39,10 @@ export class TokenManager {
       this.refreshTimer = null;
     }
 
-    // Check token validity every 2 minutes (since Whop tokens expire quickly)
+    // Check token validity every 1 minute (since Whop tokens expire in ~3-5 minutes)
     this.refreshTimer = setInterval(() => {
       this.checkTokenValidity();
-    }, 2 * 60 * 1000);
+    }, 1 * 60 * 1000);
 
     // Wait 30 seconds before first check to allow initial auth to complete
     setTimeout(() => {
