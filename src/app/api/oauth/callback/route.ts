@@ -32,20 +32,28 @@ export async function GET(request: Request) {
   }
 
   // exchange the code for a token
+  console.log('OAuth callback - Exchanging code for token...');
   const authResponse = await whopApi.oauth.exchangeCode({
     code,
     redirectUri: `${process.env.NEXT_PUBLIC_SITE_URL}/api/oauth/callback`,
   });
 
+  console.log('OAuth callback - Auth response ok:', authResponse.ok);
   if (!authResponse.ok) {
+    console.error('OAuth callback - Code exchange failed:', authResponse);
     return NextResponse.redirect(new URL("/oauth/error?error=code_exchange_failed", requestUrl.origin));
   }
 
   const { access_token } = authResponse.tokens;
+  console.log('OAuth callback - Token received, length:', access_token?.length || 0);
+  console.log('OAuth callback - Token preview:', access_token?.substring(0, 20) + '...');
+  console.log('OAuth callback - All token data:', Object.keys(authResponse.tokens));
+  console.log('OAuth callback - Full tokens object:', authResponse.tokens);
 
   // Restore the `next` parameter from the state cookie set in the previous step.
   const next = decodeURIComponent(stateCookie.split("=")[1]);
   const nextUrl = new URL(next, `${process.env.NEXT_PUBLIC_SITE_URL}`);
+  console.log('OAuth callback - Redirecting to:', nextUrl.toString());
 
   const response = NextResponse.redirect(nextUrl.toString());
 
@@ -63,6 +71,8 @@ export async function GET(request: Request) {
     cookieOptions.push("Domain=.rwaka.rw");
   }
 
+  console.log('OAuth callback - Setting cookie with options:', cookieOptions.join("; "));
   response.headers.set("Set-Cookie", cookieOptions.join("; "));
+  console.log('OAuth callback - Cookie set, completing redirect');
   return response;
 }

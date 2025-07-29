@@ -31,6 +31,10 @@ export class TokenManager {
   }
 
   startTokenMonitoring() {
+    console.log('TokenManager.startTokenMonitoring() - DISABLED FOR DEBUGGING');
+    // COMPLETELY DISABLED FOR DEBUGGING TOKEN ISSUES
+    return;
+    
     // Clear existing timer
     if (this.refreshTimer) {
       clearInterval(this.refreshTimer);
