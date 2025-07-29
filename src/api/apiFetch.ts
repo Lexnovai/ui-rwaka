@@ -40,7 +40,8 @@ export default async function apiFetch(
 ): Promise<Response> {
   if (!hasValidAccessToken()) {
     if (typeof window !== 'undefined') {
-      window.location.href = 'https://rwaka.rw'
+      const currentUrl = encodeURIComponent(window.location.href)
+      window.location.href = `https://rwaka.rw/api/oauth/init?next=${currentUrl}`
     }
     // Return a never-resolving promise to stop execution
     return new Promise(() => {})
@@ -64,6 +65,17 @@ export default async function apiFetch(
 
   try {
     const response = await fetch(input, defaultOptions)
+    
+    // Handle token expiration
+    if (response.status === 401) {
+      console.log('API call returned 401, token expired')
+      if (typeof window !== 'undefined') {
+        const currentUrl = encodeURIComponent(window.location.href)
+        window.location.href = `https://rwaka.rw/api/oauth/init?next=${currentUrl}`
+      }
+      throw new Error('Token expired')
+    }
+    
     return response
   } catch (error) {
     console.error('API fetch error:', error)

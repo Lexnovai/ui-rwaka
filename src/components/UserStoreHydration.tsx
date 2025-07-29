@@ -2,6 +2,7 @@
 
 import { useEffect, useCallback } from 'react'
 import { useUserStore } from '@/stores/userStore'
+import { initializeTokenManager } from '@/utils/tokenManager'
 
 export function UserStoreHydration() {
     const { setLoading, clearUser, setUser } = useUserStore()
@@ -51,7 +52,18 @@ export function UserStoreHydration() {
 
     useEffect(() => {
         initializeUser()
-    }, [initializeUser])
+        
+        // Initialize token manager for automatic token monitoring
+        initializeTokenManager({
+            onTokenExpired: () => {
+                console.log('Token expired, clearing user and redirecting...')
+                clearUser()
+                // Redirect to landing page OAuth with current URL as return destination
+                const currentUrl = encodeURIComponent(window.location.href)
+                window.location.href = `https://rwaka.rw/api/oauth/init?next=${currentUrl}`
+            }
+        })
+    }, [initializeUser, clearUser])
 
     return null
 }
