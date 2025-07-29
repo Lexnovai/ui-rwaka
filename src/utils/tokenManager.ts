@@ -14,7 +14,6 @@ export class TokenManager {
   private refreshTimer: NodeJS.Timeout | null = null;
   private options: TokenManagerOptions = {};
   private isChecking = false;
-  private checkInterval = 60000 // Check every 1 minute (since Whop tokens expire in ~3-5 minutes)
 
   private constructor() {}
 
@@ -41,10 +40,10 @@ export class TokenManager {
       this.refreshTimer = null;
     }
 
-    // Check token validity every 1 minute
+    // Check token validity every 1 minute (since Whop tokens expire in ~3-5 minutes)
     this.refreshTimer = setInterval(() => {
       this.checkTokenValidity();
-    }, this.checkInterval);
+    }, 1 * 60 * 1000);
 
     // Wait 30 seconds before first check to allow initial auth to complete
     setTimeout(() => {
@@ -55,20 +54,22 @@ export class TokenManager {
   private async checkTokenValidity() {
     if (this.isChecking) return;
     
-    // Skip if we're in an OAuth flow (URL contains code or state)
+    // Don't check if we're already redirecting
+    if (authRedirectManager.isCurrentlyRedirecting()) {
+      return;
+    }
+    
+    // Don't check if we just came from OAuth (has code or state params)
     if (typeof window !== 'undefined') {
-      const urlParams = new URLSearchParams(window.location.search)
+      const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.has('code') || urlParams.has('state')) {
-        debug.log('TokenManager.checkTokenValidity() - Skipping check during OAuth flow')
-        return
+        debug.log('Skipping token validation - just came from OAuth');
+        return;
       }
     }
     
     this.isChecking = true;
-    debug.log('TokenManager.checkTokenValidity() - Starting token validation...');
-
-
-
+    
     try {
       const response = await fetch('/api/auth/me', {
         method: 'GET',
@@ -159,8 +160,6 @@ export class TokenManager {
       return false;
     }
   }
-
-
 }
 
 // Utility function to initialize token management
