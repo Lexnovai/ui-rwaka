@@ -1,6 +1,7 @@
 'use client'
 
 import { authRedirectManager } from './authRedirectManager'
+import { debug } from './debug'
 
 export interface TokenManagerOptions {
   onTokenExpired?: () => void;
@@ -31,7 +32,7 @@ export class TokenManager {
   }
 
   startTokenMonitoring() {
-    console.log('TokenManager.startTokenMonitoring() - Starting with 1-minute intervals');
+    debug.log('TokenManager.startTokenMonitoring() - Starting with 1-minute intervals');
     
     // Clear existing timer
     if (this.refreshTimer) {
@@ -62,7 +63,7 @@ export class TokenManager {
     if (typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search);
       if (urlParams.has('code') || urlParams.has('state')) {
-        console.log('Skipping token validation - just came from OAuth');
+        debug.log('Skipping token validation - just came from OAuth');
         return;
       }
     }
@@ -80,10 +81,10 @@ export class TokenManager {
 
       if (!response.ok) {
         if (response.status === 401) {
-          console.log('Token validation failed, attempting refresh...');
+          debug.log('Token validation failed, attempting refresh...');
           
           // Try to refresh the token first
-          console.log('Token validation failed, attempting automatic refresh...');
+          debug.log('Token validation failed, attempting automatic refresh...');
           const refreshResponse = await fetch('/api/auth/refresh', {
             method: 'POST',
             credentials: 'include',
@@ -95,25 +96,29 @@ export class TokenManager {
           
           if (refreshResponse.ok) {
             const refreshData = await refreshResponse.json();
-            if (refreshData.success && refreshData.refreshed) {
-              console.log('Token refresh successful via API - continuing monitoring');
-              return; // Token refreshed successfully, continue monitoring
+            if (refreshData.success) {
+              if (refreshData.refreshed) {
+                debug.log('Token refresh successful via API - got new token, continuing monitoring');
+              } else {
+                debug.log('Token is still valid - no refresh needed, continuing monitoring');
+              }
+              return; // Token refreshed successfully or still valid, continue monitoring
             }
           }
           
           // If we get here, either refresh failed or requires re-auth
           const refreshData = await refreshResponse.json().catch(() => ({}));
           if (refreshData.requiresReauth) {
-            console.log('Token refresh requires re-authentication, handling expiration...');
+            debug.log('Token refresh requires re-authentication, handling expiration...');
             this.handleTokenExpired();
           } else {
-            console.log('Token refresh failed with unknown error, handling expiration...');
+            debug.log('Token refresh failed with unknown error, handling expiration...');
             this.handleTokenExpired();
           }
         }
       }
     } catch (error) {
-      console.error('Token validation failed:', error);
+      debug.error('Token validation failed:', error);
       // Don't redirect on network errors, only on auth failures
     } finally {
       this.isChecking = false;
@@ -121,7 +126,7 @@ export class TokenManager {
   }
 
   private handleTokenExpired() {
-    console.log('Token expired, handling expiration...');
+    debug.log('Token expired, handling expiration...');
     
     if (this.options.onTokenExpired) {
       this.options.onTokenExpired();
@@ -151,7 +156,7 @@ export class TokenManager {
 
       return response.ok;
     } catch (error) {
-      console.error('Manual token validation failed:', error);
+      debug.error('Manual token validation failed:', error);
       return false;
     }
   }

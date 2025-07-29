@@ -1,26 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
+import { debug } from '@/utils/debug'
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('Token refresh - Starting direct API refresh attempt...')
+    debug.log('Token refresh - Starting direct API refresh attempt...')
     
     const cookieStore = await cookies()
     const currentToken = cookieStore.get('whop_access_token')?.value
     
     if (!currentToken) {
-      console.log('Token refresh - No current token found')
+      debug.log('Token refresh - No current token found')
       return NextResponse.json({
         requiresReauth: true,
         redirectUrl: `https://rwaka.rw/api/oauth/init?next=${encodeURIComponent(request.headers.get('referer') || 'https://testing.rwaka.rw/')}`
       }, { status: 401 })
     }
 
-    // Whop doesn't provide refresh tokens, so we'll check if current token is still valid
-    console.log('Token refresh - Checking if current token is still valid...')
+    // First check if current token is still valid
+    debug.log('Token refresh - Checking if current token is still valid...')
     
     try {
-      // Check if the current token is still valid by calling /me endpoint
       const userCheck = await fetch('https://api.whop.com/api/v5/me', {
         headers: {
           'Authorization': `Bearer ${currentToken}`,
@@ -29,30 +29,108 @@ export async function POST(request: NextRequest) {
       })
       
       if (userCheck.ok) {
-        console.log('Token refresh - Current token is still valid! No refresh needed.')
+        debug.log('Token refresh - Current token is still valid! No refresh needed.')
         return NextResponse.json({ 
           success: true, 
           refreshed: false, 
           message: 'Token still valid' 
         })
-      } else {
-        console.log('Token refresh - Current token is invalid, status:', userCheck.status)
-        const errorText = await userCheck.text()
-        console.log('Token refresh - Validation error:', errorText)
       }
     } catch (error) {
-      console.log('Token refresh - Error checking token validity:', error)
+      debug.log('Token refresh - Error checking current token:', error)
     }
     
-    // If we get here, the token is invalid and needs to be refreshed via OAuth
-    console.log('Token refresh - Token is invalid, requiring re-authentication')
+    // Token is invalid, try to get a new one using session cookies
+    debug.log('Token refresh - Attempting silent token refresh using session cookies...')
+    
+    try {
+      // Make a request to Whop's OAuth endpoint with existing cookies
+      // This should work if the user has a valid Whop session
+      const silentRefreshUrl = `https://whop.com/oauth?client_id=${process.env.NEXT_PUBLIC_WHOP_APP_ID}&response_type=code&redirect_uri=${encodeURIComponent('https://rwaka.rw/api/oauth/callback')}&scope=user:read&prompt=none`
+      
+      debug.log('Token refresh - Trying silent refresh with URL:', silentRefreshUrl)
+      
+      // Forward all cookies from the original request to maintain session
+      const cookieHeader = request.headers.get('cookie') || ''
+      
+      const silentResponse = await fetch(silentRefreshUrl, {
+        method: 'GET',
+        headers: {
+          'Cookie': cookieHeader,
+          'User-Agent': request.headers.get('user-agent') || 'Whop-App-Refresh'
+        },
+        redirect: 'manual' // Don't follow redirects automatically
+      })
+      
+      debug.log('Token refresh - Silent refresh response status:', silentResponse.status)
+      
+      // If we get a redirect with a code, extract it
+      if (silentResponse.status === 302 || silentResponse.status === 301) {
+        const location = silentResponse.headers.get('location')
+        debug.log('Token refresh - Got redirect to:', location)
+        
+        if (location && location.includes('code=')) {
+          const urlParams = new URLSearchParams(location.split('?')[1])
+          const code = urlParams.get('code')
+          
+          if (code) {
+            debug.log('Token refresh - Got authorization code, exchanging for token...')
+            
+            // Exchange code for token
+            const tokenResponse = await fetch('https://api.whop.com/api/v5/oauth/token', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              body: new URLSearchParams({
+                grant_type: 'authorization_code',
+                client_id: process.env.NEXT_PUBLIC_WHOP_APP_ID!,
+                client_secret: process.env.WHOP_API_KEY!,
+                code: code,
+                redirect_uri: 'https://rwaka.rw/api/oauth/callback'
+              })
+            })
+            
+            if (tokenResponse.ok) {
+              const tokenData = await tokenResponse.json()
+              debug.log('Token refresh - Successfully got new token!')
+              
+              // Set the new token in cookies
+              const response = NextResponse.json({ success: true, refreshed: true })
+              
+              const cookieOptions = [
+                `whop_access_token=${tokenData.access_token}`,
+                "Path=/",
+                "SameSite=None",
+                "Max-Age=86400" // 24 hours
+              ];
+              
+              if (process.env.NODE_ENV === "production") {
+                cookieOptions.push("Secure");
+                cookieOptions.push("Domain=.rwaka.rw");
+              }
+              
+              response.headers.set("Set-Cookie", cookieOptions.join("; "));
+              return response
+            } else {
+              debug.log('Token refresh - Token exchange failed:', await tokenResponse.text())
+            }
+          }
+        }
+      }
+    } catch (error) {
+      debug.log('Token refresh - Silent refresh failed:', error)
+    }
+    
+    // If we get here, silent refresh failed - need user interaction
+    debug.log('Token refresh - Silent refresh failed, requiring user re-authentication')
     return NextResponse.json({
       requiresReauth: true,
       redirectUrl: `https://rwaka.rw/api/oauth/init?next=${encodeURIComponent(request.headers.get('referer') || 'https://testing.rwaka.rw/')}`
     }, { status: 401 })
 
   } catch (error) {
-    console.error('Token refresh failed:', error)
+    debug.error('Token refresh failed:', error)
     return NextResponse.json(
       { 
         error: 'Token refresh failed',
