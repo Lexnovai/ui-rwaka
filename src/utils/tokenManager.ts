@@ -14,7 +14,7 @@ export class TokenManager {
   private refreshTimer: NodeJS.Timeout | null = null;
   private options: TokenManagerOptions = {};
   private isChecking = false;
-  private checkInterval = 120000 // Check every 2 minutes (refresh before 3-minute expiry) (since Whop tokens expire in ~3-5 minutes)
+  private checkInterval = 60000 // Check every 1 minute (since Whop tokens expire in ~3-5 minutes)
 
   private constructor() {}
 
@@ -41,7 +41,7 @@ export class TokenManager {
       this.refreshTimer = null;
     }
 
-    // Check token validity every 2 minutes (proactive refresh before 3-minute expiry)
+    // Check token validity every 1 minute
     this.refreshTimer = setInterval(() => {
       this.checkTokenValidity();
     }, this.checkInterval);
@@ -67,14 +67,7 @@ export class TokenManager {
     this.isChecking = true;
     debug.log('TokenManager.checkTokenValidity() - Starting token validation...');
 
-    // First check if token is close to expiring (proactive refresh)
-    const shouldRefreshEarly = await this.shouldRefreshTokenEarly();
-    if (shouldRefreshEarly) {
-      debug.log('Token expires soon, attempting proactive refresh...');
-      await this.attemptTokenRefresh();
-      this.isChecking = false;
-      return;
-    }
+
 
     try {
       const response = await fetch('/api/auth/me', {
@@ -167,47 +160,7 @@ export class TokenManager {
     }
   }
 
-  private async shouldRefreshTokenEarly(): Promise<boolean> {
-    try {
-      // Get current token from cookies
-      const response = await fetch('/api/debug-token');
-      if (!response.ok) return false;
-      
-      const tokenData = await response.json();
-      
-      // Refresh if token expires in less than 60 seconds (1 minute buffer)
-      return tokenData.timeToExpirySeconds < 60;
-    } catch (error) {
-      debug.error('Error checking token expiry:', error);
-      return false;
-    }
-  }
 
-  private async attemptTokenRefresh(): Promise<void> {
-    try {
-      debug.log('Attempting proactive token refresh...');
-      const refreshResponse = await fetch('/api/auth/refresh', {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'Referer': typeof window !== 'undefined' ? window.location.href : 'https://testing.rwaka.rw/'
-        },
-      });
-
-      if (refreshResponse.ok) {
-        const result = await refreshResponse.json();
-        if (result.refreshed) {
-          debug.log('Proactive token refresh successful!');
-          return;
-        }
-      }
-      
-      debug.log('Proactive refresh failed, will try again later');
-    } catch (error) {
-      debug.error('Proactive refresh error:', error);
-    }
-  }
 }
 
 // Utility function to initialize token management
