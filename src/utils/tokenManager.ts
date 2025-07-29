@@ -45,10 +45,13 @@ export class TokenManager {
       this.checkTokenValidity();
     }, 1 * 60 * 1000);
 
-    // Wait 30 seconds before first check to allow initial auth to complete
+    // Do an immediate check for direct page visits, then wait 10 seconds for subsequent checks
+    this.checkTokenValidity();
+    
+    // Wait 10 seconds before next check to allow initial auth to complete if needed
     setTimeout(() => {
       this.checkTokenValidity();
-    }, 30000);
+    }, 10000);
   }
 
   private async checkTokenValidity() {
