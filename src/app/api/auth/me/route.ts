@@ -31,27 +31,42 @@ export async function GET(request: NextRequest) {
       headers.set('cookie', request.headers.get('cookie')!)
     }
 
-    console.log('Auth check - Attempting token verification...')
-    const { userId } = await whopApi.verifyUserToken(headers)
-    console.log('Auth check - Token verification result - userId:', userId)
+    console.log('Auth check - Attempting direct API call with token...')
+    
+    // For external domains, we need to make direct API calls instead of verifyUserToken
+    // First, try to get current user with the token
+    try {
+      const userResponse = await fetch('https://api.whop.com/api/v5/me', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
 
-    if (!userId) {
-      console.log('Auth check - Token verification failed - no userId returned')
+      if (!userResponse.ok) {
+        console.log('Auth check - Direct API call failed with status:', userResponse.status)
+        const errorText = await userResponse.text()
+        console.log('Auth check - API error response:', errorText)
+        return NextResponse.json(
+          { error: 'Token validation failed' },
+          { status: 401 }
+        )
+      }
+
+      const userData = await userResponse.json()
+      console.log('Auth check - Direct API call successful, user ID:', userData.id)
+
+      return NextResponse.json({
+        userId: userData.id,
+        user: userData
+      })
+    } catch (apiError) {
+      console.error('Auth check - Direct API call error:', apiError)
       return NextResponse.json(
-        { error: 'Invalid token - no user ID' },
+        { error: 'Token validation failed' },
         { status: 401 }
       )
     }
-
-    // Get user data using the verified userId
-    console.log('Auth check - Fetching user data for userId:', userId)
-    const user = await whopApi.users.getUser({ userId })
-    console.log('Auth check - User data fetched successfully')
-
-    return NextResponse.json({
-      userId,
-      user
-    })
 
   } catch (error) {
     console.error('Auth verification failed:', error)
