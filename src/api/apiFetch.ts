@@ -4,12 +4,18 @@ export const getAccessTokenFromCookies = (): string | null => {
   if (typeof window === 'undefined') return null
 
   const cookies = document.cookie
+  console.log('All cookies:', cookies)
+  
   const match = cookies.match(/(?:^|;\s*)whop_access_token=([^;]*)/)
+  console.log('Token match:', match)
 
   if (match) {
-    return decodeURIComponent(match[1])
+    const token = decodeURIComponent(match[1])
+    console.log('Found token:', token ? 'YES' : 'NO')
+    return token
   }
 
+  console.log('No whop_access_token found in cookies')
   return null
 }
 const getAccessToken = (): string | null => {

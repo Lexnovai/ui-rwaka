@@ -45,9 +45,18 @@ class AuthRedirectManager {
 
     if (typeof window !== 'undefined') {
       const currentUrl = encodeURIComponent(window.location.href);
-      const redirectUrl = `https://rwaka.rw/api/oauth/init?next=${currentUrl}`;
       
-      console.log(`Redirecting to: ${redirectUrl}`);
+      // Determine the correct landing page based on current domain
+      let landingPageUrl = 'https://rwaka.rw';
+      if (window.location.hostname.includes('testing')) {
+        // For testing.rwaka, we might need to use a different landing page
+        // or ensure the OAuth flow works correctly
+        console.log('Detected testing domain, using main landing page');
+      }
+      
+      const redirectUrl = `${landingPageUrl}/api/oauth/init?next=${currentUrl}`;
+      
+      console.log(`Redirecting from ${window.location.hostname} to: ${redirectUrl}`);
       window.location.href = redirectUrl;
     }
   }

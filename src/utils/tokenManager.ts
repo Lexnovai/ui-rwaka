@@ -41,8 +41,10 @@ export class TokenManager {
       this.checkTokenValidity();
     }, 5 * 60 * 1000);
 
-    // Also check immediately
-    this.checkTokenValidity();
+    // Wait 2 seconds before first check to allow cookies to be set after redirect
+    setTimeout(() => {
+      this.checkTokenValidity();
+    }, 2000);
   }
 
   private async checkTokenValidity() {

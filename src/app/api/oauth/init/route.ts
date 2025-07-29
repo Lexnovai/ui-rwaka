@@ -23,7 +23,7 @@ export function GET(request: Request) {
     "Path=/",
     // "HttpOnly",
     "SameSite=None",
-    "Max-Age=31536000" 
+    "Max-Age=600" // 10 minutes for OAuth state
   ];
 
   if (process.env.NODE_ENV === "production") {

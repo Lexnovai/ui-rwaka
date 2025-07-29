@@ -23,9 +23,23 @@ export function UserStoreHydration() {
 
             if (!response.ok) {
                 if (response.status === 401) {
-                    console.warn('User not authenticated - redirect to OAuth')
-                    // Optionally redirect to OAuth init
-                    // window.location.href = '/api/oauth/init'
+                    console.warn('User not authenticated - checking if we just came from OAuth...')
+                    
+                    // Check if we have URL params indicating we just came from OAuth
+                    const urlParams = new URLSearchParams(window.location.search)
+                    const hasOAuthParams = urlParams.has('code') || urlParams.has('state')
+                    
+                    if (hasOAuthParams) {
+                        console.log('Just came from OAuth, waiting a bit longer for cookies...')
+                        // Wait a bit longer and try again
+                        setTimeout(() => {
+                            initializeUser()
+                        }, 3000)
+                        return
+                    }
+                    
+                    // If no OAuth params, this is a genuine auth failure
+                    console.log('No OAuth params found, genuine auth failure')
                 } else {
                     console.error('Auth check failed:', response.status)
                 }

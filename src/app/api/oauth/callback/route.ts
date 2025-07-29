@@ -54,7 +54,7 @@ export async function GET(request: Request) {
     "Path=/",
     // "HttpOnly",
     "SameSite=None",
-    "Max-Age=31536000"
+    "Max-Age=3600" // 1 hour to match Whop token expiry
   ];
 
   // Add secure settings for production
