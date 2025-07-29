@@ -70,8 +70,15 @@ export async function POST(request: NextRequest) {
         const location = silentResponse.headers.get('location')
         debug.log('Token refresh - Got redirect to:', location)
         
-        if (location && location.includes('code=')) {
-          const urlParams = new URLSearchParams(location.split('?')[1])
+        // Handle relative redirects by making them absolute
+        const absoluteLocation = location?.startsWith('/') 
+          ? `https://whop.com${location}` 
+          : location
+        
+        debug.log('Token refresh - Absolute redirect URL:', absoluteLocation)
+        
+        if (absoluteLocation && absoluteLocation.includes('code=')) {
+          const urlParams = new URLSearchParams(absoluteLocation.split('?')[1])
           const code = urlParams.get('code')
           
           debug.log('Token refresh - Extracted code:', code ? 'present' : 'missing')
@@ -123,6 +130,11 @@ export async function POST(request: NextRequest) {
           }
         } else {
           debug.log('Token refresh - Redirect location does not contain code parameter')
+          
+          // If the redirect is back to OAuth endpoint, it means session expired
+          if (absoluteLocation && absoluteLocation.includes('/oauth/')) {
+            debug.log('Token refresh - Redirect back to OAuth endpoint indicates session expired')
+          }
         }
       } else {
         debug.log('Token refresh - No redirect received, status:', silentResponse.status)
