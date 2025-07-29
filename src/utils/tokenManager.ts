@@ -83,19 +83,31 @@ export class TokenManager {
           console.log('Token validation failed, attempting refresh...');
           
           // Try to refresh the token first
+          console.log('Token validation failed, attempting automatic refresh...');
           const refreshResponse = await fetch('/api/auth/refresh', {
             method: 'POST',
             credentials: 'include',
             headers: {
               'Content-Type': 'application/json',
+              'Referer': typeof window !== 'undefined' ? window.location.href : 'https://testing.rwaka.rw/'
             },
           });
           
           if (refreshResponse.ok) {
-            console.log('Token refresh successful');
-            return; // Token refreshed, continue monitoring
+            const refreshData = await refreshResponse.json();
+            if (refreshData.success && refreshData.refreshed) {
+              console.log('Token refresh successful via API - continuing monitoring');
+              return; // Token refreshed successfully, continue monitoring
+            }
+          }
+          
+          // If we get here, either refresh failed or requires re-auth
+          const refreshData = await refreshResponse.json().catch(() => ({}));
+          if (refreshData.requiresReauth) {
+            console.log('Token refresh requires re-authentication, handling expiration...');
+            this.handleTokenExpired();
           } else {
-            console.log('Token refresh failed, handling expiration...');
+            console.log('Token refresh failed with unknown error, handling expiration...');
             this.handleTokenExpired();
           }
         }
