@@ -1,3 +1,5 @@
+import { authRedirectManager } from '@/utils/authRedirectManager'
+
 export const getAccessTokenFromCookies = (): string | null => {
   if (typeof window === 'undefined') return null
 
@@ -40,8 +42,7 @@ export default async function apiFetch(
 ): Promise<Response> {
   if (!hasValidAccessToken()) {
     if (typeof window !== 'undefined') {
-      const currentUrl = encodeURIComponent(window.location.href)
-      window.location.href = `https://rwaka.rw/api/oauth/init?next=${currentUrl}`
+      authRedirectManager.redirectToAuth('apiFetch_no_token')
     }
     // Return a never-resolving promise to stop execution
     return new Promise(() => {})
@@ -70,8 +71,7 @@ export default async function apiFetch(
     if (response.status === 401) {
       console.log('API call returned 401, token expired')
       if (typeof window !== 'undefined') {
-        const currentUrl = encodeURIComponent(window.location.href)
-        window.location.href = `https://rwaka.rw/api/oauth/init?next=${currentUrl}`
+        authRedirectManager.redirectToAuth('apiFetch_401')
       }
       throw new Error('Token expired')
     }

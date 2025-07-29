@@ -2,6 +2,7 @@
 
 import { useCallback } from 'react'
 import { TokenManager } from '@/utils/tokenManager'
+import { authRedirectManager } from '@/utils/authRedirectManager'
 
 export function useAuth() {
   const tokenManager = TokenManager.getInstance()
@@ -11,8 +12,7 @@ export function useAuth() {
   }, [tokenManager])
 
   const handleTokenExpired = useCallback(() => {
-    const currentUrl = encodeURIComponent(window.location.href)
-    window.location.href = `https://rwaka.rw/api/oauth/init?next=${currentUrl}`
+    authRedirectManager.redirectToAuth('useAuth_hook')
   }, [])
 
   // Wrapper for API calls that automatically handles token expiration

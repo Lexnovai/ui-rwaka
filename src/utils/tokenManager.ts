@@ -1,5 +1,7 @@
 'use client'
 
+import { authRedirectManager } from './authRedirectManager'
+
 export interface TokenManagerOptions {
   onTokenExpired?: () => void;
   onTokenRefreshed?: (newToken: string) => void;
@@ -46,6 +48,11 @@ export class TokenManager {
   private async checkTokenValidity() {
     if (this.isChecking) return;
     
+    // Don't check if we're already redirecting
+    if (authRedirectManager.isCurrentlyRedirecting()) {
+      return;
+    }
+    
     this.isChecking = true;
     
     try {
@@ -72,15 +79,13 @@ export class TokenManager {
   }
 
   private handleTokenExpired() {
-    console.log('Token expired, redirecting to login...');
+    console.log('Token expired, handling expiration...');
     
     if (this.options.onTokenExpired) {
       this.options.onTokenExpired();
     } else {
-      // Default behavior: redirect to landing page OAuth
-      const landingPageUrl = this.options.landingPageUrl || 'https://rwaka.rw';
-      const currentUrl = encodeURIComponent(window.location.href);
-      window.location.href = `${landingPageUrl}/api/oauth/init?next=${currentUrl}`;
+      // Default behavior: use centralized redirect manager
+      authRedirectManager.redirectToAuth('token_manager_expired');
     }
   }
 
