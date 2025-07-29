@@ -31,24 +31,23 @@ export class TokenManager {
   }
 
   startTokenMonitoring() {
-    console.log('TokenManager.startTokenMonitoring() - DISABLED FOR DEBUGGING');
-    // COMPLETELY DISABLED FOR DEBUGGING TOKEN ISSUES
-    return;
+    console.log('TokenManager.startTokenMonitoring() - Starting with 2-minute intervals');
     
     // Clear existing timer
     if (this.refreshTimer) {
       clearInterval(this.refreshTimer);
+      this.refreshTimer = null;
     }
 
-    // Check token validity every 5 minutes
+    // Check token validity every 2 minutes (since Whop tokens expire quickly)
     this.refreshTimer = setInterval(() => {
       this.checkTokenValidity();
-    }, 5 * 60 * 1000);
+    }, 2 * 60 * 1000);
 
-    // Wait 10 seconds before first check to allow initial auth to complete
+    // Wait 30 seconds before first check to allow initial auth to complete
     setTimeout(() => {
       this.checkTokenValidity();
-    }, 10000);
+    }, 30000);
   }
 
   private async checkTokenValidity() {
@@ -81,8 +80,24 @@ export class TokenManager {
 
       if (!response.ok) {
         if (response.status === 401) {
-          console.log('Token expired, handling expiration...');
-          this.handleTokenExpired();
+          console.log('Token validation failed, attempting refresh...');
+          
+          // Try to refresh the token first
+          const refreshResponse = await fetch('/api/auth/refresh', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+          
+          if (refreshResponse.ok) {
+            console.log('Token refresh successful');
+            return; // Token refreshed, continue monitoring
+          } else {
+            console.log('Token refresh failed, handling expiration...');
+            this.handleTokenExpired();
+          }
         }
       }
     } catch (error) {

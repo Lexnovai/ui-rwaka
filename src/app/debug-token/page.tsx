@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { decodeJWT } from '@/utils/jwtDecoder'
 
 export default function DebugTokenPage() {
-  const [tokenInfo, setTokenInfo] = useState<any>(null)
+  const [tokenInfo, setTokenInfo] = useState<Record<string, unknown> | null>(null)
   const [loading, setLoading] = useState(false)
 
   const checkToken = async () => {

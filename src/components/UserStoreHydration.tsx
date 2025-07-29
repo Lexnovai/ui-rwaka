@@ -73,16 +73,13 @@ export function UserStoreHydration() {
         
         initializeUser()
         
-        // Temporarily disable token manager to debug quick expiration
-        console.log('TokenManager disabled for debugging')
-        // initializeTokenManager({
-        //     onTokenExpired: () => {
-        //         console.log('Token expired, clearing user and redirecting...')
-        //         clearUser()
-        //         // Use centralized redirect manager
-        //         authRedirectManager.redirectToAuth('user_store_hydration')
-        //     }
-        // })
+        // Initialize token monitoring with refresh capability
+        initializeTokenManager({
+          onTokenExpired: () => {
+            console.log('Token expired from TokenManager, redirecting...');
+            authRedirectManager.redirectToAuth('token_manager_expiry');
+          }
+        });
     }, [initializeUser, clearUser])
 
     return null
