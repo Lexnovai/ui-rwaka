@@ -17,27 +17,34 @@ export async function POST(request: NextRequest) {
       }, { status: 401 })
     }
 
-    // First check if current token is still valid
+    // First check if current token is still valid AND not about to expire
     debug.log('Token refresh - Checking if current token is still valid...')
     
+    // Check JWT expiration first
+    let tokenExpiresInSeconds = 0;
     try {
-      const userCheck = await fetch('https://api.whop.com/api/v5/me', {
-        headers: {
-          'Authorization': `Bearer ${currentToken}`,
-          'Content-Type': 'application/json'
+      const tokenParts = currentToken.split('.');
+      if (tokenParts.length === 3) {
+        const payload = JSON.parse(atob(tokenParts[1]));
+        const now = Math.floor(Date.now() / 1000);
+        tokenExpiresInSeconds = payload.exp - now;
+        debug.log('Token refresh - Token expires in:', tokenExpiresInSeconds, 'seconds');
+        
+        // If token expires in less than 30 seconds, force refresh even if still "valid"
+        if (tokenExpiresInSeconds < 30) {
+          debug.log('Token refresh - Token expires soon, forcing refresh...');
+        } else {
+          debug.log('Token refresh - Token has plenty of time left, no refresh needed.');
+          return NextResponse.json({ 
+            success: true, 
+            refreshed: false, 
+            message: 'Token still valid' 
+          })
         }
-      })
-      
-      if (userCheck.ok) {
-        debug.log('Token refresh - Current token is still valid! No refresh needed.')
-        return NextResponse.json({ 
-          success: true, 
-          refreshed: false, 
-          message: 'Token still valid' 
-        })
       }
     } catch (error) {
-      debug.log('Token refresh - Error checking current token:', error)
+      debug.log('Token refresh - Error decoding JWT token:', error)
+      // Continue to silent refresh if JWT decode fails
     }
     
     // Token is invalid, try to get a new one using session cookies
@@ -112,7 +119,7 @@ export async function POST(request: NextRequest) {
                 `whop_access_token=${tokenData.access_token}`,
                 "Path=/",
                 "SameSite=None",
-                "Max-Age=300" // 5 minutes to match token expiry
+                "Max-Age=3600" // 1 hour - JWT expiration check handles refresh timing
               ];
               
               if (process.env.NODE_ENV === "production") {

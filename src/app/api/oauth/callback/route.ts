@@ -62,7 +62,7 @@ export async function GET(request: Request) {
     "Path=/",
     // "HttpOnly",
     "SameSite=None",
-    "Max-Age=300" // 5 minutes to slightly outlast 3-minute token expiry
+    "Max-Age=3600" // 1 hour - JWT expiration check handles refresh timing
   ];
 
   // Add secure settings for production
