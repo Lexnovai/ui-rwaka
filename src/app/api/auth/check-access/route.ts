@@ -20,35 +20,16 @@ export async function GET() {
       )
     }
 
-    // Fetch user info via REST API to obtain userId
+    // Decode JWT to extract userId (avoids extra API call)
     let userId: string | undefined
     try {
-      const userRes = await fetch('https://api.whop.com/api/v5/me', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      })
-
-      if (!userRes.ok) {
-        debug.log('Access check - Failed to fetch user info. Status:', userRes.status)
-        const errorText = await userRes.text()
-        debug.log('Access check - User info error response:', errorText)
-        return NextResponse.json(
-          { hasAccess: false, error: 'Failed to fetch user info' },
-          { status: 401 }
-        )
-      }
-
-      const userData = await userRes.json()
-      userId = userData.id || userData.user?.id
-      debug.log('Access check - Retrieved userId:', userId)
-    } catch (userErr) {
-      debug.log('Access check - Error fetching user info:', userErr)
-      return NextResponse.json(
-        { hasAccess: false, error: 'Failed to fetch user info' },
-        { status: 401 }
-      )
+      const [, payloadB64] = token.split('.')
+      const buff = Buffer.from(payloadB64.replace(/-/g, '+').replace(/_/g, '/'), 'base64')
+      const decodedJson = JSON.parse(buff.toString('utf-8'))
+      userId = decodedJson.sub || decodedJson.id || decodedJson.user_id
+      debug.log('Access check - Extracted userId from token:', userId)
+    } catch (decodeErr) {
+      debug.log('Access check - Error decoding token:', decodeErr)
     }
 
     if (!userId) {
