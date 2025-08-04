@@ -15,7 +15,7 @@ export interface AccessCheckResult {
  * @param request - Next.js request object
  * @returns AccessCheckResult
  */
-export async function checkAccess(_request: NextRequest): Promise<AccessCheckResult> {
+export async function checkAccess(): Promise<AccessCheckResult> {
   try {
     const cookieStore = await cookies()
     const token = cookieStore.get('whop_access_token')?.value
@@ -107,7 +107,7 @@ export function withAccessControl(
   handler: (request: NextRequest, context: { params: Record<string, string> }) => Promise<NextResponse>
 ) {
   return async (request: NextRequest, context: { params: Record<string, string> }) => {
-    const accessResult = await checkAccess(request)
+    const accessResult = await checkAccess()
 
     if (!accessResult.hasAccess) {
       debug.log('AccessMiddleware - Access denied for API route')
