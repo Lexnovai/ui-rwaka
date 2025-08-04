@@ -22,12 +22,13 @@ export async function GET() {
     // Check access using Whop's access API
     // The access expression format for products is typically: product:PRODUCT_ID
     const accessExpression = `product:${REQUIRED_PRODUCT_ID}`
+    const encodedExpression = encodeURIComponent(accessExpression)
     
     debug.log('Access check - Checking access for expression:', accessExpression)
 
     try {
       const accessResponse = await fetch(
-        `https://access.api.whop.com/check/${accessExpression}`,
+        `https://access.api.whop.com/check/${encodedExpression}`,
         {
           headers: {
             'Authorization': `Bearer ${token}`,
