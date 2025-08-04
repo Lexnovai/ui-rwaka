@@ -6,7 +6,7 @@ export function middleware(request: NextRequest) {
 
   // Set CORS headers for cross-subdomain requests
   response.headers.set('Access-Control-Allow-Credentials', 'true')
-  response.headers.set('Access-Control-Allow-Origin', 'https://rwaka.rw')
+  response.headers.set('Access-Control-Allow-Origin', 'https://norway.rwaka.rw')
   response.headers.set(
     'Access-Control-Allow-Methods',
     'GET,DELETE,PATCH,POST,PUT'
