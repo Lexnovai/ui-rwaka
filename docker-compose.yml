@@ -7,17 +7,17 @@ services:
       dockerfile: Dockerfile
     restart: always
     ports:
-      - 3027
+      - 3023
     volumes:
       - ./public:/public
     networks:
       - dokploy-network
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.rwakanorwy.rule=Host(`testing.rwaka.rw`)'
+      - 'traefik.http.routers.rwakanorwy.rule=Host(`rettsai.rwaka.rw`)'
       - 'traefik.http.routers.rwakanorwy.entrypoints=websecure'
       - 'traefik.http.routers.rwakanorwy.tls.certResolver=letsencrypt'
-      - 'traefik.http.services.rwakanorwy.loadbalancer.server.port=3027'
+      - 'traefik.http.services.rwakanorwy.loadbalancer.server.port=3023'
 
 networks:
   dokploy-network:
