@@ -137,7 +137,7 @@ export default function AccessGuard({
               </div>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h2>
               <p className="text-gray-600 mb-4">
-                You don't have access to this application. You need to purchase the required product to continue.
+                You don&apos;t have access to this application. You need to purchase the required product to continue.
               </p>
               {accessState.error && (
                 <p className="text-sm text-red-600 mb-4">

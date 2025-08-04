@@ -4,7 +4,7 @@ import { debug } from '@/utils/debug'
 
 const REQUIRED_PRODUCT_ID = 'prod_N6taIBKbQWkig'
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const cookieStore = await cookies()
     const token = cookieStore.get('whop_access_token')?.value

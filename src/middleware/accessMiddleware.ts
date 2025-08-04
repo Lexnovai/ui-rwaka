@@ -15,7 +15,7 @@ export interface AccessCheckResult {
  * @param request - Next.js request object
  * @returns AccessCheckResult
  */
-export async function checkAccess(request: NextRequest): Promise<AccessCheckResult> {
+export async function checkAccess(_request: NextRequest): Promise<AccessCheckResult> {
   try {
     const cookieStore = await cookies()
     const token = cookieStore.get('whop_access_token')?.value
@@ -104,9 +104,9 @@ export async function checkAccess(request: NextRequest): Promise<AccessCheckResu
  * @returns Protected API route handler
  */
 export function withAccessControl(
-  handler: (request: NextRequest, context: { params: any }) => Promise<NextResponse>
+  handler: (request: NextRequest, context: { params: Record<string, string> }) => Promise<NextResponse>
 ) {
-  return async (request: NextRequest, context: { params: any }) => {
+  return async (request: NextRequest, context: { params: Record<string, string> }) => {
     const accessResult = await checkAccess(request)
 
     if (!accessResult.hasAccess) {
