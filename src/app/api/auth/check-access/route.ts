@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { whopSdk } from '@/lib/whop-sdk'
 import { cookies } from 'next/headers'
 import { debug } from '@/utils/debug'
 
@@ -19,63 +20,70 @@ export async function GET() {
       )
     }
 
-    // Check access using Whop's access API
-    // The access expression format for products is typically: product:PRODUCT_ID
-    const accessExpression = `product:${REQUIRED_PRODUCT_ID}`
-    const encodedExpression = encodeURIComponent(accessExpression)
-    
-    debug.log('Access check - Checking access for expression:', accessExpression)
-
+    // Fetch user info via REST API to obtain userId
+    let userId: string | undefined
     try {
-      const accessResponse = await fetch(
-        `https://access.api.whop.com/check/${encodedExpression}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
+      const userRes = await fetch('https://api.whop.com/api/v5/me', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
-      )
+      })
 
-      if (!accessResponse.ok) {
-        debug.log('Access check - API call failed with status:', accessResponse.status)
-        const errorText = await accessResponse.text()
-        debug.log('Access check - API error response:', errorText)
-        
+      if (!userRes.ok) {
+        debug.log('Access check - Failed to fetch user info. Status:', userRes.status)
+        const errorText = await userRes.text()
+        debug.log('Access check - User info error response:', errorText)
         return NextResponse.json(
-          { hasAccess: false, error: 'Access check failed' },
-          { status: accessResponse.status }
+          { hasAccess: false, error: 'Failed to fetch user info' },
+          { status: 401 }
         )
       }
 
-      const accessData = await accessResponse.json()
-      debug.log('Access check - API response:', accessData)
-
-      const hasAccess = accessData.access === true
-
-      return NextResponse.json({
-        hasAccess,
-        productId: REQUIRED_PRODUCT_ID,
-        accessExpression
-      })
-
-    } catch (apiError) {
-      debug.log('Access check - API call error:', apiError)
+      const userData = await userRes.json()
+      userId = userData.id || userData.user?.id
+      debug.log('Access check - Retrieved userId:', userId)
+    } catch (userErr) {
+      debug.log('Access check - Error fetching user info:', userErr)
       return NextResponse.json(
-        { hasAccess: false, error: 'Access verification failed' },
-        { status: 500 }
+        { hasAccess: false, error: 'Failed to fetch user info' },
+        { status: 401 }
       )
     }
 
+    if (!userId) {
+      return NextResponse.json(
+        { hasAccess: false, error: 'User ID not found' },
+        { status: 401 }
+      )
+    }
+
+    // Use Whop Server SDK to check access
+    try {
+      const { hasAccess } = await whopSdk.access.checkIfUserHasAccessToAccessPass({
+        accessPassId: REQUIRED_PRODUCT_ID,
+        userId
+      })
+
+      debug.log('Access check - SDK response hasAccess:', hasAccess)
+
+      return NextResponse.json({
+        hasAccess,
+        productId: REQUIRED_PRODUCT_ID
+      })
+    } catch (sdkErr) {
+      debug.log('Access check - SDK error:', sdkErr)
+      return NextResponse.json(
+        { hasAccess: false, error: 'Access check failed' },
+        { status: 500 }
+      )
+    }
   } catch (error) {
     debug.log('Access check failed:', error)
-    return NextResponse.json(
-      {
-        hasAccess: false,
-        error: 'Access check failed',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
-      { status: 500 }
-    )
+    return NextResponse.json({
+      hasAccess: false,
+      error: 'Access check failed',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 })
   }
 }
