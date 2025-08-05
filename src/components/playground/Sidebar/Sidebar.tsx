@@ -23,8 +23,8 @@ import useIsMobile from '@/hooks/useIsMobile'
 
 const SidebarHeader = () => (
   <div className="flex items-center justify-center gap-2">
-    <Icon type="rwaka" size="default" className="w-48" />
-    <p className="font-semibold">Rettsai</p>
+    <Icon type="rwaka-chat" size="default" className="w-48" />
+    <p className="font-semibold text-xl md:text-2xl">Rettsai</p>
   </div>
 )
 
