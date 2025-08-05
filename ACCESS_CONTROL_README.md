@@ -1,46 +1,82 @@
 # Access Control System
 
-This system checks if users have access to product `prod_N6taIBKbQWkig` and redirects them to the landing page if they don't have access.
+This system checks if users have access to product `prod_N6taIBKbQWkig` using the Whop SDK and provides a beautiful blur effect with upgrade prompt for users without access.
 
 ## How it works
 
-1. **API Route**: `/api/auth/check-access` - Checks if user has access to the required product
-2. **AccessGuard Component**: Wraps your app content and automatically redirects users without access
-3. **Utility Functions**: Helper functions for manual access checks
+1. **API Route**: `/api/auth/validate-access` - Uses Whop SDK to check user access to the required product
+2. **AccessProtection Component**: Wraps content with blur effect and upgrade prompt for users without access
+3. **useAccessControl Hook**: React hook for access state management with 24-hour caching
+4. **Utility Functions**: Helper functions for manual access checks and cache management
 
 ## Current Implementation
 
-The main page (`/src/app/page.tsx`) is now protected with `AccessGuard`:
+The main page (`/src/app/page.tsx`) is now protected with `AccessProtection`:
 
 ```tsx
-import AccessGuard from '@/components/AccessGuard'
+import AccessProtection from '@/components/AccessProtection'
 
 export default function Home() {
+  const [isCollapsed, setIsCollapsed] = useState(false)
   return (
-    <AccessGuard>
-      {/* Your app content here */}
-    </AccessGuard>
+    <Suspense fallback={<div>Loading...</div>}>
+      <div className="bg-background flex min-h-screen flex-col md:flex-row">
+        <Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
+        <AccessProtection>
+          <ChatArea isCollapsed={isCollapsed} />
+        </AccessProtection>
+      </div>
+    </Suspense>
   )
 }
 ```
 
 ## What happens:
 
-1. **User visits the app** → AccessGuard checks access
-2. **If hasAccess: true** → User sees the app normally
-3. **If hasAccess: false** → User is redirected to `https://norway.rwaka.rw/api/oauth/init?next=<current_url>`
-4. **After purchase/auth** → User is redirected back to the original page
+1. **User visits the app** → AccessProtection checks access using Whop SDK
+2. **If hasAccess: true** → User sees the app normally with "Hello [username]" greeting
+3. **If hasAccess: false** → Chat area blurs, upgrade prompt appears with working redirect
+4. **Upgrade button** → Redirects to `https://norway.rwaka.rw/#pricing`
+5. **24-hour caching** → Access results cached locally to prevent repeated API calls
+
+## Components Available
+
+### AccessProtection Component
+```tsx
+import AccessProtection from '@/components/AccessProtection'
+
+<AccessProtection>
+  <YourProtectedContent />
+</AccessProtection>
+```
+
+### Higher-Order Component
+```tsx
+import { withAccessProtection } from '@/components/withAccessProtection'
+
+const ProtectedComponent = withAccessProtection(YourComponent)
+```
+
+### useAccessControl Hook
+```tsx
+import { useAccessControl } from '@/hooks/useAccessControl'
+
+const { hasAccess, isLoading, error, userName, redirectToPurchase } = useAccessControl()
+```
 
 ## Manual Usage (if needed)
 
 ```tsx
-import { checkUserAccess, redirectToLandingPage } from '@/utils/accessControl'
+import { checkUserAccess, redirectToPurchase, clearAccessCache } from '@/utils/accessUtils'
 
 // Check access manually
 const result = await checkUserAccess()
 if (!result.hasAccess) {
-  redirectToLandingPage()
+  redirectToPurchase()
 }
+
+// Clear cache (useful after purchase)
+clearAccessCache()
 ```
 
 ## API Response Format
@@ -48,7 +84,9 @@ if (!result.hasAccess) {
 ```json
 {
   "hasAccess": true,
-  "productId": "prod_N6taIBKbQWkig"
+  "accessLevel": "customer",
+  "userId": "user_XXXXXXXX",
+  "userName": "John Doe"
 }
 ```
 
@@ -57,8 +95,28 @@ or
 ```json
 {
   "hasAccess": false,
-  "error": "Access denied"
+  "error": "Access denied to product",
+  "userId": "user_XXXXXXXX",
+  "userName": "John Doe"
 }
 ```
 
-That's it! Your app is now protected and will automatically redirect users to the landing page if they don't have access to the required product.
+## Features
+
+- **Blur Effect**: Chat area blurs when access denied, sidebar remains functional
+- **Personalized Greeting**: Shows "Hello [username]" for users with access
+- **24-Hour Caching**: Prevents repeated API calls for better performance
+- **Whop SDK Integration**: Uses official Whop SDK for secure access validation
+- **Beautiful UI**: Modern gradient upgrade prompt with hover effects
+- **Debug Logging**: Comprehensive logging for troubleshooting
+- **Error Handling**: Graceful fallbacks and error states
+- **Security**: No sensitive data logged to console
+
+## Security Notes
+
+- Server-side validation using Whop SDK ensures security
+- No sensitive authentication data is logged to browser console
+- Access tokens are handled securely through HTTP-only cookies
+- Client-side caching uses localStorage for non-sensitive access results only
+
+Your app is now protected with a beautiful, secure access control system that provides an excellent user experience!

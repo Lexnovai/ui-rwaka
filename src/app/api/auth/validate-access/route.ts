@@ -47,7 +47,13 @@ export async function GET(): Promise<NextResponse<AccessResponse>> {
 
     const userData = await userResponse.json()
     const userId = userData.id
-    const userName = userData.name || userData.email || 'User'
+    
+    // Debug: Log the entire user data structure to understand available fields
+    debug.log('Access validation - Full user data:', JSON.stringify(userData, null, 2))
+    debug.log('Access validation - Available fields:', Object.keys(userData))
+    
+    // Try different possible name fields
+    const userName = userData.name || userData.username || userData.display_name || userData.email || 'User'
     
     debug.log('Access validation - User ID:', userId)
     debug.log('Access validation - User Name:', userName)
