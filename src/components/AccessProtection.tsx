@@ -8,12 +8,13 @@ interface AccessProtectionProps {
   fallbackComponent?: React.ReactNode
 }
 
-export default function AccessProtection({ 
-  children, 
+export default function AccessProtection({
+  children,
   loadingComponent,
-  fallbackComponent 
+  fallbackComponent
 }: AccessProtectionProps) {
   const { hasAccess, isLoading, error, redirectToPurchase } = useAccessControl()
+  const [showDialog, setShowDialog] = React.useState(false)
 
   // Debug logging
   React.useEffect(() => {
@@ -21,6 +22,13 @@ export default function AccessProtection({
     debug.log('AccessProtection - isLoading:', isLoading)
     debug.log('AccessProtection - error:', error)
   }, [hasAccess, isLoading, error])
+
+  // Show dialog when access is denied
+  React.useEffect(() => {
+    if (!isLoading && hasAccess === false) {
+      setShowDialog(true)
+    }
+  }, [hasAccess, isLoading])
 
   // Show loading state
   if (isLoading || hasAccess === null) {
@@ -36,18 +44,25 @@ export default function AccessProtection({
     )
   }
 
-  // Show access denied state with blur effect
-  if (!hasAccess) {
-    return (
-      <div className="relative min-h-screen">
-        {/* Blurred content */}
-        <div className="blur-sm pointer-events-none select-none">
-          {children}
-        </div>
-        
-        {/* Overlay with upgrade prompt */}
-        <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-          <div className="bg-white rounded-lg shadow-xl p-8 max-w-md mx-4 text-center transform -translate-y-8">
+  const handleUpgrade = () => {
+    redirectToPurchase()
+    setShowDialog(false)
+  }
+
+  return (
+    <>
+      {/* Always render content - let your app decide what to show */}
+      {hasAccess ? children : (fallbackComponent || children)}
+
+      {/* Access Denied Dialog */}
+      {showDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+
+          {/* Dialog */}
+          <div className="relative bg-white rounded-xl shadow-2xl p-8 max-w-md mx-4 text-center transform scale-100 transition-transform">
+
             <div className="mb-6">
               <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -58,40 +73,38 @@ export default function AccessProtection({
                 Upgrade Required
               </h2>
               <p className="text-gray-600">
-                You need access to this product to use this feature. 
+                You need access to this product to use this feature.
                 Upgrade now to unlock full functionality.
               </p>
             </div>
-            
+
             {error && (
               <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
                 <p className="text-sm text-red-600">{error}</p>
               </div>
             )}
-            
-            <button
-              onClick={redirectToPurchase}
-              className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg"
-            >
-              Upgrade Now
-            </button>
-            
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowDialog(false)}
+                className="flex-1 bg-gray-100 text-gray-700 font-semibold py-3 px-6 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Maybe Later
+              </button>
+              <button
+                onClick={handleUpgrade}
+                className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg"
+              >
+                Upgrade Now
+              </button>
+            </div>
+
             <p className="text-xs text-gray-500 mt-4">
               You&apos;ll be redirected to complete your purchase
             </p>
           </div>
         </div>
-        
-        {/* Custom fallback component if provided */}
-        {fallbackComponent && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            {fallbackComponent}
-          </div>
-        )}
-      </div>
-    )
-  }
-
-  // User has access, show content normally
-  return <>{children}</>
+      )}
+    </>
+  )
 }
