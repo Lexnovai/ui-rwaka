@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import { motion, Variants, AnimatePresence } from 'framer-motion'
 import React, { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'

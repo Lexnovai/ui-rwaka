@@ -47,7 +47,7 @@ export async function GET(): Promise<NextResponse<AccessResponse>> {
 
     const userData = await userResponse.json()
     const userId = userData.id
-    const userName = userData.username || userData.name || userData.email || 'User'
+    const userName = userData.name || userData.email || 'User'
     
     debug.log('Access validation - User ID:', userId)
     debug.log('Access validation - User Name:', userName)
