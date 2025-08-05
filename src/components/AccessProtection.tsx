@@ -69,7 +69,7 @@ export default function AccessProtection({
             </button>
             
             <p className="text-xs text-gray-500 mt-4">
-              You'll be redirected to complete your purchase
+              You&apos;ll be redirected to complete your purchase
             </p>
           </div>
         </div>

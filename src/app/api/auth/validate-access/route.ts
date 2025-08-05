@@ -11,7 +11,7 @@ interface AccessResponse {
   userId?: string
 }
 
-export async function GET(request: NextRequest): Promise<NextResponse<AccessResponse>> {
+export async function GET(): Promise<NextResponse<AccessResponse>> {
   try {
     // Get access token from cookies
     const cookieStore = await cookies()
