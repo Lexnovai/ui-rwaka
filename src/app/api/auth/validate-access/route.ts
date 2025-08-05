@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { debug } from '@/utils/debug'
+import { whopSdk } from '@/lib/whop-sdk'
 
-const PRODUCT_ID = 'prod_N6taIBKbQWkig'
-const WHOP_ACCESS_API = 'https://access.api.whop.com/check'
+const ACCESS_PASS_ID = 'prod_N6taIBKbQWkig'
 
 interface AccessResponse {
   hasAccess: boolean
+  accessLevel?: string
   error?: string
   userId?: string
 }
@@ -27,7 +28,7 @@ export async function GET(): Promise<NextResponse<AccessResponse>> {
       }, { status: 401 })
     }
 
-    // First verify the token is valid by checking user info
+    // First get the user ID from the token
     const userResponse = await fetch('https://api.whop.com/api/v5/me', {
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -36,6 +37,7 @@ export async function GET(): Promise<NextResponse<AccessResponse>> {
     })
 
     if (!userResponse.ok) {
+      debug.log('Access validation - Failed to get user info:', userResponse.status)
       return NextResponse.json({ 
         hasAccess: false, 
         error: 'Invalid or expired token' 
@@ -44,37 +46,28 @@ export async function GET(): Promise<NextResponse<AccessResponse>> {
 
     const userData = await userResponse.json()
     const userId = userData.id
+    
+    debug.log('Access validation - User ID:', userId)
+    debug.log('Access validation - Checking access for product:', ACCESS_PASS_ID)
 
-    // Check access to the specific product
-    const accessResponse = await fetch(`${WHOP_ACCESS_API}/product:${PRODUCT_ID}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
+    // Use Whop SDK to check access
+    const accessResult = await whopSdk.access.checkIfUserHasAccessToAccessPass({
+      accessPassId: ACCESS_PASS_ID,
+      userId: userId
     })
 
-    if (!accessResponse.ok) {
-      console.error('Access check failed:', accessResponse.status, await accessResponse.text())
-      return NextResponse.json({ 
-        hasAccess: false, 
-        error: 'Failed to check access',
-        userId 
-      }, { status: 500 })
-    }
-
-    const accessData = await accessResponse.json()
-    const hasAccess = accessData.access === true
-
-    console.log(`Access check for user ${userId}: ${hasAccess ? 'GRANTED' : 'DENIED'}`)
+    debug.log('Access validation - SDK result:', accessResult)
 
     return NextResponse.json({ 
-      hasAccess, 
+      hasAccess: accessResult.hasAccess,
+      accessLevel: accessResult.accessLevel,
       userId,
-      ...(hasAccess ? {} : { error: 'Access denied to product' })
+      ...(accessResult.hasAccess ? {} : { error: 'Access denied to product' })
     })
 
   } catch (error) {
     console.error('Access validation error:', error)
+    debug.log('Access validation - Error details:', error)
     return NextResponse.json({ 
       hasAccess: false, 
       error: 'Internal server error' 
