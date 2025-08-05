@@ -26,8 +26,7 @@ const ChatInput = ({ className }: { className: string }) => {
       await handleStreamResponse(currentMessage)
     } catch (error) {
       toast.error(
-        `Error in handleSubmit: ${
-          error instanceof Error ? error.message : String(error)
+        `Error in handleSubmit: ${error instanceof Error ? error.message : String(error)
         }`
       )
     }
@@ -64,7 +63,7 @@ const ChatInput = ({ className }: { className: string }) => {
           onClick={handleSubmit}
           disabled={!selectedAgent || !inputMessage.trim() || isStreaming}
           size="icon"
-          className="text-primary rounded-xl bg-[#0C555D] p-5"
+          className="text-primary rounded-xl bg-[#0096FF] p-5"
         >
           <Icon type="send" color="#49EA99" />
         </Button>

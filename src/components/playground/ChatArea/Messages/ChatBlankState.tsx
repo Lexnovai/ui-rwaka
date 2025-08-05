@@ -83,11 +83,9 @@ const ChatBlankState = () => {
   return (
     <section className="font-geist flex flex-col items-center justify-center">
       <div className="flex flex-col gap-y-6">
-        <div className="mx-auto flex w-fit items-center justify-center gap-3 rounded-xl bg-[#0C555D] px-5 py-2 text-base shadow-lg ring-1 ring-white/10 backdrop-blur-md">
-          <span className="font-semibold text-white">
-            Hello {user?.name || user?.username || 'User'}
-          </span>
-        </div>
+        <p className="font-semibold text-white text-xl md:text-2xl">
+          Hello {user?.name || user?.username || 'User'}
+        </p>
 
         <motion.h1
           initial={{ opacity: 0, y: 10 }}
@@ -170,7 +168,7 @@ const ChatBlankState = () => {
           </DropdownMenu>
         </motion.div>
       </div>
-    </section>
+    </section >
   )
 }
 

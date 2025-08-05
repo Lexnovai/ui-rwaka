@@ -22,7 +22,10 @@ import { Ellipsis, LogOut, UserCircle } from 'lucide-react'
 import useIsMobile from '@/hooks/useIsMobile'
 
 const SidebarHeader = () => (
-  <Icon type="rwaka" size="default" className="w-48" />
+  <div className="flex items-center justify-center gap-2">
+    <Icon type="rwaka" size="default" className="w-48" />
+    <p className="font-semibold">Rettsai</p>
+  </div>
 )
 
 const NewChatButton = ({
@@ -65,7 +68,7 @@ const ProfileMenu = () => {
         <DropdownMenuSeparator />
         <DropdownMenuItem className="flex justify-between font-semibold">
           Log out
-          <LogOut className="text-[#49EA99]" />
+          <LogOut className="text-[#7BC4EA]" />
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

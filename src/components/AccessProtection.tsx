@@ -1,6 +1,7 @@
 import React from 'react'
 import { useAccessControl } from '@/hooks/useAccessControl'
 import { debug } from '@/utils/debug'
+import { Button } from './ui/button'
 
 interface AccessProtectionProps {
   children: React.ReactNode
@@ -51,16 +52,11 @@ export default function AccessProtection({
 
   return (
     <>
-      {/* Always render content - let your app decide what to show */}
       {hasAccess ? children : (fallbackComponent || children)}
 
-      {/* Access Denied Dialog */}
       {showDialog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          {/* Backdrop */}
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
-
-          {/* Dialog */}
           <div className="relative bg-white rounded-xl shadow-2xl p-8 max-w-md mx-4 text-center transform scale-100 transition-transform">
 
             <div className="mb-6">
@@ -85,18 +81,18 @@ export default function AccessProtection({
             )}
 
             <div className="flex gap-3">
-              <button
+              <Button
                 onClick={() => setShowDialog(false)}
                 className="flex-1 bg-gray-100 text-gray-700 font-semibold py-3 px-6 rounded-lg hover:bg-gray-200 transition-colors"
               >
                 Maybe Later
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={handleUpgrade}
                 className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg"
               >
                 Upgrade Now
-              </button>
+              </Button>
             </div>
 
             <p className="text-xs text-gray-500 mt-4">

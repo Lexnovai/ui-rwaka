@@ -44,7 +44,7 @@ const SessionBlankState = () => {
             <Icon type="user" size="lg" />
           </div>
 
-          <div className="-translate-y-2 rotate-[6deg] rounded-md bg-[#49EA99]/90 p-0.5">
+          <div className="-translate-y-2 rotate-[6deg] rounded-md bg-[#7BC4EA] p-0.5">
             <Icon type="rwaka-chat" size="sm" />
           </div>
         </div>
