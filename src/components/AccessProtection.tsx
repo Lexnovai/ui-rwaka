@@ -1,5 +1,6 @@
 import React from 'react'
 import { useAccessControl } from '@/hooks/useAccessControl'
+import { debug } from '@/utils/debug'
 
 interface AccessProtectionProps {
   children: React.ReactNode
@@ -13,6 +14,13 @@ export default function AccessProtection({
   fallbackComponent 
 }: AccessProtectionProps) {
   const { hasAccess, isLoading, error, redirectToPurchase } = useAccessControl()
+
+  // Debug logging
+  React.useEffect(() => {
+    debug.log('AccessProtection - hasAccess:', hasAccess)
+    debug.log('AccessProtection - isLoading:', isLoading)
+    debug.log('AccessProtection - error:', error)
+  }, [hasAccess, isLoading, error])
 
   // Show loading state
   if (isLoading || hasAccess === null) {
@@ -39,7 +47,7 @@ export default function AccessProtection({
         
         {/* Overlay with upgrade prompt */}
         <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-          <div className="bg-white rounded-lg shadow-xl p-8 max-w-md mx-4 text-center">
+          <div className="bg-white rounded-lg shadow-xl p-8 max-w-md mx-4 text-center transform -translate-y-8">
             <div className="mb-6">
               <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
