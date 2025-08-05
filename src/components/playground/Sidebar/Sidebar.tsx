@@ -22,9 +22,9 @@ import { Ellipsis, LogOut, UserCircle } from 'lucide-react'
 import useIsMobile from '@/hooks/useIsMobile'
 
 const SidebarHeader = () => (
-  <div className="flex items-center justify-center gap-2">
-    <Icon type="rwaka-chat" size="default" className="w-48" />
-    <p className="font-semibold text-xl md:text-2xl">Rettsai</p>
+  <div className="flex justify-start items-start gap-2 mb-4">
+    <Icon type="rwaka-chat" size="xl" className="w-48" />
+    <p className="font-semibold text-2xl md:text-3xl">Rettsai</p>
   </div>
 )
 
