@@ -8,7 +8,7 @@ import { ChevronDown, ExternalLink } from 'lucide-react'
 import useAIChatStreamHandler from '@/hooks/useAIStreamHandler'
 import { usePlaygroundStore } from '@/store'
 import { useSearchParams } from 'next/navigation'
-import { useAccessControl } from '@/hooks/useAccessControl'
+import { useUserStore } from '@/stores/userStore'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -31,7 +31,7 @@ const ChatBlankState = () => {
   const [currentRoleIndex, setCurrentRoleIndex] = useState(0)
   const [, setActiveCategory] = useState<string | null>(null)
   const { agents } = usePlaygroundStore()
-  const { userName } = useAccessControl()
+  const { user } = useUserStore()
   const searchParams = useSearchParams()
   const agentId = searchParams?.get('agent')
   const agentLabel = agents.find((a) => a.value === agentId)?.label
@@ -85,7 +85,7 @@ const ChatBlankState = () => {
       <div className="flex flex-col gap-y-6">
         <div className="mx-auto flex w-fit items-center justify-center gap-3 rounded-xl bg-[#0C555D] px-5 py-2 text-base shadow-lg ring-1 ring-white/10 backdrop-blur-md">
           <span className="font-semibold text-white">
-            Hello {userName || 'User'}
+            Hello {user?.name || user?.username || 'User'}
           </span>
         </div>
 
