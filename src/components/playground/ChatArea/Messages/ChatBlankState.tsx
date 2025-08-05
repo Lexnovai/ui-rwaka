@@ -9,6 +9,7 @@ import { ChevronDown, ExternalLink } from 'lucide-react'
 import useAIChatStreamHandler from '@/hooks/useAIStreamHandler'
 import { usePlaygroundStore } from '@/store'
 import { useSearchParams } from 'next/navigation'
+import { useAccessControl } from '@/hooks/useAccessControl'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -31,6 +32,7 @@ const ChatBlankState = () => {
   const [currentRoleIndex, setCurrentRoleIndex] = useState(0)
   const [, setActiveCategory] = useState<string | null>(null)
   const { agents } = usePlaygroundStore()
+  const { userName } = useAccessControl()
   const searchParams = useSearchParams()
   const agentId = searchParams?.get('agent')
   const agentLabel = agents.find((a) => a.value === agentId)?.label
@@ -83,27 +85,9 @@ const ChatBlankState = () => {
     <section className="font-geist flex flex-col items-center justify-center">
       <div className="flex flex-col gap-y-6">
         <div className="mx-auto flex w-fit items-center justify-center gap-3 rounded-xl bg-[#0C555D] px-5 py-2 text-base shadow-lg ring-1 ring-white/10 backdrop-blur-md">
-          <span className="font-semibold text-white">Free Plan</span>
-          <Link
-            href="/upgrade"
-            className="flex items-center gap-1 text-[#49EA99] transition-opacity duration-200 hover:opacity-80"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M14 5l7 7m0 0l-7 7m7-7H3"
-              />
-            </svg>
-            <span className="underline">Upgrade</span>
-          </Link>
+          <span className="font-semibold text-white">
+            Hello {userName || 'User'}
+          </span>
         </div>
 
         <motion.h1

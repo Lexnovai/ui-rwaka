@@ -5,6 +5,7 @@ interface AccessState {
   isLoading: boolean
   error: string | null
   userId?: string
+  userName?: string
 }
 
 interface UseAccessControlReturn extends AccessState {
@@ -18,6 +19,7 @@ const CACHE_DURATION = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
 interface CachedAccess {
   hasAccess: boolean
   userId?: string
+  userName?: string
   timestamp: number
 }
 
@@ -53,11 +55,12 @@ export function useAccessControl(): UseAccessControlReturn {
   }, [])
 
   // Cache access result
-  const setCachedAccess = useCallback((hasAccess: boolean, userId?: string) => {
+  const setCachedAccess = useCallback((hasAccess: boolean, userId?: string, userName?: string) => {
     try {
       const cacheData: CachedAccess = {
         hasAccess,
         userId,
+        userName,
         timestamp: Date.now()
       }
       localStorage.setItem(ACCESS_CACHE_KEY, JSON.stringify(cacheData))
@@ -76,7 +79,8 @@ export function useAccessControl(): UseAccessControlReturn {
         hasAccess: cachedAccess.hasAccess,
         isLoading: false,
         error: null,
-        userId: cachedAccess.userId
+        userId: cachedAccess.userId,
+        userName: cachedAccess.userName
       })
       return
     }
@@ -94,13 +98,14 @@ export function useAccessControl(): UseAccessControlReturn {
 
       if (response.ok) {
         // Cache the result
-        setCachedAccess(data.hasAccess, data.userId)
+        setCachedAccess(data.hasAccess, data.userId, data.userName)
         
         setState({
           hasAccess: data.hasAccess,
           isLoading: false,
           error: data.hasAccess ? null : (data.error || 'Access denied'),
-          userId: data.userId
+          userId: data.userId,
+          userName: data.userName
         })
       } else {
         setState({

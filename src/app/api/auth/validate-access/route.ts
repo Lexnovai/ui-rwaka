@@ -10,6 +10,7 @@ interface AccessResponse {
   accessLevel?: string
   error?: string
   userId?: string
+  userName?: string
 }
 
 export async function GET(): Promise<NextResponse<AccessResponse>> {
@@ -46,8 +47,10 @@ export async function GET(): Promise<NextResponse<AccessResponse>> {
 
     const userData = await userResponse.json()
     const userId = userData.id
+    const userName = userData.username || userData.name || userData.email || 'User'
     
     debug.log('Access validation - User ID:', userId)
+    debug.log('Access validation - User Name:', userName)
     debug.log('Access validation - Checking access for product:', ACCESS_PASS_ID)
 
     // Use Whop SDK to check access
@@ -62,6 +65,7 @@ export async function GET(): Promise<NextResponse<AccessResponse>> {
       hasAccess: accessResult.hasAccess,
       accessLevel: accessResult.accessLevel,
       userId,
+      userName,
       ...(accessResult.hasAccess ? {} : { error: 'Access denied to product' })
     })
 
