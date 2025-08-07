@@ -4,145 +4,161 @@ import { authRedirectManager } from './authRedirectManager'
 import { debug } from './debug'
 
 export interface TokenManagerOptions {
-  onTokenExpired?: () => void;
-  onTokenRefreshed?: (newToken: string) => void;
-  landingPageUrl?: string;
+  onTokenExpired?: () => void
+  onTokenRefreshed?: (newToken: string) => void
+  landingPageUrl?: string
 }
 
 export class TokenManager {
-  private static instance: TokenManager;
-  private refreshTimer: NodeJS.Timeout | null = null;
-  private options: TokenManagerOptions = {};
-  private isChecking = false;
+  private static instance: TokenManager
+  private refreshTimer: NodeJS.Timeout | null = null
+  private options: TokenManagerOptions = {}
+  private isChecking = false
 
   private constructor() {}
 
   static getInstance(): TokenManager {
     if (!TokenManager.instance) {
-      TokenManager.instance = new TokenManager();
+      TokenManager.instance = new TokenManager()
     }
-    return TokenManager.instance;
+    return TokenManager.instance
   }
 
   setOptions(options: TokenManagerOptions) {
     this.options = {
-      landingPageUrl: 'https://rwaka.rw',
+      landingPageUrl: 'https://norway.rwaka.rw',
       ...options
-    };
+    }
   }
 
   startTokenMonitoring() {
-    debug.log('TokenManager.startTokenMonitoring() - Starting with 1-minute intervals');
-    
+    debug.log(
+      'TokenManager.startTokenMonitoring() - Starting with 1-minute intervals'
+    )
+
     // Clear existing timer
     if (this.refreshTimer) {
-      clearInterval(this.refreshTimer);
-      this.refreshTimer = null;
+      clearInterval(this.refreshTimer)
+      this.refreshTimer = null
     }
 
     // Check token validity every 1 minute (since Whop tokens expire in ~3-5 minutes)
-    this.refreshTimer = setInterval(() => {
-      this.checkTokenValidity();
-    }, 1 * 60 * 1000);
+    this.refreshTimer = setInterval(
+      () => {
+        this.checkTokenValidity()
+      },
+      1 * 60 * 1000
+    )
 
     // Do an immediate check for direct page visits, then wait 10 seconds for subsequent checks
-    this.checkTokenValidity();
-    
+    this.checkTokenValidity()
+
     // Wait 10 seconds before next check to allow initial auth to complete if needed
     setTimeout(() => {
-      this.checkTokenValidity();
-    }, 10000);
+      this.checkTokenValidity()
+    }, 10000)
   }
 
   private async checkTokenValidity() {
-    if (this.isChecking) return;
-    
+    if (this.isChecking) return
+
     // Don't check if we're already redirecting
     if (authRedirectManager.isCurrentlyRedirecting()) {
-      return;
+      return
     }
-    
+
     // Don't check if we just came from OAuth (has code or state params)
     if (typeof window !== 'undefined') {
-      const urlParams = new URLSearchParams(window.location.search);
+      const urlParams = new URLSearchParams(window.location.search)
       if (urlParams.has('code') || urlParams.has('state')) {
-        debug.log('Skipping token validation - just came from OAuth');
-        return;
+        debug.log('Skipping token validation - just came from OAuth')
+        return
       }
     }
-    
-    this.isChecking = true;
-    
+
+    this.isChecking = true
+
     try {
       const response = await fetch('/api/auth/me', {
         method: 'GET',
         credentials: 'include',
         headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+          'Content-Type': 'application/json'
+        }
+      })
 
       if (!response.ok) {
         if (response.status === 401) {
-          debug.log('Token validation failed, attempting refresh...');
-          
+          debug.log('Token validation failed, attempting refresh...')
+
           // Try to refresh the token first
-          debug.log('Token validation failed, attempting automatic refresh...');
+          debug.log('Token validation failed, attempting automatic refresh...')
           const refreshResponse = await fetch('/api/auth/refresh', {
             method: 'POST',
             credentials: 'include',
             headers: {
               'Content-Type': 'application/json',
-              'Referer': typeof window !== 'undefined' ? window.location.href : 'https://testing.rwaka.rw/'
-            },
-          });
-          
+              Referer:
+                typeof window !== 'undefined'
+                  ? window.location.href
+                  : 'https://rettsai.rwaka.rw/'
+            }
+          })
+
           if (refreshResponse.ok) {
-            const refreshData = await refreshResponse.json();
+            const refreshData = await refreshResponse.json()
             if (refreshData.success) {
               if (refreshData.refreshed) {
-                debug.log('Token refresh successful via API - got new token, continuing monitoring');
+                debug.log(
+                  'Token refresh successful via API - got new token, continuing monitoring'
+                )
               } else {
-                debug.log('Token is still valid - no refresh needed, continuing monitoring');
+                debug.log(
+                  'Token is still valid - no refresh needed, continuing monitoring'
+                )
               }
-              return; // Token refreshed successfully or still valid, continue monitoring
+              return // Token refreshed successfully or still valid, continue monitoring
             }
           }
-          
+
           // If we get here, either refresh failed or requires re-auth
-          const refreshData = await refreshResponse.json().catch(() => ({}));
+          const refreshData = await refreshResponse.json().catch(() => ({}))
           if (refreshData.requiresReauth) {
-            debug.log('Token refresh requires re-authentication, handling expiration...');
-            this.handleTokenExpired();
+            debug.log(
+              'Token refresh requires re-authentication, handling expiration...'
+            )
+            this.handleTokenExpired()
           } else {
-            debug.log('Token refresh failed with unknown error, handling expiration...');
-            this.handleTokenExpired();
+            debug.log(
+              'Token refresh failed with unknown error, handling expiration...'
+            )
+            this.handleTokenExpired()
           }
         }
       }
     } catch (error) {
-      debug.error('Token validation failed:', error);
+      debug.error('Token validation failed:', error)
       // Don't redirect on network errors, only on auth failures
     } finally {
-      this.isChecking = false;
+      this.isChecking = false
     }
   }
 
   private handleTokenExpired() {
-    debug.log('Token expired, handling expiration...');
-    
+    debug.log('Token expired, handling expiration...')
+
     if (this.options.onTokenExpired) {
-      this.options.onTokenExpired();
+      this.options.onTokenExpired()
     } else {
       // Default behavior: use centralized redirect manager
-      authRedirectManager.redirectToAuth('token_manager_expired');
+      authRedirectManager.redirectToAuth('token_manager_expired')
     }
   }
 
   stopTokenMonitoring() {
     if (this.refreshTimer) {
-      clearInterval(this.refreshTimer);
-      this.refreshTimer = null;
+      clearInterval(this.refreshTimer)
+      this.refreshTimer = null
     }
   }
 
@@ -153,14 +169,14 @@ export class TokenManager {
         method: 'GET',
         credentials: 'include',
         headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+          'Content-Type': 'application/json'
+        }
+      })
 
-      return response.ok;
+      return response.ok
     } catch (error) {
-      debug.error('Manual token validation failed:', error);
-      return false;
+      debug.error('Manual token validation failed:', error)
+      return false
     }
   }
 }
@@ -168,18 +184,18 @@ export class TokenManager {
 // Utility function to initialize token management
 export function initializeTokenManager(options?: TokenManagerOptions) {
   if (typeof window !== 'undefined') {
-    const tokenManager = TokenManager.getInstance();
+    const tokenManager = TokenManager.getInstance()
     if (options) {
-      tokenManager.setOptions(options);
+      tokenManager.setOptions(options)
     }
-    tokenManager.startTokenMonitoring();
-    
+    tokenManager.startTokenMonitoring()
+
     // Cleanup on page unload
     window.addEventListener('beforeunload', () => {
-      tokenManager.stopTokenMonitoring();
-    });
+      tokenManager.stopTokenMonitoring()
+    })
 
-    return tokenManager;
+    return tokenManager
   }
-  return null;
+  return null
 }

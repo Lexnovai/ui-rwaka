@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           requiresReauth: true,
-          redirectUrl: `https://norway.rwaka.rw/api/oauth/init?next=${encodeURIComponent(request.headers.get('referer') || 'https://testing.rwaka.rw/')}`
+          redirectUrl: `https://norway.rwaka.rw/api/oauth/init?next=${encodeURIComponent(request.headers.get('referer') || 'https://rettsai.rwaka.rw/')}`
         },
         { status: 401 }
       )
