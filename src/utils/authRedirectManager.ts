@@ -64,7 +64,7 @@ class AuthRedirectManager {
       const currentUrl = encodeURIComponent(window.location.href)
 
       // Determine the correct landing page based on current domain
-      const landingPageUrl = 'https://norway.rwaka.rw'
+      const landingPageUrl = 'https://rwaka.rw'
       if (window.location.hostname.includes('rettsai')) {
         // For testing.rwaka, we might need to use a different landing page
         // or ensure the OAuth flow works correctly

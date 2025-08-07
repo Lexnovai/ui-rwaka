@@ -26,7 +26,7 @@ export class TokenManager {
 
   setOptions(options: TokenManagerOptions) {
     this.options = {
-      landingPageUrl: 'https://norway.rwaka.rw',
+      landingPageUrl: 'https://rwaka.rw',
       ...options
     }
   }
