@@ -51,6 +51,11 @@ export default function RootLayout({
         ></script>
       </head>
       <body className={`${geistSans.variable} ${dmMono.variable} antialiased`}>
+        <script
+          defer
+          src="https://analytics.rwaka.rw/script.js"
+          data-website-id="beaba870-c958-480e-b11d-dea74f6d60c0"
+        ></script>
         <UserStoreHydration />
         <NuqsAdapter>{children}</NuqsAdapter>
         <Toaster />
