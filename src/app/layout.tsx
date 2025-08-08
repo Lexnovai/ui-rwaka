@@ -3,7 +3,7 @@ import { DM_Mono, Geist } from 'next/font/google'
 import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { Toaster } from '@/components/ui/sonner'
 import './globals.css'
-import Script from 'next/script'
+import Script from 'next/Script'
 import { UserStoreHydration } from '@/components/UserStoreHydration'
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -44,18 +44,13 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script
+        <Script
           defer
           src="https://analytics.rwaka.rw/script.js"
           data-website-id="beaba870-c958-480e-b11d-dea74f6d60c0"
-        ></script>
+        />
       </head>
       <body className={`${geistSans.variable} ${dmMono.variable} antialiased`}>
-        <script
-          defer
-          src="https://analytics.rwaka.rw/script.js"
-          data-website-id="beaba870-c958-480e-b11d-dea74f6d60c0"
-        ></script>
         <UserStoreHydration />
         <NuqsAdapter>{children}</NuqsAdapter>
         <Toaster />
