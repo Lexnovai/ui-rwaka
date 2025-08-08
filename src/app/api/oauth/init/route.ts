@@ -8,8 +8,7 @@ const whopApi = WhopServerSdk({
 
 export function GET(request: Request) {
   const requestUrl = new URL(request.url)
-  const next =
-    requestUrl.searchParams.get('next') ?? 'https://rettsai.rwaka.rw/'
+  const next = requestUrl.searchParams.get('next') ?? 'https://ask.rettsai.no/'
 
   const { url: authUrl, state } = whopApi.oauth.getAuthorizationUrl({
     redirectUri: `${process.env.NEXT_PUBLIC_SITE_URL}/api/oauth/callback`,

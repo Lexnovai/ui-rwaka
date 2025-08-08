@@ -36,21 +36,23 @@ export default function Home() {
 1. **User visits the app** → AccessProtection checks access using Whop SDK
 2. **If hasAccess: true** → User sees the app normally with "Hello [username]" greeting
 3. **If hasAccess: false** → Chat area blurs, upgrade prompt appears with working redirect
-4. **Upgrade button** → Redirects to `https://norway.rwaka.rw/#pricing`
+4. **Upgrade button** → Redirects to `https://rettsai.no/#pricing`
 5. **24-hour caching** → Access results cached locally to prevent repeated API calls
 
 ## Components Available
 
 ### AccessProtection Component
+
 ```tsx
 import AccessProtection from '@/components/AccessProtection'
 
-<AccessProtection>
+;<AccessProtection>
   <YourProtectedContent />
 </AccessProtection>
 ```
 
 ### Higher-Order Component
+
 ```tsx
 import { withAccessProtection } from '@/components/withAccessProtection'
 
@@ -58,16 +60,22 @@ const ProtectedComponent = withAccessProtection(YourComponent)
 ```
 
 ### useAccessControl Hook
+
 ```tsx
 import { useAccessControl } from '@/hooks/useAccessControl'
 
-const { hasAccess, isLoading, error, userName, redirectToPurchase } = useAccessControl()
+const { hasAccess, isLoading, error, userName, redirectToPurchase } =
+  useAccessControl()
 ```
 
 ## Manual Usage (if needed)
 
 ```tsx
-import { checkUserAccess, redirectToPurchase, clearAccessCache } from '@/utils/accessUtils'
+import {
+  checkUserAccess,
+  redirectToPurchase,
+  clearAccessCache
+} from '@/utils/accessUtils'
 
 // Check access manually
 const result = await checkUserAccess()

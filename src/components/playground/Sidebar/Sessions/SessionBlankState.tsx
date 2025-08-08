@@ -23,7 +23,7 @@ const SessionBlankState = () => {
             Connect{' '}
             <Link
               className="underline"
-              href={'https://norway.rwaka.rw'}
+              href={'https://rettsai.no'}
               target="_blank"
             >
               storage

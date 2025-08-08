@@ -101,7 +101,7 @@ export class TokenManager {
               Referer:
                 typeof window !== 'undefined'
                   ? window.location.href
-                  : 'https://rettsai.rwaka.rw/'
+                  : 'https://ask.rettsai.no/'
             }
           })
 

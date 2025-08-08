@@ -38,12 +38,12 @@ export function useAccessControl(): UseAccessControlReturn {
 
       const parsedCache: CachedAccess = JSON.parse(cached)
       const now = Date.now()
-      
+
       // Check if cache is still valid (within 24 hours)
       if (now - parsedCache.timestamp < CACHE_DURATION) {
         return parsedCache
       }
-      
+
       // Cache expired, remove it
       localStorage.removeItem(ACCESS_CACHE_KEY)
       return null
@@ -55,19 +55,22 @@ export function useAccessControl(): UseAccessControlReturn {
   }, [])
 
   // Cache access result
-  const setCachedAccess = useCallback((hasAccess: boolean, userId?: string, userName?: string) => {
-    try {
-      const cacheData: CachedAccess = {
-        hasAccess,
-        userId,
-        userName,
-        timestamp: Date.now()
+  const setCachedAccess = useCallback(
+    (hasAccess: boolean, userId?: string, userName?: string) => {
+      try {
+        const cacheData: CachedAccess = {
+          hasAccess,
+          userId,
+          userName,
+          timestamp: Date.now()
+        }
+        localStorage.setItem(ACCESS_CACHE_KEY, JSON.stringify(cacheData))
+      } catch (error) {
+        console.error('Error caching access result:', error)
       }
-      localStorage.setItem(ACCESS_CACHE_KEY, JSON.stringify(cacheData))
-    } catch (error) {
-      console.error('Error caching access result:', error)
-    }
-  }, [])
+    },
+    []
+  )
 
   // Check access from server
   const checkAccess = useCallback(async () => {
@@ -86,7 +89,7 @@ export function useAccessControl(): UseAccessControlReturn {
     }
 
     // No valid cache, check server
-    setState(prev => ({ ...prev, isLoading: true, error: null }))
+    setState((prev) => ({ ...prev, isLoading: true, error: null }))
 
     try {
       const response = await fetch('/api/auth/validate-access', {
@@ -99,11 +102,11 @@ export function useAccessControl(): UseAccessControlReturn {
       if (response.ok) {
         // Cache the result
         setCachedAccess(data.hasAccess, data.userId, data.userName)
-        
+
         setState({
           hasAccess: data.hasAccess,
           isLoading: false,
-          error: data.hasAccess ? null : (data.error || 'Access denied'),
+          error: data.hasAccess ? null : data.error || 'Access denied',
           userId: data.userId,
           userName: data.userName
         })
@@ -127,7 +130,7 @@ export function useAccessControl(): UseAccessControlReturn {
 
   // Redirect to purchase page
   const redirectToPurchase = useCallback(() => {
-    window.location.href = 'https://norway.rwaka.rw/#pricing'
+    window.location.href = 'https://rettsai.no/#pricing'
   }, [])
 
   // Check access on mount
