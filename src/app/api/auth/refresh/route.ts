@@ -148,7 +148,7 @@ export async function POST(request: NextRequest) {
 
               if (process.env.NODE_ENV === 'production') {
                 cookieOptions.push('Secure')
-                cookieOptions.push('Domain=.rwaka.rw')
+                cookieOptions.push('Domain=.rettsai.no')
               }
 
               response.headers.set('Set-Cookie', cookieOptions.join('; '))
