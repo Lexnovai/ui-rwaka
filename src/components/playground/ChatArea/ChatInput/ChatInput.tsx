@@ -11,8 +11,6 @@ import Icon from '@/components/ui/icon'
 import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
 import { Loader, Paperclip } from 'lucide-react'
-import * as pdfjsLib from 'pdfjs-dist'
-
 
 const ChatInput = ({ className }: { className: string }) => {
   const { chatInputRef } = usePlaygroundStore()
@@ -43,6 +41,46 @@ const ChatInput = ({ className }: { className: string }) => {
     }
   }
 
+  const extractPdfText = async (file: File) => {
+    try {
+      // Dynamic import to avoid SSR issues
+      const pdfjsLib = await import('pdfjs-dist')
+
+      // Set worker path
+      pdfjsLib.GlobalWorkerOptions.workerSrc = `/pdf.worker.mjs`
+
+      const reader = new FileReader()
+
+      return new Promise<string>((resolve, reject) => {
+        reader.onload = async () => {
+          try {
+            const typedarray = new Uint8Array(reader.result as ArrayBuffer)
+            const pdf = await pdfjsLib.getDocument(typedarray).promise
+            let textContent = ''
+
+            for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+              const page = await pdf.getPage(pageNum)
+              const content = await page.getTextContent()
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const strings = content.items.map((item: any) => item.str)
+              textContent += strings.join(' ') + '\n'
+            }
+
+            resolve(textContent)
+          } catch (error) {
+            reject(error)
+          }
+        }
+
+        reader.onerror = () => reject(new Error('Failed to read file'))
+        reader.readAsArrayBuffer(file)
+      })
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      throw new Error('Failed to load PDF.js library')
+    }
+  }
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -57,28 +95,13 @@ const ChatInput = ({ className }: { className: string }) => {
         // Set the PDF file for preview
         setPdfFile(file)
 
-        // Extract text content but don't display it in the preview
-        const reader = new FileReader()
-        reader.onload = async () => {
-          const typedarray = new Uint8Array(reader.result as ArrayBuffer)
+        // Extract text content dynamically
+        const textContent = await extractPdfText(file)
 
-          const pdf = await pdfjsLib.getDocument(typedarray).promise
-          let textContent = ''
-
-          for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-            const page = await pdf.getPage(pageNum)
-            const content = await page.getTextContent()
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const strings = content.items.map((item: any) => item.str)
-            textContent += strings.join(' ') + '\n'
-          }
-
-          // Store the text content separately (for sending to AI)
-          setPdfTextContent(textContent)
-          // Don't set any message in the input
-          chatInputRef.current?.focus()
-        }
-        reader.readAsArrayBuffer(file)
+        // Store the text content separately (for sending to AI)
+        setPdfTextContent(textContent)
+        // Don't set any message in the input
+        chatInputRef.current?.focus()
       } else {
         toast.error('Unsupported file type. Please upload a .txt or .pdf file.')
       }
@@ -97,13 +120,6 @@ const ChatInput = ({ className }: { className: string }) => {
   const handleFileButtonClick = () => {
     fileInputRef.current?.click()
   }
-
-  // const removePdfPreview = () => {
-  //   setPdfFile(null)
-  //   setNumPages(null)
-  //   setPdfTextContent('')
-  //   setInputMessage('')
-  // }
 
   const handleSubmitWithPdf = async () => {
     if (!inputMessage.trim() && !pdfTextContent) return
@@ -130,11 +146,6 @@ const ChatInput = ({ className }: { className: string }) => {
 
   return (
     <div className={cn("fixed bottom-0 left-0 right-0 flex flex-col justify-center px-4 pb-2 bg-background", className)}>
-      {/* PDF Preview */}
-      {/* {pdfFile && (
-        <PDFPreview file={pdfFile} onRemove={removePdfPreview} />
-      )} */}
-
       <div className="flex w-full max-w-3xl items-end justify-center gap-x-2 mx-auto">
         <TextArea
           placeholder={'Ask anything...'}
