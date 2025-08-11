@@ -12,6 +12,9 @@ import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
 import { Loader, Paperclip } from 'lucide-react'
 
+// Dynamic import to avoid SSR issues
+const loadPdfJs = () => import('pdfjs-dist')
+
 const ChatInput = ({ className }: { className: string }) => {
   const { chatInputRef } = usePlaygroundStore()
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -43,11 +46,11 @@ const ChatInput = ({ className }: { className: string }) => {
 
   const extractPdfText = async (file: File): Promise<string> => {
     try {
-      const pdfjsLib = await import('pdfjs-dist')
+      // Dynamic import to avoid SSR issues
+      const pdfjsLib = await loadPdfJs()
 
-      if (typeof window !== 'undefined') {
-        pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.mjs'
-      }
+      // Set worker path for PDF.js
+      pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`
 
       const reader = new FileReader()
 
@@ -75,8 +78,9 @@ const ChatInput = ({ className }: { className: string }) => {
         reader.onerror = () => reject(new Error('Failed to read file'))
         reader.readAsArrayBuffer(file)
       })
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      throw new Error(`Failed to load PDF library: ${error}`)
+      throw new Error('Failed to load PDF.js library')
     }
   }
 
@@ -91,10 +95,11 @@ const ChatInput = ({ className }: { className: string }) => {
         const text = await file.text()
         setInputMessage(text)
       } else if (file.type === 'application/pdf') {
+        // Set the PDF file for preview
         setPdfFile(file)
 
+        // Extract text content using dynamic import
         const textContent = await extractPdfText(file)
-
         setPdfTextContent(textContent)
         chatInputRef.current?.focus()
       } else {
@@ -119,6 +124,7 @@ const ChatInput = ({ className }: { className: string }) => {
   const handleSubmitWithPdf = async () => {
     if (!inputMessage.trim() && !pdfTextContent) return
 
+    // If there's PDF content, include it in the message
     const messageToSend = pdfTextContent ?
       `${inputMessage}\n\nPDF Content:\n${pdfTextContent}` :
       inputMessage
@@ -140,11 +146,6 @@ const ChatInput = ({ className }: { className: string }) => {
 
   return (
     <div className={cn("fixed bottom-0 left-0 right-0 flex flex-col justify-center px-4 pb-2 bg-background", className)}>
-      {/* PDF Preview - Commented out to avoid SSR issues */}
-      {/* {pdfFile && (
-        <PDFPreview file={pdfFile} onRemove={removePdfPreview} />
-      )} */}
-
       <div className="flex w-full max-w-3xl items-end justify-center gap-x-2 mx-auto">
         <TextArea
           placeholder={'Ask anything...'}
