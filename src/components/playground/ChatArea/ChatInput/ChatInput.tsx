@@ -11,6 +11,8 @@ import Icon from '@/components/ui/icon'
 import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
 import { Loader, Paperclip } from 'lucide-react'
+// Remove this line that's causing the SSR issue:
+// import * as pdfjsLib from 'pdfjs-dist'
 
 const ChatInput = ({ className }: { className: string }) => {
   const { chatInputRef } = usePlaygroundStore()
@@ -41,14 +43,18 @@ const ChatInput = ({ className }: { className: string }) => {
     }
   }
 
-  const extractPdfText = async (file: File) => {
+  // New function to handle PDF text extraction with dynamic import
+  const extractPdfText = async (file: File): Promise<string> => {
     try {
-      // Dynamic import to avoid SSR issues
+      // Dynamically import pdfjs-dist only when needed
       const pdfjsLib = await import('pdfjs-dist')
 
-      const reader = new FileReader()
+      // Set the worker source
+      pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`
 
       return new Promise<string>((resolve, reject) => {
+        const reader = new FileReader()
+
         reader.onload = async () => {
           try {
             const typedarray = new Uint8Array(reader.result as ArrayBuffer)
@@ -64,8 +70,9 @@ const ChatInput = ({ className }: { className: string }) => {
             }
 
             resolve(textContent)
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
           } catch (error) {
-            reject(error)
+            reject(new Error('Failed to extract PDF text'))
           }
         }
 
@@ -74,7 +81,7 @@ const ChatInput = ({ className }: { className: string }) => {
       })
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      throw new Error('Failed to load PDF.js library')
+      throw new Error('Failed to load PDF processing library')
     }
   }
 
@@ -92,7 +99,7 @@ const ChatInput = ({ className }: { className: string }) => {
         // Set the PDF file for preview
         setPdfFile(file)
 
-        // Extract text content dynamically
+        // Extract text content using the new function
         const textContent = await extractPdfText(file)
 
         // Store the text content separately (for sending to AI)
@@ -117,6 +124,13 @@ const ChatInput = ({ className }: { className: string }) => {
   const handleFileButtonClick = () => {
     fileInputRef.current?.click()
   }
+
+  // const removePdfPreview = () => {
+  //   setPdfFile(null)
+  //   setNumPages(null)
+  //   setPdfTextContent('')
+  //   setInputMessage('')
+  // }
 
   const handleSubmitWithPdf = async () => {
     if (!inputMessage.trim() && !pdfTextContent) return
@@ -143,6 +157,11 @@ const ChatInput = ({ className }: { className: string }) => {
 
   return (
     <div className={cn("fixed bottom-0 left-0 right-0 flex flex-col justify-center px-4 pb-2 bg-background", className)}>
+      {/* PDF Preview */}
+      {/* {pdfFile && (
+        <PDFPreview file={pdfFile} onRemove={removePdfPreview} />
+      )} */}
+
       <div className="flex w-full max-w-3xl items-end justify-center gap-x-2 mx-auto">
         <TextArea
           placeholder={'Ask anything...'}
