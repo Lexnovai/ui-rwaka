@@ -46,9 +46,6 @@ const ChatInput = ({ className }: { className: string }) => {
       // Dynamic import to avoid SSR issues
       const pdfjsLib = await import('pdfjs-dist')
 
-      // Set worker path
-      pdfjsLib.GlobalWorkerOptions.workerSrc = `/pdf.worker.mjs`
-
       const reader = new FileReader()
 
       return new Promise<string>((resolve, reject) => {
