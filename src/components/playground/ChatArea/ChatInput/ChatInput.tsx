@@ -12,9 +12,6 @@ import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
 import { Loader, Paperclip } from 'lucide-react'
 
-// Dynamic import to avoid SSR issues
-const loadPdfJs = () => import('pdfjs-dist')
-
 const ChatInput = ({ className }: { className: string }) => {
   const { chatInputRef } = usePlaygroundStore()
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -44,17 +41,17 @@ const ChatInput = ({ className }: { className: string }) => {
     }
   }
 
-  const extractPdfText = async (file: File): Promise<string> => {
+  const extractPdfText = async (file: File) => {
     try {
       // Dynamic import to avoid SSR issues
-      const pdfjsLib = await loadPdfJs()
+      const pdfjsLib = await import('pdfjs-dist')
 
-      // Set worker path for PDF.js
+      // Set worker path
       pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`
 
       const reader = new FileReader()
 
-      return new Promise((resolve, reject) => {
+      return new Promise<string>((resolve, reject) => {
         reader.onload = async () => {
           try {
             const typedarray = new Uint8Array(reader.result as ArrayBuffer)
@@ -98,9 +95,12 @@ const ChatInput = ({ className }: { className: string }) => {
         // Set the PDF file for preview
         setPdfFile(file)
 
-        // Extract text content using dynamic import
+        // Extract text content dynamically
         const textContent = await extractPdfText(file)
+
+        // Store the text content separately (for sending to AI)
         setPdfTextContent(textContent)
+        // Don't set any message in the input
         chatInputRef.current?.focus()
       } else {
         toast.error('Unsupported file type. Please upload a .txt or .pdf file.')

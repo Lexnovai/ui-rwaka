@@ -1,6 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import { Document, Page, pdfjs } from 'react-pdf'
+
+pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.mjs';
 
 const PDFPreview = ({
     file,
@@ -9,16 +12,7 @@ const PDFPreview = ({
     file: File
     onRemove: () => void
 }) => {
-    const [pdfUrl, setPdfUrl] = useState<string>('')
-
-    useEffect(() => {
-        if (file) {
-            const url = URL.createObjectURL(file)
-            setPdfUrl(url)
-
-            return () => URL.revokeObjectURL(url)
-        }
-    }, [file])
+    const [, setNumPages] = useState<number | null>(null)
 
     return (
         <div className="mb-4 max-w-3xl mx-auto">
@@ -35,16 +29,12 @@ const PDFPreview = ({
                     </button>
                 </div>
                 <div className="w-32 h-32 overflow-hidden border rounded flex items-center justify-center bg-gray-50">
-                    {pdfUrl ? (
-                        <iframe
-                            src={pdfUrl}
-                            className="w-full h-full"
-                            style={{ transform: 'scale(0.3)', transformOrigin: 'top left' }}
-                            title="PDF Preview"
-                        />
-                    ) : (
-                        <div className="text-xs text-gray-500">PDF Preview</div>
-                    )}
+                    <Document
+                        file={file}
+                        onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+                    >
+                        <Page pageNumber={1} width={100} />
+                    </Document>
                 </div>
             </div>
         </div>
