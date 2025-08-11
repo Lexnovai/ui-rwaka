@@ -68,8 +68,10 @@ export function UserStoreHydration() {
     }, [setLoading, clearUser, setUser]) // Fixed dependency array
 
     useEffect(() => {
-        // Reset any stuck redirect state on page load
-        authRedirectManager.reset()
+        // NOTE: Do NOT reset the redirect manager here – doing so clears the
+        // recent-redirect timestamp and can cause an immediate redirect loop
+        // before cookies have been set.  We only reset after a *successful*
+        // authentication inside initializeUser().
         
         initializeUser()
         

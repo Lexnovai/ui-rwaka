@@ -18,7 +18,7 @@ export async function checkUserAccess(): Promise<AccessResult> {
     })
 
     const data = await response.json()
-    
+
     return {
       hasAccess: data.hasAccess || false,
       error: data.error,
@@ -37,7 +37,7 @@ export async function checkUserAccess(): Promise<AccessResult> {
  * Redirect user to purchase page
  */
 export function redirectToPurchase(): void {
-  window.location.href = 'https://norway.rwaka.rw/#pricing'
+  window.location.href = 'https://rettsai.no/#pricing'
 }
 
 /**
@@ -55,7 +55,10 @@ export function clearAccessCache(): void {
 /**
  * Get cached access result without making server request
  */
-export function getCachedAccessResult(): { hasAccess: boolean; userId?: string } | null {
+export function getCachedAccessResult(): {
+  hasAccess: boolean
+  userId?: string
+} | null {
   try {
     const cached = localStorage.getItem('whop_access_cache')
     if (!cached) return null
@@ -63,7 +66,7 @@ export function getCachedAccessResult(): { hasAccess: boolean; userId?: string }
     const parsedCache = JSON.parse(cached)
     const now = Date.now()
     const CACHE_DURATION = 24 * 60 * 60 * 1000 // 24 hours
-    
+
     // Check if cache is still valid
     if (now - parsedCache.timestamp < CACHE_DURATION) {
       return {
@@ -71,7 +74,7 @@ export function getCachedAccessResult(): { hasAccess: boolean; userId?: string }
         userId: parsedCache.userId
       }
     }
-    
+
     return null
   } catch (error) {
     console.error('Error reading cached access:', error)

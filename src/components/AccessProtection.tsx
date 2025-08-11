@@ -17,6 +17,9 @@ export default function AccessProtection({
 }: AccessProtectionProps) {
   const { hasAccess, isLoading, error, redirectToPurchase } = useAccessControl()
   const [showDialog, setShowDialog] = React.useState(false)
+  const [freeRequestsRemaining, setFreeRequestsRemaining] = React.useState<number>(4)
+
+  const FREE_REQUESTS_KEY = 'free_requests_remaining'
 
   // Debug logging
   React.useEffect(() => {
@@ -24,6 +27,18 @@ export default function AccessProtection({
     debug.log('AccessProtection - isLoading:', isLoading)
     debug.log('AccessProtection - error:', error)
   }, [hasAccess, isLoading, error])
+
+  // Initialise free requests from localStorage
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return
+    const stored = localStorage.getItem(FREE_REQUESTS_KEY)
+    if (stored !== null) {
+      setFreeRequestsRemaining(parseInt(stored, 10))
+    } else {
+      localStorage.setItem(FREE_REQUESTS_KEY, '4')
+      setFreeRequestsRemaining(4)
+    }
+  }, [])
 
   // Show dialog when access is denied
   React.useEffect(() => {
@@ -48,6 +63,14 @@ export default function AccessProtection({
 
   const handleUpgrade = () => {
     redirectToPurchase()
+    setShowDialog(false)
+  }
+
+  const handleUseFreeRequest = () => {
+    if (freeRequestsRemaining <= 0) return
+    const newCount = freeRequestsRemaining - 1
+    setFreeRequestsRemaining(newCount)
+    localStorage.setItem(FREE_REQUESTS_KEY, newCount.toString())
     setShowDialog(false)
   }
 
@@ -81,10 +104,10 @@ export default function AccessProtection({
 
             <div className="flex gap-3">
               <Button
-                onClick={() => setShowDialog(false)}
+                onClick={handleUseFreeRequest}
                 className="flex-1 bg-gray-100 text-gray-700 font-semibold py-3 px-6 rounded-lg hover:bg-gray-200 transition-colors"
               >
-                Maybe Later
+                {freeRequestsRemaining === 0 ? 'No free requests remaining' : `Use one of ${freeRequestsRemaining} free requests`}
               </Button>
               <Button
                 onClick={handleUpgrade}
@@ -95,7 +118,7 @@ export default function AccessProtection({
             </div>
 
             <p className="text-xs text-gray-500 mt-4">
-              You&apos;ll be redirected to complete your purchase
+              {freeRequestsRemaining === 0 ? 'No free requests remaining' : 'You have limited free requests remaining'}
             </p>
           </div>
         </div>

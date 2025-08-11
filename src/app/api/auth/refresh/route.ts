@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           requiresReauth: true,
-          redirectUrl: `https://norway.rwaka.rw/api/oauth/init?next=${encodeURIComponent(request.headers.get('referer') || 'https://testing.rwaka.rw/')}`
+          redirectUrl: `https://rettsai.no/api/oauth/init?next=${encodeURIComponent(request.headers.get('referer') || 'https://ask.rettsai.no/')}`
         },
         { status: 401 }
       )
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     try {
       // Make a request to Whop's OAuth endpoint with existing cookies
       // This should work if the user has a valid Whop session
-      const silentRefreshUrl = `https://whop.com/oauth?client_id=${process.env.NEXT_PUBLIC_WHOP_APP_ID}&response_type=code&redirect_uri=${encodeURIComponent('https://norway.rwaka.rw/api/oauth/callback')}&scope=user:read&prompt=none`
+      const silentRefreshUrl = `https://whop.com/oauth?client_id=${process.env.NEXT_PUBLIC_WHOP_APP_ID}&response_type=code&redirect_uri=${encodeURIComponent('https://rettsai.no/api/oauth/callback')}&scope=user:read&prompt=none`
 
       debug.log(
         'Token refresh - Trying silent refresh with URL:',
@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
                   client_id: process.env.NEXT_PUBLIC_WHOP_APP_ID!,
                   client_secret: process.env.WHOP_API_KEY!,
                   code: code,
-                  redirect_uri: 'https://norway.rwaka.rw/api/oauth/callback'
+                  redirect_uri: 'https://rettsai.no/api/oauth/callback'
                 })
               }
             )
@@ -148,7 +148,7 @@ export async function POST(request: NextRequest) {
 
               if (process.env.NODE_ENV === 'production') {
                 cookieOptions.push('Secure')
-                cookieOptions.push('Domain=.rwaka.rw')
+                cookieOptions.push('Domain=.rettsai.no')
               }
 
               response.headers.set('Set-Cookie', cookieOptions.join('; '))
@@ -196,7 +196,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         requiresReauth: true,
-        redirectUrl: `https://norway.rwaka.rw/api/oauth/init?next=${encodeURIComponent(request.headers.get('referer') || 'https://rettsai.rwaka.rw/')}`
+        redirectUrl: `https://rettsai.no/api/oauth/init?next=${encodeURIComponent(request.headers.get('referer') || 'https://ask.rettsai.no/')}`
       },
       { status: 401 }
     )
@@ -206,7 +206,7 @@ export async function POST(request: NextRequest) {
       {
         error: 'Token refresh failed',
         requiresReauth: true,
-        redirectUrl: `https://norway.rwaka.rw/api/oauth/init?next=${encodeURIComponent(request.headers.get('referer') || 'https://rettsai.rwaka.rw/')}`
+        redirectUrl: `https://rettsai.no/api/oauth/init?next=${encodeURIComponent(request.headers.get('referer') || 'https://ask.rettsai.no/')}`
       },
       { status: 401 }
     )

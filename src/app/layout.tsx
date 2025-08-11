@@ -18,11 +18,16 @@ const dmMono = DM_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Rwaka Legal Assistant',
+  title: 'Rettsai Legal Assistant',
   description:
     'An AI-powered assistant for legal research, document drafting, and compliance support.',
   keywords: [
     'AI Legal Assistant',
+    'LegalAI',
+    'Norway Legal AI',
+    'Legal AI Norway',
+    'Legal AI',
+    'Internertional student legal aid',
     'LegalTech',
     'Document Drafting',
     'Case Law',
@@ -38,23 +43,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <script
-          defer
-          src="https://analytics.rwaka.rw/script.js"
-          data-website-id="bb0ccd95-e310-4faf-bd66-52d7b9db22ba"
-        ></script>
-      </head>
       <body className={`${geistSans.variable} ${dmMono.variable} antialiased`}>
         <Script
           defer
           src="https://analytics.rwaka.rw/script.js"
-          data-website-id="67ea61db-949b-4227-a9d1-65f95db92b45"
-        />
+          data-website-id="beaba870-c958-480e-b11d-dea74f6d60c0"
+        ></Script>
         <UserStoreHydration />
         <NuqsAdapter>{children}</NuqsAdapter>
         <Toaster />
       </body>
-    </html >
+    </html>
   )
 }

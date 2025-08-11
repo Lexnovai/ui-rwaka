@@ -14,7 +14,7 @@ services:
       - dokploy-network
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.rwakanorwychat.rule=Host(`rettsai.rwaka.rw`)'
+      - 'traefik.http.routers.rwakanorwychat.rule=Host(`ask.rettsai.no`)'
       - 'traefik.http.routers.rwakanorwychat.entrypoints=websecure'
       - 'traefik.http.routers.rwakanorwychat.tls.certResolver=letsencrypt'
       - 'traefik.http.services.rwakanorwychat.loadbalancer.server.port=3023'
