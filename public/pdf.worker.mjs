@@ -64,21 +64,7 @@ const AnnotationEditorType = {
   SIGNATURE: 101,
   COMMENT: 102
 }
-const AnnotationEditorParamsType = {
-  RESIZE: 1,
-  CREATE: 2,
-  FREETEXT_SIZE: 11,
-  FREETEXT_COLOR: 12,
-  FREETEXT_OPACITY: 13,
-  INK_COLOR: 21,
-  INK_THICKNESS: 22,
-  INK_OPACITY: 23,
-  HIGHLIGHT_COLOR: 31,
-  HIGHLIGHT_THICKNESS: 32,
-  HIGHLIGHT_FREE: 33,
-  HIGHLIGHT_SHOW_ALL: 34,
-  DRAW_STEP: 41
-}
+
 const PermissionFlag = {
   PRINT: 0x04,
   MODIFY_CONTENTS: 0x08,

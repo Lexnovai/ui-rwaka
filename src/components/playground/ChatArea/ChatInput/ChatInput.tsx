@@ -43,13 +43,10 @@ const ChatInput = ({ className }: { className: string }) => {
     }
   }
 
-  // New function to handle PDF text extraction with dynamic import
   const extractPdfText = async (file: File): Promise<string> => {
     try {
-      // Dynamically import pdfjs-dist only when needed
       const pdfjsLib = await import('pdfjs-dist')
 
-      // Set the worker source
       pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`
 
       return new Promise<string>((resolve, reject) => {
@@ -135,7 +132,6 @@ const ChatInput = ({ className }: { className: string }) => {
   const handleSubmitWithPdf = async () => {
     if (!inputMessage.trim() && !pdfTextContent) return
 
-    // If there's PDF content, include it in the message
     const messageToSend = pdfTextContent ?
       `${inputMessage}\n\nPDF Content:\n${pdfTextContent}` :
       inputMessage
@@ -197,7 +193,7 @@ const ChatInput = ({ className }: { className: string }) => {
           onClick={handleFileButtonClick}
           disabled={!selectedAgent || isStreaming || isLoadingFile}
           size="icon"
-          className="text-primary rounded-xl bg-[#0C555D] hover:bg-[#0C555D] cursor-pointer p-5"
+          className="text-primary rounded-xl bg-[#0096FF] cursor-pointer p-5"
           title="Upload file"
         >
           {isLoadingFile ? (
@@ -211,7 +207,7 @@ const ChatInput = ({ className }: { className: string }) => {
           onClick={pdfTextContent ? handleSubmitWithPdf : handleSubmit}
           disabled={!selectedAgent || (!inputMessage.trim() && !pdfTextContent) || isStreaming || isLoadingFile}
           size="icon"
-          className="text-primary rounded-xl bg-[#0C555D] p-5"
+          className="text-primary rounded-xl bg-[#0096FF] p-5"
         >
           <Icon type="send" color="#49EA99" />
         </Button>
