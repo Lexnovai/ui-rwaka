@@ -11,14 +11,14 @@ export const LEGAL_CATEGORIES = [
     ]
   },
   {
-    name: 'CIVIL LAW EXPERT',
+    name: 'SEARCH LAWYER EXPERT',
     ability: {
-      can: 'Explain obligations, contracts, property, family and inheritance law in Rwanda',
-      cannot: 'Handle criminal, tax, or land-specific policy'
+      can: 'Find and recommend the top 3 lawyers in Norway based on location and legal specialization',
+      cannot: 'Provide legal advice or represent clients in court proceedings'
     },
     questions: [
-      'How is divorce processed under Rwandan law?',
-      'What are the formal requirements for a valid contract in Rwanda?'
+      'Can you find me a criminal defense lawyer in Oslo?',
+      'I need a family law attorney in Bergen who speaks English with specialty in divorce law'
     ]
   },
   {
