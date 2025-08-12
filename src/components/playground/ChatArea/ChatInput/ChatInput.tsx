@@ -11,8 +11,6 @@ import Icon from '@/components/ui/icon'
 import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
 import { Loader, Paperclip } from 'lucide-react'
-// Remove this line that's causing the SSR issue:
-// import * as pdfjsLib from 'pdfjs-dist'
 
 const ChatInput = ({ className }: { className: string }) => {
   const { chatInputRef } = usePlaygroundStore()
@@ -47,7 +45,7 @@ const ChatInput = ({ className }: { className: string }) => {
     try {
       const pdfjsLib = await import('pdfjs-dist')
 
-      pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`
+      pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs"
 
       return new Promise<string>((resolve, reject) => {
         const reader = new FileReader()
@@ -133,7 +131,7 @@ const ChatInput = ({ className }: { className: string }) => {
     if (!inputMessage.trim() && !pdfTextContent) return
 
     const messageToSend = pdfTextContent ?
-      `${inputMessage}\n\nPDF Content:\n${pdfTextContent}` :
+      `${inputMessage} \n\nPDF Content: \n${pdfTextContent} ` :
       inputMessage
 
     setInputMessage('')
@@ -146,7 +144,7 @@ const ChatInput = ({ className }: { className: string }) => {
     } catch (error) {
       toast.error(
         `Error in handleSubmit: ${error instanceof Error ? error.message : String(error)
-        }`
+        } `
       )
     }
   }
