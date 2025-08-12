@@ -100,7 +100,7 @@ const AgentMessage = ({ message }: MessageProps) => {
   }
   return (
     <div className="font-geist flex flex-row items-start gap-4">
-      <div className="rounded-md bg-[#49EA99]/90 p-0.5">
+      <div className="rounded-md bg-[#0096FF]/90 p-0.5">
         <Icon type="rwaka-chat" size="sm" />
       </div>
       <div className="flex flex-col gap-2">

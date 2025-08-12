@@ -45,7 +45,7 @@ const ChatInput = ({ className }: { className: string }) => {
     try {
       const pdfjsLib = await import('pdfjs-dist')
 
-      pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs"
+      pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
 
       return new Promise<string>((resolve, reject) => {
         const reader = new FileReader()
