@@ -74,7 +74,8 @@ const ChatBlankState = () => {
       await handleStreamResponse(query)
     } catch (error) {
       toast.error(
-        `Error in handling query: ${error instanceof Error ? error.message : String(error)
+        `Error in handling query: ${
+          error instanceof Error ? error.message : String(error)
         }`
       )
     }
@@ -90,7 +91,7 @@ const ChatBlankState = () => {
           className="px-4 text-xl font-[600] tracking-tight sm:text-2xl md:text-3xl"
         >
           <div className="mb-2 flex flex-wrap justify-center gap-x-3 text-base font-medium sm:text-xl md:text-2xl">
-            <p className="flex items-center font-[600]">Designed to assist</p>
+            <p className="flex items-center font-[600]">Using:</p>
             {matchedCategory?.name === 'USERS LEGAL EXPERT' ? (
               <>
                 <span className="relative inline-flex h-[40px] min-w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-xl bg-white px-3 text-sm font-semibold text-black hover:scale-[1.05] md:text-lg">
@@ -142,9 +143,7 @@ const ChatBlankState = () => {
         >
           <DropdownMenu>
             <DropdownMenuTrigger asChild className="">
-              <button
-                className="px-4 py-2 text-sm font-dmmono tracking-tight border border-border hover:bg-neutral-800 rounded-xl flex items-center gap-2 "
-              >
+              <button className="font-dmmono border-border flex items-center gap-2 rounded-xl border px-4 py-2 text-sm tracking-tight hover:bg-neutral-800">
                 <span>VIEW SAMPLE {matchedCategory?.name} QUESTIONS</span>
                 <ChevronDown size={16} />
               </button>
@@ -156,7 +155,9 @@ const ChatBlankState = () => {
                   onClick={() => handleQuery(q)}
                   className="flex justify-between"
                 >
-                  <span className='break-words max-w-[300px] md:max-w-[500px]'>{q}</span>
+                  <span className="max-w-[300px] break-words md:max-w-[500px]">
+                    {q}
+                  </span>
                   <ExternalLink size={16} className="text-gray-400" />
                 </DropdownMenuItem>
               ))}
@@ -164,7 +165,7 @@ const ChatBlankState = () => {
           </DropdownMenu>
         </motion.div>
       </div>
-    </section >
+    </section>
   )
 }
 
