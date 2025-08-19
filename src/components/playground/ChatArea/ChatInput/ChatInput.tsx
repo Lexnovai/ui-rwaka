@@ -43,42 +43,44 @@ const ChatInput = ({ className }: { className: string }) => {
 
   const extractPdfText = async (file: File): Promise<string> => {
     try {
-      const pdfjsLib = await import('pdfjs-dist')
-
-      pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
+      const pdfjsLib = await import('pdfjs-dist');
+      const pdfjsWorker = await import('pdfjs-dist/build/pdf.worker.min.mjs');
+      // Register worker
+      pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
       return new Promise<string>((resolve, reject) => {
-        const reader = new FileReader()
+        const reader = new FileReader();
 
         reader.onload = async () => {
           try {
-            const typedarray = new Uint8Array(reader.result as ArrayBuffer)
-            const pdf = await pdfjsLib.getDocument(typedarray).promise
-            let textContent = ''
+            const typedarray = new Uint8Array(reader.result as ArrayBuffer);
+            const pdf = await pdfjsLib.getDocument({ data: typedarray }).promise;
+            let textContent = '';
 
             for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-              const page = await pdf.getPage(pageNum)
-              const content = await page.getTextContent()
+              const page = await pdf.getPage(pageNum);
+              const content = await page.getTextContent();
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              const strings = content.items.map((item: any) => item.str)
-              textContent += strings.join(' ') + '\n'
+              const strings = content.items.map((item: any) => item.str);
+              textContent += strings.join(' ') + '\n';
             }
 
-            resolve(textContent)
+            resolve(textContent);
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
           } catch (error) {
-            reject(new Error('Failed to extract PDF text'))
+            reject(new Error('Failed to extract PDF text'));
           }
-        }
+        };
 
-        reader.onerror = () => reject(new Error('Failed to read file'))
-        reader.readAsArrayBuffer(file)
-      })
+        reader.onerror = () => reject(new Error('Failed to read file'));
+        reader.readAsArrayBuffer(file);
+      });
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
-      throw new Error('Failed to load PDF processing library')
+      throw new Error('Failed to load PDF processing library');
     }
-  }
+  };
+
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -91,7 +93,6 @@ const ChatInput = ({ className }: { className: string }) => {
         const text = await file.text()
         setInputMessage(text)
       } else if (file.type === 'application/pdf') {
-        // Set the PDF file for preview
         setPdfFile(file)
 
         // Extract text content using the new function
