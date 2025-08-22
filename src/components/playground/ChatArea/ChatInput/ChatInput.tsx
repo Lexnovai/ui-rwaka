@@ -18,7 +18,8 @@ const ChatInput = ({ className }: { className: string }) => {
   const { handleStreamResponse } = useAIChatStreamHandler()
   const [selectedAgent] = useQueryState('agent')
   const [inputMessage, setInputMessage] = useState('')
-  const isStreaming = usePlaygroundStore((state) => state.isStreaming)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const isStreaming = usePlaygroundStore((state: { isStreaming: any }) => state.isStreaming)
   const [isLoadingFile, setIsLoadingFile] = useState(false)
 
   const [, setPdfFile] = useState<File | null>(null)
@@ -34,106 +35,62 @@ const ChatInput = ({ className }: { className: string }) => {
     try {
       await handleStreamResponse(currentMessage)
     } catch (error) {
-      toast.error(
-        `Error in handleSubmit: ${error instanceof Error ? error.message : String(error)
-        }`
-      )
+      toast.error(`Error in handleSubmit: ${error instanceof Error ? error.message : String(error)}`)
     }
   }
 
-  const extractPdfText = async (file: File): Promise<string> => {
-    try {
-      const pdfjsLib = await import('pdfjs-dist');
-      const pdfjsWorker = await import('pdfjs-dist/build/pdf.worker.min.mjs');
-      // Register worker
-      pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
-
-      return new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-
-        reader.onload = async () => {
-          try {
-            const typedarray = new Uint8Array(reader.result as ArrayBuffer);
-            const pdf = await pdfjsLib.getDocument({ data: typedarray }).promise;
-            let textContent = '';
-
-            for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-              const page = await pdf.getPage(pageNum);
-              const content = await page.getTextContent();
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              const strings = content.items.map((item: any) => item.str);
-              textContent += strings.join(' ') + '\n';
-            }
-
-            resolve(textContent);
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          } catch (error) {
-            reject(new Error('Failed to extract PDF text'));
-          }
-        };
-
-        reader.onerror = () => reject(new Error('Failed to read file'));
-        reader.readAsArrayBuffer(file);
-      });
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
-      throw new Error('Failed to load PDF processing library');
-    }
-  };
-
-
+  // Replace pdf-parse API call with pdf2json API
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-    setIsLoadingFile(true)
+    setIsLoadingFile(true);
 
     try {
-      if (file.type === 'text/plain') {
-        const text = await file.text()
-        setInputMessage(text)
-      } else if (file.type === 'application/pdf') {
-        setPdfFile(file)
+      if (file.type === "text/plain") {
+        const text = await file.text();
+        setInputMessage(text);
+      } else if (file.type === "application/pdf") {
+        setPdfFile(file);
 
-        // Extract text content using the new function
-        const textContent = await extractPdfText(file)
+        const formData = new FormData();
+        formData.append("file", file);
 
-        // Store the text content separately (for sending to AI)
-        setPdfTextContent(textContent)
-        // Don't set any message in the input
-        chatInputRef.current?.focus()
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+
+        setPdfTextContent(data.text);
+        chatInputRef.current?.focus();
       } else {
-        toast.error('Unsupported file type. Please upload a .txt or .pdf file.')
+        toast.error("Unsupported file type. Please upload a .txt or .pdf file.");
       }
     } catch (err) {
-      console.error('File upload error:', err)
-      toast.error('Failed to read file.')
+      console.error("File upload error:", err);
+      toast.error("Failed to read file.");
     } finally {
-      setIsLoadingFile(false)
+      setIsLoadingFile(false);
     }
 
     if (fileInputRef.current) {
-      fileInputRef.current.value = ''
+      fileInputRef.current.value = "";
     }
-  }
+  };
 
   const handleFileButtonClick = () => {
     fileInputRef.current?.click()
   }
 
-  // const removePdfPreview = () => {
-  //   setPdfFile(null)
-  //   setNumPages(null)
-  //   setPdfTextContent('')
-  //   setInputMessage('')
-  // }
-
   const handleSubmitWithPdf = async () => {
     if (!inputMessage.trim() && !pdfTextContent) return
 
-    const messageToSend = pdfTextContent ?
-      `${inputMessage} \n\nPDF Content: \n${pdfTextContent} ` :
-      inputMessage
+    const messageToSend = pdfTextContent
+      ? `${inputMessage}\n\nPDF Content:\n${pdfTextContent}`
+      : inputMessage
 
     setInputMessage('')
     setPdfTextContent('')
@@ -143,26 +100,20 @@ const ChatInput = ({ className }: { className: string }) => {
     try {
       await handleStreamResponse(messageToSend)
     } catch (error) {
-      toast.error(
-        `Error in handleSubmit: ${error instanceof Error ? error.message : String(error)
-        } `
-      )
+      toast.error(`Error in handleSubmit: ${error instanceof Error ? error.message : String(error)}`)
     }
   }
 
   return (
     <div className={cn("fixed bottom-0 left-0 right-0 flex flex-col justify-center px-4 pb-2 bg-background", className)}>
-      {/* PDF Preview */}
-      {/* {pdfFile && (
-        <PDFPreview file={pdfFile} onRemove={removePdfPreview} />
-      )} */}
-
       <div className="flex w-full max-w-3xl items-end justify-center gap-x-2 mx-auto">
         <TextArea
           placeholder={'Ask anything...'}
           value={inputMessage}
-          onChange={(e) => setInputMessage(e.target.value)}
-          onKeyDown={(e) => {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          onChange={(e: { target: { value: any } }) => setInputMessage(e.target.value)}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          onKeyDown={(e: { key: string; nativeEvent: { isComposing: any }; shiftKey: any; preventDefault: () => void }) => {
             if (
               e.key === 'Enter' &&
               !e.nativeEvent.isComposing &&
