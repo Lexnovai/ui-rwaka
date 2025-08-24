@@ -1,6 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from 'next/server'
 import pdf from 'pdf-parse'
+
+// Force dynamic rendering to prevent static generation issues with pdf-parse
+export const dynamic = 'force-dynamic'
 
 export async function POST(req: Request) {
   try {
