@@ -3,7 +3,9 @@
 import { useState } from 'react'
 import { Document, Page, pdfjs } from 'react-pdf'
 
-pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.mjs';
+// Configure pdf.js worker from CDN (version pinned to match package.json)
+pdfjs.GlobalWorkerOptions.workerSrc =
+  'https://unpkg.com/pdfjs-dist@5.3.93/build/pdf.worker.min.mjs'
 
 const PDFPreview = ({
     file,

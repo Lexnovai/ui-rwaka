@@ -11,6 +11,7 @@ import Icon from '@/components/ui/icon'
 import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
 import { Loader, Paperclip } from 'lucide-react'
+import PDFPreview from './PDFPreview'
 
 const ChatInput = ({ className }: { className: string }) => {
   const { chatInputRef } = usePlaygroundStore()
@@ -22,9 +23,12 @@ const ChatInput = ({ className }: { className: string }) => {
   const isStreaming = usePlaygroundStore((state: { isStreaming: any }) => state.isStreaming)
   const [isLoadingFile, setIsLoadingFile] = useState(false)
 
-  const [, setPdfFile] = useState<File | null>(null)
-  const [, setNumPages] = useState<number | null>(null)
-  const [pdfTextContent, setPdfTextContent] = useState<string>('')
+  type Uploaded = {
+    file: File
+    kind: 'pdf' | 'text' | 'other'
+    text?: string
+  }
+  const [uploads, setUploads] = useState<Uploaded[]>([])
 
   const handleSubmit = async () => {
     if (!inputMessage.trim()) return
@@ -39,69 +43,80 @@ const ChatInput = ({ className }: { className: string }) => {
     }
   }
 
-  // Replace pdf-parse API call with pdf2json API
+  // Multi-file upload with per-type extraction
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = e.target.files ? Array.from(e.target.files) : []
+    if (!files.length) return
 
-    setIsLoadingFile(true);
+    setIsLoadingFile(true)
 
     try {
-      if (file.type === "text/plain") {
-        const text = await file.text();
-        setInputMessage(text);
-      } else if (file.type === "application/pdf") {
-        setPdfFile(file);
+      const newUploads: Uploaded[] = []
+      for (const file of files) {
+        const mime = file.type
 
-        const formData = new FormData();
-        formData.append("file", file);
-
-        const res = await fetch("/api/upload", {
-          method: "POST",
-          body: formData,
-        });
-
-        const data = await res.json();
-        if (data.error) throw new Error(data.error);
-
-        setPdfTextContent(data.text);
-        chatInputRef.current?.focus();
-      } else {
-        toast.error("Unsupported file type. Please upload a .txt or .pdf file.");
+        if (mime === 'application/pdf') {
+          // server-side extract
+          const formData = new FormData()
+          formData.append('file', file)
+          const res = await fetch('/api/upload', { method: 'POST', body: formData })
+          const data = await res.json()
+          if (data.error) throw new Error(data.error)
+          newUploads.push({ file, kind: 'pdf', text: data.text })
+        } else if (
+          mime === 'text/plain' ||
+          mime === 'text/markdown' ||
+          mime === 'text/csv' ||
+          mime === 'application/json'
+        ) {
+          const text = await file.text()
+          newUploads.push({ file, kind: 'text', text })
+        } else {
+          // unsupported for extraction but allow preview chip
+          newUploads.push({ file, kind: 'other' })
+        }
       }
+
+      setUploads((prev) => [...prev, ...newUploads])
+      chatInputRef.current?.focus()
     } catch (err) {
-      console.error("File upload error:", err);
-      toast.error("Failed to read file.");
+      console.error('File upload error:', err)
+      toast.error('Failed to read one or more files.')
     } finally {
-      setIsLoadingFile(false);
+      setIsLoadingFile(false)
     }
 
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
 
   const handleFileButtonClick = () => {
     fileInputRef.current?.click()
   }
 
-  const handleSubmitWithPdf = async () => {
-    if (!inputMessage.trim() && !pdfTextContent) return
+  const handleSubmitWithFiles = async () => {
+    const extracted = uploads
+      .filter((u) => u.text && u.text.trim().length > 0)
+      .map((u) => `File: ${u.file.name}\n${u.text}`)
+      .join('\n\n')
 
-    const messageToSend = pdfTextContent
-      ? `${inputMessage}\n\nPDF Content:\n${pdfTextContent}`
+    if (!inputMessage.trim() && !extracted) return
+
+    const messageToSend = extracted
+      ? `${inputMessage ? inputMessage + '\n\n' : ''}${extracted}`
       : inputMessage
 
     setInputMessage('')
-    setPdfTextContent('')
-    setPdfFile(null)
-    setNumPages(null)
+    setUploads([])
 
     try {
       await handleStreamResponse(messageToSend)
     } catch (error) {
       toast.error(`Error in handleSubmit: ${error instanceof Error ? error.message : String(error)}`)
     }
+  }
+
+  const removeUpload = (index: number) => {
+    setUploads((prev) => prev.filter((_, i) => i !== index))
   }
 
   return (
@@ -122,7 +137,7 @@ const ChatInput = ({ className }: { className: string }) => {
             ) {
               e.preventDefault()
               // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-              pdfTextContent ? handleSubmitWithPdf() : handleSubmit()
+              uploads.length ? handleSubmitWithFiles() : handleSubmit()
             }
           }}
           className="border-border bg-primaryAccent text-primary focus:border-accent w-full border px-4 text-sm"
@@ -134,7 +149,8 @@ const ChatInput = ({ className }: { className: string }) => {
           ref={fileInputRef}
           id="file-upload"
           type="file"
-          accept=".txt,.pdf"
+          multiple
+          accept=".txt,.pdf,.md,.csv,.json"
           onChange={handleFileUpload}
           className="hidden"
         />
@@ -154,14 +170,31 @@ const ChatInput = ({ className }: { className: string }) => {
         </Button>
 
         <Button
-          onClick={pdfTextContent ? handleSubmitWithPdf : handleSubmit}
-          disabled={!selectedAgent || (!inputMessage.trim() && !pdfTextContent) || isStreaming || isLoadingFile}
+          onClick={uploads.length ? handleSubmitWithFiles : handleSubmit}
+          disabled={!selectedAgent || (!inputMessage.trim() && uploads.length === 0) || isStreaming || isLoadingFile}
           size="icon"
           className="text-primary rounded-xl bg-[#0096FF] p-5"
         >
           <Icon type="send" color="#49EA99" />
         </Button>
       </div>
+
+      {uploads.length > 0 && (
+        <div className="w-full max-w-3xl mx-auto mt-2 flex flex-wrap gap-2 items-start">
+          {uploads.map((u, idx) => (
+            <div key={idx} className="shrink-0">
+              {u.kind === 'pdf' ? (
+                <PDFPreview file={u.file} onRemove={() => removeUpload(idx)} />)
+                : (
+                <div className="mb-2 inline-flex items-center gap-2 border rounded-lg px-2 py-1 bg-white shadow-sm">
+                  <span className="text-xs text-gray-700 truncate max-w-[160px]">{u.file.name}</span>
+                  <button onClick={() => removeUpload(idx)} className="text-xs text-gray-500 hover:text-gray-900">✕</button>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
