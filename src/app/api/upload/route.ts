@@ -1,35 +1,9 @@
 import { NextResponse } from 'next/server'
 
-// PDF.js type definitions
-interface TextItem {
-  str: string
-}
-
-interface TextContent {
-  items: TextItem[]
-}
-
-interface PDFPage {
-  getTextContent(): Promise<TextContent>
-}
-
-interface PDFDocument {
-  numPages: number
-  getPage(pageNumber: number): Promise<PDFPage>
-}
-
-interface PDFJSStatic {
-  GlobalWorkerOptions: {
-    workerSrc: string
-  }
-  getDocument(params: { data: Uint8Array }): {
-    promise: Promise<PDFDocument>
-  }
-}
-
 // Force dynamic rendering to prevent static generation issues with PDF parsing
 
 export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
 
 export async function POST(req: Request) {
   try {
@@ -44,25 +18,48 @@ export async function POST(req: Request) {
     const buffer = Buffer.from(arrayBuffer)
 
     // If not a PDF, reject early (client handles text types directly)
-    const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')
+    const isPdf =
+      file.type === 'application/pdf' ||
+      file.name.toLowerCase().endsWith('.pdf')
     if (!isPdf) {
-      return NextResponse.json({ error: 'Unsupported file type for server extraction' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Unsupported file type for server extraction' },
+        { status: 400 }
+      )
     }
 
-    // Dynamically import pdfjs-dist for server-side text extraction (avoid pdf-parse ENOENT issue)
-    const pdfjsLib = (await import('pdfjs-dist')) as unknown as PDFJSStatic
-    // Disable worker in Node context (no worker needed server-side)
-    pdfjsLib.GlobalWorkerOptions.workerSrc = ''
+    // Use pdf2json for server-side PDF text extraction (Node.js compatible)
+    const PDFParser = (await import('pdf2json')).default
 
-    const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(buffer) })
-    const pdfDocument = await loadingTask.promise
+    const pdfParser = new (PDFParser as any)()
 
-    let text = ''
-    for (let pageNum = 1; pageNum <= pdfDocument.numPages; pageNum++) {
-      const page = await pdfDocument.getPage(pageNum)
-      const content = await page.getTextContent()
-      text += content.items.map((item) => item.str).join(' ') + '\n'
-    }
+    const text = await new Promise<string>((resolve, reject) => {
+      pdfParser.on('pdfParser_dataError', (errData: any) => {
+        reject(new Error(errData?.parserError || 'PDF parse error'))
+      })
+
+      pdfParser.on('pdfParser_dataReady', (pdfData: any) => {
+        let extractedText = ''
+        if (pdfData?.Pages) {
+          for (const page of pdfData.Pages) {
+            if (page?.Texts) {
+              for (const textItem of page.Texts) {
+                if (textItem?.R) {
+                  for (const run of textItem.R) {
+                    if (run?.T) extractedText += decodeURIComponent(run.T) + ' '
+                  }
+                }
+              }
+            }
+            extractedText += '\n'
+          }
+        }
+        resolve(extractedText.trim())
+      })
+
+      // Start parsing from buffer
+      pdfParser.parseBuffer(buffer)
+    })
 
     return NextResponse.json({ text })
   } catch (err) {

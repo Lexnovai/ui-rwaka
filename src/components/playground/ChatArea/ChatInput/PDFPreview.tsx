@@ -1,15 +1,12 @@
 'use client'
 
+import '@/polyfills/promiseWithResolvers'
 import { useState } from 'react'
-import { Document, Page } from 'react-pdf'
-import { GlobalWorkerOptions } from 'pdfjs-dist'
+import { Document, Page, pdfjs } from 'react-pdf'
 
-// Configure real pdf.js worker using import.meta.url resolution (no CDN, no fake worker)
+// Configure pdf.js worker to use the static file served from public/
 if (typeof window !== 'undefined') {
-  GlobalWorkerOptions.workerSrc = new URL(
-    'pdfjs-dist/build/pdf.worker.min.mjs',
-    import.meta.url
-  ).toString()
+  pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs'
 }
 
 const PDFPreview = ({
