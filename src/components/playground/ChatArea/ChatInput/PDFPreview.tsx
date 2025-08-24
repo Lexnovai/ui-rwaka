@@ -1,12 +1,15 @@
 'use client'
 
 import { useState } from 'react'
-import { Document, Page, pdfjs } from 'react-pdf'
+import { Document, Page } from 'react-pdf'
+import * as pdfjs from 'pdfjs-dist'
 
-// Configure pdf.js worker from CDN only in the browser
+// Configure real pdf.js worker using import.meta.url resolution (no CDN, no fake worker)
 if (typeof window !== 'undefined') {
-  // Serve the real worker from our app to ensure same-origin and no CORS
-  pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs'
+  pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+    'pdfjs-dist/build/pdf.worker.min.mjs',
+    import.meta.url
+  ).toString()
 }
 
 const PDFPreview = ({
