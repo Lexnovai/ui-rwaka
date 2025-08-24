@@ -1,4 +1,1 @@
-declare module 'pdfjs-dist/legacy/build/pdf.js' {
-  import * as pdfjs from 'pdfjs-dist';
-  export = pdfjs;
-}
+// This file is no longer needed since we're using the main pdfjs-dist import

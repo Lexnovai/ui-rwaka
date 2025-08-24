@@ -50,7 +50,7 @@ export async function POST(req: Request) {
     }
 
     // Dynamically import pdfjs-dist for server-side text extraction (avoid pdf-parse ENOENT issue)
-    const pdfjsLib = (await import('pdfjs-dist/legacy/build/pdf.js')) as unknown as PDFJSStatic
+    const pdfjsLib = (await import('pdfjs-dist')) as unknown as PDFJSStatic
     // Disable worker in Node context (no worker needed server-side)
     pdfjsLib.GlobalWorkerOptions.workerSrc = ''
 
