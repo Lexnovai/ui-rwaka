@@ -11,7 +11,8 @@ import Icon from '@/components/ui/icon'
 import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
 import { Loader, Paperclip } from 'lucide-react'
-import PDFPreview from './PDFPreview'
+import dynamic from 'next/dynamic'
+const PDFPreview = dynamic(() => import('./PDFPreview'), { ssr: false })
 
 const ChatInput = ({ className }: { className: string }) => {
   const { chatInputRef } = usePlaygroundStore()

@@ -3,9 +3,11 @@
 import { useState } from 'react'
 import { Document, Page, pdfjs } from 'react-pdf'
 
-// Configure pdf.js worker from CDN (version pinned to match package.json)
-pdfjs.GlobalWorkerOptions.workerSrc =
-  'https://unpkg.com/pdfjs-dist@5.3.93/build/pdf.worker.min.mjs'
+// Configure pdf.js worker from CDN only in the browser
+if (typeof window !== 'undefined') {
+  pdfjs.GlobalWorkerOptions.workerSrc =
+    'https://unpkg.com/pdfjs-dist@5.3.93/build/pdf.worker.min.mjs'
+}
 
 const PDFPreview = ({
     file,
@@ -33,7 +35,7 @@ const PDFPreview = ({
                 <div className="w-32 h-32 overflow-hidden border rounded flex items-center justify-center bg-gray-50">
                     <Document
                         file={file}
-                        onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+                        onLoadSuccess={({ numPages }: { numPages: number }) => setNumPages(numPages)}
                     >
                         <Page pageNumber={1} width={100} />
                     </Document>
