@@ -31,14 +31,17 @@ export async function POST(req: Request) {
     // Use pdf2json for server-side PDF text extraction (Node.js compatible)
     const PDFParser = (await import('pdf2json')).default
 
-    const pdfParser = new (PDFParser as any)()
+    const pdfParser = new PDFParser()
 
     const text = await new Promise<string>((resolve, reject) => {
-      pdfParser.on('pdfParser_dataError', (errData: any) => {
-        reject(new Error(errData?.parserError || 'PDF parse error'))
+      pdfParser.on('pdfParser_dataError', (errData) => {
+        const errorMessage = typeof errData.parserError === 'string' 
+          ? errData.parserError 
+          : errData.parserError.message;
+        reject(new Error(errorMessage || 'PDF parse error'))
       })
 
-      pdfParser.on('pdfParser_dataReady', (pdfData: any) => {
+      pdfParser.on('pdfParser_dataReady', (pdfData) => {
         let extractedText = ''
         if (pdfData?.Pages) {
           for (const page of pdfData.Pages) {
