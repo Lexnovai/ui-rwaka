@@ -1,4 +1,32 @@
 import { NextResponse } from 'next/server'
+
+// PDF.js type definitions
+interface TextItem {
+  str: string
+}
+
+interface TextContent {
+  items: TextItem[]
+}
+
+interface PDFPage {
+  getTextContent(): Promise<TextContent>
+}
+
+interface PDFDocument {
+  numPages: number
+  getPage(pageNumber: number): Promise<PDFPage>
+}
+
+interface PDFJSStatic {
+  GlobalWorkerOptions: {
+    workerSrc: string
+  }
+  getDocument(params: { data: Uint8Array }): {
+    promise: Promise<PDFDocument>
+  }
+}
+
 // Force dynamic rendering to prevent static generation issues with PDF parsing
 
 export const dynamic = 'force-dynamic'
@@ -22,18 +50,18 @@ export async function POST(req: Request) {
     }
 
     // Dynamically import pdfjs-dist for server-side text extraction (avoid pdf-parse ENOENT issue)
-    const pdfjsLib: any = await import('pdfjs-dist/legacy/build/pdf.js')
+    const pdfjsLib = (await import('pdfjs-dist/legacy/build/pdf.js')) as unknown as PDFJSStatic
     // Disable worker in Node context (no worker needed server-side)
     pdfjsLib.GlobalWorkerOptions.workerSrc = ''
 
-    const loadingTask = pdfjsLib.getDocument({ data: buffer })
+    const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(buffer) })
     const pdfDocument = await loadingTask.promise
 
     let text = ''
     for (let pageNum = 1; pageNum <= pdfDocument.numPages; pageNum++) {
       const page = await pdfDocument.getPage(pageNum)
       const content = await page.getTextContent()
-      text += content.items.map((item: any) => (item as any).str).join(' ') + '\n'
+      text += content.items.map((item) => item.str).join(' ') + '\n'
     }
 
     return NextResponse.json({ text })
