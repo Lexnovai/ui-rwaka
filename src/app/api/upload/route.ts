@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-// Force dynamic rendering to prevent static generation issues with pdf-parse (and pdf-parse dynamic import)
+// Force dynamic rendering to prevent static generation issues with PDF parsing
 
 export const dynamic = 'force-dynamic'
 
@@ -21,12 +21,20 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unsupported file type for server extraction' }, { status: 400 })
     }
 
-    // Dynamically import pdf-parse only when handling a request to avoid build-time issues
-    const pdfParse = (await import('pdf-parse')).default
+    // Dynamically import pdfjs-dist for server-side text extraction (avoid pdf-parse ENOENT issue)
+    const pdfjsLib: any = await import('pdfjs-dist/legacy/build/pdf.js')
+    // Disable worker in Node context (no worker needed server-side)
+    pdfjsLib.GlobalWorkerOptions.workerSrc = ''
 
-    // Robust PDF text extraction with pdf-parse
-    const result = await pdfParse(buffer)
-    const text = result.text || ''
+    const loadingTask = pdfjsLib.getDocument({ data: buffer })
+    const pdfDocument = await loadingTask.promise
+
+    let text = ''
+    for (let pageNum = 1; pageNum <= pdfDocument.numPages; pageNum++) {
+      const page = await pdfDocument.getPage(pageNum)
+      const content = await page.getTextContent()
+      text += content.items.map((item: any) => (item as any).str).join(' ') + '\n'
+    }
 
     return NextResponse.json({ text })
   } catch (err) {

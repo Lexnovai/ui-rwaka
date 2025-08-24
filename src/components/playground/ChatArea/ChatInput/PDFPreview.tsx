@@ -2,11 +2,11 @@
 
 import { useState } from 'react'
 import { Document, Page } from 'react-pdf'
-import * as pdfjs from 'pdfjs-dist'
+import { GlobalWorkerOptions } from 'pdfjs-dist'
 
 // Configure real pdf.js worker using import.meta.url resolution (no CDN, no fake worker)
 if (typeof window !== 'undefined') {
-  pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  GlobalWorkerOptions.workerSrc = new URL(
     'pdfjs-dist/build/pdf.worker.min.mjs',
     import.meta.url
   ).toString()
