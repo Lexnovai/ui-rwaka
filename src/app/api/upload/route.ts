@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from 'next/server'
-import PDFParser from 'pdf2json'
+import pdf from 'pdf-parse'
 
 export async function POST(req: Request) {
   try {
@@ -14,26 +14,15 @@ export async function POST(req: Request) {
     const arrayBuffer = await file.arrayBuffer()
     const buffer = Buffer.from(arrayBuffer)
 
-    // PDF parsing with pdf2json
-    const text = await new Promise<string>((resolve, reject) => {
-      const pdfParser = new PDFParser()
+    // If not a PDF, reject early (client handles text types directly)
+    const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')
+    if (!isPdf) {
+      return NextResponse.json({ error: 'Unsupported file type for server extraction' }, { status: 400 })
+    }
 
-      pdfParser.on('pdfParser_dataError', (err: any) => reject(err.parserError))
-      pdfParser.on('pdfParser_dataReady', (pdfData: any) => {
-        try {
-          const text = pdfData.FormImage.Pages.map((page: any) =>
-            page.Texts.map((t: any) =>
-              decodeURIComponent(t.R.map((r: any) => r.T).join(''))
-            ).join(' ')
-          ).join('\n')
-          resolve(text)
-        } catch (e) {
-          reject(e)
-        }
-      })
-
-      pdfParser.parseBuffer(buffer)
-    })
+    // Robust PDF text extraction with pdf-parse
+    const result = await pdf(buffer)
+    const text = result.text || ''
 
     return NextResponse.json({ text })
   } catch (err) {
