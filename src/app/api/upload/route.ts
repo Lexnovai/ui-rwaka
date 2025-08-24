@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
-import pdf from 'pdf-parse'
+// Force dynamic rendering to prevent static generation issues with pdf-parse (and pdf-parse dynamic import)
 
-// Force dynamic rendering to prevent static generation issues with pdf-parse
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: Request) {
@@ -22,8 +21,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unsupported file type for server extraction' }, { status: 400 })
     }
 
+    // Dynamically import pdf-parse only when handling a request to avoid build-time issues
+    const pdfParse = (await import('pdf-parse')).default
+
     // Robust PDF text extraction with pdf-parse
-    const result = await pdf(buffer)
+    const result = await pdfParse(buffer)
     const text = result.text || ''
 
     return NextResponse.json({ text })
