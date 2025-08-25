@@ -7,7 +7,7 @@ export const LEGAL_CATEGORIES = [
     },
     questions: [
       'What defenses exist for homicide under Norwegian law?',
-      'Describe penalties for theft and robbery in Norway'
+      'Marriage law in Norway'
     ]
   },
   {
