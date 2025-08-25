@@ -166,7 +166,7 @@ const ChatInput = ({ className }: { className: string }) => {
           {isLoadingFile ? (
             <Loader size={14} color="#49EA99" className="animate-spin" />
           ) : (
-            <Paperclip color="#49EA99" />
+            <Paperclip color="#FFFFFF" />
           )}
         </Button>
 
@@ -187,11 +187,11 @@ const ChatInput = ({ className }: { className: string }) => {
               {u.kind === 'pdf' ? (
                 <PDFPreview file={u.file} onRemove={() => removeUpload(idx)} />)
                 : (
-                <div className="mb-2 inline-flex items-center gap-2 border rounded-lg px-2 py-1 bg-white shadow-sm">
-                  <span className="text-xs text-gray-700 truncate max-w-[160px]">{u.file.name}</span>
-                  <button onClick={() => removeUpload(idx)} className="text-xs text-gray-500 hover:text-gray-900">✕</button>
-                </div>
-              )}
+                  <div className="mb-2 inline-flex items-center gap-2 border rounded-lg px-2 py-1 bg-white shadow-sm">
+                    <span className="text-xs text-gray-700 truncate max-w-[160px]">{u.file.name}</span>
+                    <button onClick={() => removeUpload(idx)} className="text-xs text-gray-500 hover:text-gray-900">✕</button>
+                  </div>
+                )}
             </div>
           ))}
         </div>
