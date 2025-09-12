@@ -99,7 +99,7 @@ export async function GET() {
 
     // Add access passes if any
     if (accessData?.data) {
-      const accessSubs = accessData.data.map((access: any) => ({
+      const accessSubs = accessData.data.map((access: { id: string; status?: string; product?: { title?: string; price?: number }; access_pass?: { title?: string; price?: number }; created_at?: string; expires_at?: string }) => ({
         id: access.id,
         status: access.status || 'active',
         type: 'access_pass',

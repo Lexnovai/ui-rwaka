@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { redis, getFreeUsage, incrementFreeUsage } from '@/lib/redis'
+import { getFreeUsage, incrementFreeUsage } from '@/lib/redis'
 
 // Helper to fetch current user ID from Whop using the access token cookie
 async function getCurrentUserIdFromWhop(token: string): Promise<string | null> {
@@ -25,7 +25,7 @@ function noStoreHeaders() {
   }
 }
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const cookieStore = await cookies()
     const token = cookieStore.get('whop_access_token')?.value
@@ -43,12 +43,12 @@ export async function GET(req: NextRequest) {
     const envLimit = envLimitRaw ? parseInt(envLimitRaw, 10) : undefined
     const limit = Number.isFinite(envLimit as number) && (envLimit as number) > 0 ? (envLimit as number) : undefined
     return NextResponse.json({ userId, count, limit }, { headers: noStoreHeaders() })
-  } catch (e) {
+  } catch {
     return NextResponse.json({ error: 'Failed to fetch usage' }, { status: 500, headers: noStoreHeaders() })
   }
 }
 
-export async function POST(req: NextRequest) {
+export async function POST() {
   try {
     const cookieStore = await cookies()
     const token = cookieStore.get('whop_access_token')?.value
@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
       { userId, count: newCount, limited: limit !== undefined ? newCount >= limit : false },
       { headers: noStoreHeaders() }
     )
-  } catch (e) {
+  } catch {
     return NextResponse.json({ error: 'Failed to update usage' }, { status: 500, headers: noStoreHeaders() })
   }
 }

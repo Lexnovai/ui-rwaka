@@ -13,15 +13,7 @@ interface UseAccessControlReturn extends AccessState {
   redirectToPurchase: () => void
 }
 
-const ACCESS_CACHE_KEY = 'whop_access_cache'
-const CACHE_DURATION = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
-
-interface CachedAccess {
-  hasAccess: boolean
-  userId?: string
-  userName?: string
-  timestamp: number
-}
+// Caching removed - always use fresh access validation
 
 export function useAccessControl(): UseAccessControlReturn {
   const [state, setState] = useState<AccessState>({
