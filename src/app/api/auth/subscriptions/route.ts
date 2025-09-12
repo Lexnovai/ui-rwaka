@@ -1,7 +1,19 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 
-export async function GET(request: NextRequest) {
+interface Membership {
+  id: string
+  status: string
+  product?: {
+    title?: string
+    price?: number
+  }
+  created_at: string
+  expires_at?: string
+  cancel_at_period_end?: boolean
+}
+
+export async function GET() {
   try {
     const cookieStore = await cookies()
     const token = cookieStore.get('whop_access_token')?.value
@@ -50,7 +62,7 @@ export async function GET(request: NextRequest) {
     const membershipsData = await membershipsResponse.json()
     
     // Transform the data to match our interface
-    const subscriptions = membershipsData.data?.map((membership: any) => ({
+    const subscriptions = membershipsData.data?.map((membership: Membership) => ({
       id: membership.id,
       status: membership.status,
       product: {
