@@ -19,7 +19,6 @@ export default function AccessProtection({
   const [showDialog, setShowDialog] = React.useState(false)
   const [freeRequestsRemaining, setFreeRequestsRemaining] = React.useState<number>(4)
 
-  const FREE_REQUESTS_KEY = 'free_requests_remaining'
 
   // Debug logging
   React.useEffect(() => {
@@ -28,17 +27,7 @@ export default function AccessProtection({
     debug.log('AccessProtection - error:', error)
   }, [hasAccess, isLoading, error])
 
-  // Initialise free requests from localStorage
-  React.useEffect(() => {
-    if (typeof window === 'undefined') return
-    const stored = localStorage.getItem(FREE_REQUESTS_KEY)
-    if (stored !== null) {
-      setFreeRequestsRemaining(parseInt(stored, 10))
-    } else {
-      localStorage.setItem(FREE_REQUESTS_KEY, '4')
-      setFreeRequestsRemaining(4)
-    }
-  }, [])
+  // No localStorage caching - always start with 4 free requests
 
   // Show dialog when access is denied
   React.useEffect(() => {
@@ -70,7 +59,6 @@ export default function AccessProtection({
     if (freeRequestsRemaining <= 0) return
     const newCount = freeRequestsRemaining - 1
     setFreeRequestsRemaining(newCount)
-    localStorage.setItem(FREE_REQUESTS_KEY, newCount.toString())
     setShowDialog(false)
   }
 
