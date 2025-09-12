@@ -30,47 +30,7 @@ export function useAccessControl(): UseAccessControlReturn {
     error: null
   })
 
-  // Check if we have valid cached access
-  const getCachedAccess = useCallback((): CachedAccess | null => {
-    try {
-      const cached = localStorage.getItem(ACCESS_CACHE_KEY)
-      if (!cached) return null
-
-      const parsedCache: CachedAccess = JSON.parse(cached)
-      const now = Date.now()
-
-      // Check if cache is still valid (within 24 hours)
-      if (now - parsedCache.timestamp < CACHE_DURATION) {
-        return parsedCache
-      }
-
-      // Cache expired, remove it
-      localStorage.removeItem(ACCESS_CACHE_KEY)
-      return null
-    } catch (error) {
-      console.error('Error reading access cache:', error)
-      localStorage.removeItem(ACCESS_CACHE_KEY)
-      return null
-    }
-  }, [])
-
-  // Cache access result
-  const setCachedAccess = useCallback(
-    (hasAccess: boolean, userId?: string, userName?: string) => {
-      try {
-        const cacheData: CachedAccess = {
-          hasAccess,
-          userId,
-          userName,
-          timestamp: Date.now()
-        }
-        localStorage.setItem(ACCESS_CACHE_KEY, JSON.stringify(cacheData))
-      } catch (error) {
-        console.error('Error caching access result:', error)
-      }
-    },
-    []
-  )
+  // Caching removed to ensure fresh access validation
 
   // Check access from server
   const checkAccess = useCallback(async () => {
