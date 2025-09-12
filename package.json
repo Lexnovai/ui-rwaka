@@ -23,6 +23,7 @@
     "@radix-ui/react-tooltip": "^1.1.7",
     "@whop/api": "^0.0.40",
     "@whop/iframe": "^0.0.3",
+    "@whop/react": "^0.0.3",
     "axios": "^1.9.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

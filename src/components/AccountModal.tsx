@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { useUserStore } from '@/stores/userStore'
 import { X } from 'lucide-react'
+import { createSdk } from '@whop/iframe'
 
 interface AccountModalProps {
   isOpen: boolean
@@ -12,16 +13,32 @@ interface AccountModalProps {
 const AccountModal = ({ isOpen, onClose }: AccountModalProps) => {
   const { user } = useUserStore()
 
-  const openWhopProfile = () => {
-    if (user?.username) {
-      // Use Whop's profile URL with the user's username
-      window.open(`https://whop.com/@${user.username}`, '_blank')
-    } else if (user?.id) {
-      // Fallback to user ID if username not available
-      window.open(`https://whop.com/@${user.id}`, '_blank')
-    } else {
-      // Fallback to general Whop profile page
-      window.open('https://whop.com/profile', '_blank')
+  const openWhopMemberships = () => {
+    try {
+      // Create iframe SDK instance
+      const iframeSdk = createSdk({
+        appId: process.env.NEXT_PUBLIC_WHOP_APP_ID || ''
+      })
+
+      // Open user's Whop profile which shows memberships
+      if (user?.username) {
+        iframeSdk.openExternalUrl({ url: `https://whop.com/@${user.username}` })
+      } else if (user?.id) {
+        iframeSdk.openExternalUrl({ url: `https://whop.com/@${user.id}` })
+      } else {
+        // Fallback to general membership management
+        iframeSdk.openExternalUrl({ url: 'https://whop.com/memberships' })
+      }
+    } catch (error) {
+      console.error('Failed to open Whop profile:', error)
+      // Fallback to regular window.open
+      if (user?.username) {
+        window.open(`https://whop.com/@${user.username}`, '_blank')
+      } else if (user?.id) {
+        window.open(`https://whop.com/@${user.id}`, '_blank')
+      } else {
+        window.open('https://whop.com/memberships', '_blank')
+      }
     }
     onClose()
   }
@@ -57,10 +74,10 @@ const AccountModal = ({ isOpen, onClose }: AccountModalProps) => {
           {/* Whop Profile Button */}
           <div className="space-y-3">
             <Button
-              onClick={openWhopProfile}
+              onClick={openWhopMemberships}
               className="w-full bg-[#0096FF] hover:bg-[#0086E6] text-white"
             >
-              View Full Profile on Whop
+              Manage Memberships
             </Button>
             
             <div className="flex gap-2">
