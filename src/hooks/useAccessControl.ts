@@ -74,35 +74,30 @@ export function useAccessControl(): UseAccessControlReturn {
 
   // Check access from server
   const checkAccess = useCallback(async () => {
-    // First check cache
-    const cachedAccess = getCachedAccess()
-    if (cachedAccess) {
-      console.log('Using cached access result:', cachedAccess.hasAccess)
-      setState({
-        hasAccess: cachedAccess.hasAccess,
-        isLoading: false,
-        error: null,
-        userId: cachedAccess.userId,
-        userName: cachedAccess.userName
-      })
-      return
-    }
-
-    // No valid cache, check server
+    console.log('🔍 useAccessControl - Starting fresh access check (no cache)...')
+    
+    // Always check server directly (no cache)
     setState((prev) => ({ ...prev, isLoading: true, error: null }))
 
     try {
+      console.log('📡 useAccessControl - Making API request to /api/auth/validate-access')
       const response = await fetch('/api/auth/validate-access', {
         method: 'GET',
         credentials: 'include'
       })
 
+      console.log('📡 useAccessControl - Response status:', response.status)
+      console.log('📡 useAccessControl - Response ok:', response.ok)
+
       const data = await response.json()
+      console.log('📋 useAccessControl - Response data:', JSON.stringify(data, null, 2))
 
       if (response.ok) {
-        // Cache the result
-        setCachedAccess(data.hasAccess, data.userId, data.userName)
-
+        console.log('✅ useAccessControl - Server response OK')
+        console.log('🔐 useAccessControl - Has access:', data.hasAccess)
+        console.log('📦 useAccessControl - Accessed products:', data.accessedProducts)
+        
+        // No caching - always fresh results
         setState({
           hasAccess: data.hasAccess,
           isLoading: false,
@@ -111,6 +106,8 @@ export function useAccessControl(): UseAccessControlReturn {
           userName: data.userName
         })
       } else {
+        console.log('❌ useAccessControl - Server response NOT OK')
+        console.log('❌ useAccessControl - Error:', data.error)
         setState({
           hasAccess: false,
           isLoading: false,
@@ -119,14 +116,14 @@ export function useAccessControl(): UseAccessControlReturn {
         })
       }
     } catch (error) {
-      console.error('Access check error:', error)
+      console.error('❌ useAccessControl - Network error:', error)
       setState({
         hasAccess: false,
         isLoading: false,
         error: 'Network error while checking access'
       })
     }
-  }, [getCachedAccess, setCachedAccess])
+  }, [])
 
   // Redirect to purchase page
   const redirectToPurchase = useCallback(() => {

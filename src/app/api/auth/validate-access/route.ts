@@ -26,6 +26,7 @@ export async function GET(): Promise<NextResponse<AccessResponse>> {
 
     debug.log('Access validation - Token present:', !!token)
     debug.log('Access validation - Token length:', token?.length || 0)
+    debug.log('Access validation - Full token (first 50 chars):', token?.substring(0, 50) + '...')
 
     if (!token) {
       return NextResponse.json(
@@ -82,29 +83,47 @@ export async function GET(): Promise<NextResponse<AccessResponse>> {
     debug.log('Access validation - Checking access for products:', PRODUCT_IDS)
 
     // Check access for all products
+    debug.log('Access validation - Starting product access checks...')
+    debug.log('Access validation - WhopSDK instance:', !!whopSdk)
+    debug.log('Access validation - WhopSDK access method:', !!whopSdk.access)
+    
     const accessResults = await Promise.all(
-      PRODUCT_IDS.map(async (productId) => {
+      PRODUCT_IDS.map(async (productId, index) => {
         try {
+          debug.log(`Access validation - Checking product ${index + 1}/${PRODUCT_IDS.length}: ${productId}`)
+          debug.log(`Access validation - Using userId: ${userId}`)
+          
           const result = await whopSdk.access.checkIfUserHasAccessToAccessPass({
             accessPassId: productId,
             userId: userId
           })
-          debug.log(`Access validation - Product ${productId}:`, result)
+          
+          debug.log(`Access validation - Product ${productId} result:`, JSON.stringify(result, null, 2))
+          debug.log(`Access validation - Product ${productId} hasAccess:`, result.hasAccess)
+          debug.log(`Access validation - Product ${productId} accessLevel:`, result.accessLevel)
+          
           return {
             productId,
             hasAccess: result.hasAccess,
             accessLevel: result.accessLevel
           }
         } catch (error) {
-          debug.log(`Access validation - Error checking ${productId}:`, error)
+          debug.log(`Access validation - ERROR checking ${productId}:`, error)
+          debug.log(`Access validation - Error type:`, typeof error)
+          debug.log(`Access validation - Error message:`, error instanceof Error ? error.message : String(error))
+          debug.log(`Access validation - Error stack:`, error instanceof Error ? error.stack : 'No stack')
+          
           return {
             productId,
             hasAccess: false,
-            accessLevel: undefined
+            accessLevel: undefined,
+            error: error instanceof Error ? error.message : String(error)
           }
         }
       })
     )
+    
+    debug.log('Access validation - All access results:', JSON.stringify(accessResults, null, 2))
 
     // Check if user has access to any product
     const accessedProducts = accessResults
@@ -117,20 +136,29 @@ export async function GET(): Promise<NextResponse<AccessResponse>> {
       .map((result) => result.accessLevel)
       .find((level) => level) // Get first non-undefined access level
 
+    debug.log('Access validation - Accessed products:', accessedProducts)
+    debug.log('Access validation - Has any access:', hasAnyAccess)
+    debug.log('Access validation - Best access level:', bestAccessLevel)
     debug.log('Access validation - Final result:', {
       hasAccess: hasAnyAccess,
       accessedProducts,
-      accessLevel: bestAccessLevel
+      accessLevel: bestAccessLevel,
+      userId,
+      userName
     })
 
-    return NextResponse.json({
+    const finalResponse = {
       hasAccess: hasAnyAccess,
       accessLevel: bestAccessLevel,
       userId,
       userName,
       accessedProducts,
       ...(hasAnyAccess ? {} : { error: 'Access denied to all products' })
-    })
+    }
+
+    debug.log('Access validation - Returning response:', JSON.stringify(finalResponse, null, 2))
+
+    return NextResponse.json(finalResponse)
   } catch (error) {
     console.error('Access validation error:', error)
     debug.log('Access validation - Error details:', error)
