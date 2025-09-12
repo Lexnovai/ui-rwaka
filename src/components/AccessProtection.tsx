@@ -3,6 +3,7 @@ import { useAccessControl } from '@/hooks/useAccessControl'
 import { debug } from '@/utils/debug'
 import { Button } from './ui/button'
 import Icon from './ui/icon'
+import apiFetch from '@/api/apiFetch'
 
 interface AccessProtectionProps {
   children: React.ReactNode
@@ -17,7 +18,12 @@ export default function AccessProtection({
 }: AccessProtectionProps) {
   const { hasAccess, isLoading, error, redirectToPurchase } = useAccessControl()
   const [showDialog, setShowDialog] = React.useState(false)
-  const [freeRequestsRemaining, setFreeRequestsRemaining] = React.useState<number>(4)
+  const [usageCount, setUsageCount] = React.useState<number>(0)
+  const [limit, setLimit] = React.useState<number | undefined>(undefined)
+  const freeRequestsRemaining = React.useMemo(
+    () => (typeof limit === 'number' ? Math.max(limit - usageCount, 0) : undefined),
+    [limit, usageCount]
+  )
 
 
   // Debug logging
@@ -27,7 +33,7 @@ export default function AccessProtection({
     debug.log('AccessProtection - error:', error)
   }, [hasAccess, isLoading, error])
 
-  // No localStorage caching - always start with 4 free requests
+  // No localStorage caching - usage is read from server (Redis)
 
   // Show dialog when access is denied
   React.useEffect(() => {
@@ -35,6 +41,27 @@ export default function AccessProtection({
       setShowDialog(true)
     }
   }, [hasAccess, isLoading])
+
+  // When dialog opens, fetch current usage from server
+  React.useEffect(() => {
+    const fetchUsage = async () => {
+      try {
+        const res = await apiFetch('/api/usage/free', { method: 'GET' })
+        if (!res.ok) {
+          debug.log('AccessProtection - failed to fetch usage, status:', res.status)
+          return
+        }
+        const data = await res.json()
+        setUsageCount(typeof data?.count === 'number' ? data.count : 0)
+        setLimit(typeof data?.limit === 'number' ? data.limit : undefined)
+      } catch (e) {
+        debug.log('AccessProtection - error fetching usage:', e)
+      }
+    }
+    if (showDialog) {
+      fetchUsage()
+    }
+  }, [showDialog])
 
   // Show loading state
   if (isLoading || hasAccess === null) {
@@ -55,11 +82,28 @@ export default function AccessProtection({
     setShowDialog(false)
   }
 
-  const handleUseFreeRequest = () => {
-    if (freeRequestsRemaining <= 0) return
-    const newCount = freeRequestsRemaining - 1
-    setFreeRequestsRemaining(newCount)
-    setShowDialog(false)
+  const handleUseFreeRequest = async () => {
+    if (typeof freeRequestsRemaining === 'number' && freeRequestsRemaining <= 0) return
+    try {
+      const res = await apiFetch('/api/usage/free', { method: 'POST', body: JSON.stringify({}) })
+      if (res.status === 429) {
+        const data = await res.json().catch(() => null)
+        setUsageCount(typeof data?.count === 'number' ? data.count : usageCount)
+        // Ensure limit state is kept if provided earlier
+        setShowDialog(true)
+        return
+      }
+      if (!res.ok) {
+        debug.log('AccessProtection - increment failed, status:', res.status)
+        return
+      }
+      const data = await res.json()
+      setUsageCount(typeof data?.count === 'number' ? data.count : usageCount + 1)
+      if (typeof data?.limit === 'number') setLimit(data.limit)
+      setShowDialog(false)
+    } catch (e) {
+      debug.log('AccessProtection - error incrementing usage:', e)
+    }
   }
 
   return (
@@ -95,7 +139,11 @@ export default function AccessProtection({
                 onClick={handleUseFreeRequest}
                 className="flex-1 bg-gray-100 text-gray-700 font-semibold py-3 px-6 rounded-lg hover:bg-gray-200 transition-colors"
               >
-                {freeRequestsRemaining === 0 ? 'No free requests remaining' : `Use one of ${freeRequestsRemaining} free requests`}
+                {typeof freeRequestsRemaining === 'number'
+                  ? freeRequestsRemaining === 0
+                    ? 'No free requests remaining'
+                    : `Use one of ${freeRequestsRemaining} free requests`
+                  : 'Use free request'}
               </Button>
               <Button
                 onClick={handleUpgrade}
@@ -106,7 +154,11 @@ export default function AccessProtection({
             </div>
 
             <p className="text-xs text-gray-500 mt-4">
-              {freeRequestsRemaining === 0 ? 'No free requests remaining' : 'You have limited free requests remaining'}
+              {typeof freeRequestsRemaining === 'number'
+                ? freeRequestsRemaining === 0
+                  ? 'No free requests remaining'
+                  : `You have ${freeRequestsRemaining} free request(s) remaining`
+                : 'You have limited free requests remaining'}
             </p>
           </div>
         </div>
