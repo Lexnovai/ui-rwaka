@@ -20,25 +20,12 @@ const AccountModal = ({ isOpen, onClose }: AccountModalProps) => {
         appId: process.env.NEXT_PUBLIC_WHOP_APP_ID || ''
       })
 
-      // Open user's Whop profile which shows memberships
-      if (user?.username) {
-        iframeSdk.openExternalUrl({ url: `https://whop.com/@${user.username}` })
-      } else if (user?.id) {
-        iframeSdk.openExternalUrl({ url: `https://whop.com/@${user.id}` })
-      } else {
-        // Fallback to general membership management
-        iframeSdk.openExternalUrl({ url: 'https://whop.com/memberships' })
-      }
+      // Redirect to rettsai membership management page
+      iframeSdk.openExternalUrl({ url: 'https://whop.com/joined/rettsai/' })
     } catch (error) {
-      console.error('Failed to open Whop profile:', error)
+      console.error('Failed to open Whop membership page:', error)
       // Fallback to regular window.open
-      if (user?.username) {
-        window.open(`https://whop.com/@${user.username}`, '_blank')
-      } else if (user?.id) {
-        window.open(`https://whop.com/@${user.id}`, '_blank')
-      } else {
-        window.open('https://whop.com/memberships', '_blank')
-      }
+      window.open('https://whop.com/joined/rettsai/', '_blank')
     }
     onClose()
   }
