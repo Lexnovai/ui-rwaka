@@ -43,10 +43,10 @@ export async function GET() {
     const userData = await userResponse.json()
     const userId = userData.id
 
-    // Fetch user's memberships/subscriptions
-    const membershipsResponse = await fetch(`https://api.whop.com/api/v5/memberships?user_id=${userId}`, {
+    // Fetch user's memberships/subscriptions using user token
+    const membershipsResponse = await fetch('https://api.whop.com/api/v5/me/memberships', {
       headers: {
-        'Authorization': `Bearer ${process.env.WHOP_API_KEY}`,
+        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       }
     })
