@@ -20,11 +20,12 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Ellipsis, LogOut, UserCircle } from 'lucide-react'
 import useIsMobile from '@/hooks/useIsMobile'
+import AccountModal from '@/components/AccountModal'
 
 const SidebarHeader = () => (
-  <div className="flex justify-start items-start gap-2 mb-4">
+  <div className="mb-4 flex items-start justify-start gap-2">
     <Icon type="rwaka-chat" size="xl" className="w-48" />
-    <p className="font-semibold text-2xl md:text-3xl">Rettsai</p>
+    <p className="text-2xl font-semibold md:text-3xl">Rettsai</p>
   </div>
 )
 
@@ -47,31 +48,95 @@ const NewChatButton = ({
 )
 
 const ProfileMenu = () => {
+  const [showAccountModal, setShowAccountModal] = useState(false)
+
+  const handleLogout = async () => {
+    try {
+      // Call logout API to clear cookies
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      
+      // Clear any client-side storage
+      localStorage.clear()
+      sessionStorage.clear()
+      
+      // Redirect to landing page
+      window.location.href = 'http://rettsai.no/'
+    } catch (error) {
+      console.error('Logout error:', error)
+      // Even if API call fails, still redirect to clear client state
+      localStorage.clear()
+      sessionStorage.clear()
+      window.location.href = 'http://rettsai.no/'
+    }
+  }
+
+  const handleHelp = () => {
+    window.open('https://rettsai.featurebase.app/help', '_blank')
+  }
+
+  const handlePricingPlans = () => {
+    window.location.href = 'http://rettsai.no/#pricing'
+  }
+
+  const handleMyAccount = () => {
+    setShowAccountModal(true)
+  }
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger>
-        <Ellipsis className="cursor-pointer" />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent
-        className="bg-background-secondary mb-4 w-60 border-none"
-        align="end"
-        forceMount
-      >
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
-        <DropdownMenuSeparator className="border-border" />
-        <DropdownMenuGroup>
-          <DropdownMenuItem>Help</DropdownMenuItem>
-          <DropdownMenuItem>Settings</DropdownMenuItem>
-          <DropdownMenuItem>Pricing Plans</DropdownMenuItem>
-          <DropdownMenuItem>Manage Team</DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem className="flex justify-between font-semibold">
-          Log out
-          <LogOut className="text-[#7BC4EA]" />
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger>
+          <Ellipsis className="cursor-pointer" />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          className="bg-background-secondary mb-4 w-60 border-none"
+          align="end"
+          forceMount
+        >
+          <DropdownMenuLabel 
+            className="cursor-pointer hover:bg-accent"
+            onClick={handleMyAccount}
+          >
+            My Account
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator className="border-border" />
+          <DropdownMenuGroup>
+            <DropdownMenuItem 
+              className="cursor-pointer"
+              onClick={handleHelp}
+            >
+              Help
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              className="cursor-pointer"
+              onClick={handlePricingPlans}
+            >
+              Pricing Plans
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem 
+            className="flex justify-between font-semibold cursor-pointer"
+            onClick={handleLogout}
+          >
+            Log out
+            <LogOut className="text-[#7BC4EA]" />
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      
+      {showAccountModal && (
+        <AccountModal 
+          isOpen={showAccountModal} 
+          onClose={() => setShowAccountModal(false)} 
+        />
+      )}
+    </>
   )
 }
 
@@ -198,7 +263,7 @@ const Sidebar = ({
                   {isUserLoading ? (
                     <>
                       <Skeleton className="h-3 w-20" />
-                      <Skeleton className="h-2 w-32 mt-1" />
+                      <Skeleton className="mt-1 h-2 w-32" />
                     </>
                   ) : (
                     <>
