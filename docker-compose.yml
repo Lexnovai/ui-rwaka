@@ -11,7 +11,7 @@ services:
     volumes:
       - ./public:/public
     environment:
-      - REDIS_URL=redis://redis:6379
+      - REDIS_URL=redis://redis:6777
       - FREE_REQUEST_LIMIT=5
     networks:
       - dokploy-network
@@ -29,7 +29,7 @@ services:
     container_name: rettsai-redis
     restart: always
     ports:
-      - '6379:6379'
+      - '6777:6777'
     volumes:
       - redis_data:/data
     networks:
