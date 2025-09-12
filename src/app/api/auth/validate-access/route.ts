@@ -3,7 +3,11 @@ import { cookies } from 'next/headers'
 import { debug } from '@/utils/debug'
 import { whopSdk } from '@/lib/whop-sdk'
 
-const ACCESS_PASS_ID = 'prod_N6taIBKbQWkig'
+const PRODUCT_IDS = [
+  'prod_9TfEsh2jStL0g',
+  'prod_1bvM6PZJmljgm', 
+  'prod_ku40zdor6zMl6'
+]
 
 interface AccessResponse {
   hasAccess: boolean
@@ -11,6 +15,7 @@ interface AccessResponse {
   error?: string
   userId?: string
   userName?: string
+  accessedProducts?: string[]
 }
 
 export async function GET(): Promise<NextResponse<AccessResponse>> {
@@ -57,22 +62,57 @@ export async function GET(): Promise<NextResponse<AccessResponse>> {
     
     debug.log('Access validation - User ID:', userId)
     debug.log('Access validation - User Name:', userName)
-    debug.log('Access validation - Checking access for product:', ACCESS_PASS_ID)
+    debug.log('Access validation - Checking access for products:', PRODUCT_IDS)
 
-    // Use Whop SDK to check access
-    const accessResult = await whopSdk.access.checkIfUserHasAccessToAccessPass({
-      accessPassId: ACCESS_PASS_ID,
-      userId: userId
+    // Check access for all products
+    const accessResults = await Promise.all(
+      PRODUCT_IDS.map(async (productId) => {
+        try {
+          const result = await whopSdk.access.checkIfUserHasAccessToAccessPass({
+            accessPassId: productId,
+            userId: userId
+          })
+          debug.log(`Access validation - Product ${productId}:`, result)
+          return {
+            productId,
+            hasAccess: result.hasAccess,
+            accessLevel: result.accessLevel
+          }
+        } catch (error) {
+          debug.log(`Access validation - Error checking ${productId}:`, error)
+          return {
+            productId,
+            hasAccess: false,
+            accessLevel: undefined
+          }
+        }
+      })
+    )
+
+    // Check if user has access to any product
+    const accessedProducts = accessResults
+      .filter(result => result.hasAccess)
+      .map(result => result.productId)
+    
+    const hasAnyAccess = accessedProducts.length > 0
+    const bestAccessLevel = accessResults
+      .filter(result => result.hasAccess)
+      .map(result => result.accessLevel)
+      .find(level => level) // Get first non-undefined access level
+
+    debug.log('Access validation - Final result:', {
+      hasAccess: hasAnyAccess,
+      accessedProducts,
+      accessLevel: bestAccessLevel
     })
 
-    debug.log('Access validation - SDK result:', accessResult)
-
     return NextResponse.json({ 
-      hasAccess: accessResult.hasAccess,
-      accessLevel: accessResult.accessLevel,
+      hasAccess: hasAnyAccess,
+      accessLevel: bestAccessLevel,
       userId,
       userName,
-      ...(accessResult.hasAccess ? {} : { error: 'Access denied to product' })
+      accessedProducts,
+      ...(hasAnyAccess ? {} : { error: 'Access denied to all products' })
     })
 
   } catch (error) {

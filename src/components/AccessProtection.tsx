@@ -91,8 +91,8 @@ export default function AccessProtection({
                 Upgrade Required
               </h2>
               <p className="text-gray-600">
-                You need access to this product to use this feature.
-                Upgrade now to unlock full functionality.
+                You need access to one of our products to use this feature.
+                Choose a plan that fits your needs.
               </p>
             </div>
 
