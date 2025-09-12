@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { useUserStore } from '@/stores/userStore'
 import { X } from 'lucide-react'
-import { createSdk } from '@whop/iframe'
 
 interface AccountModalProps {
   isOpen: boolean
@@ -14,19 +13,7 @@ const AccountModal = ({ isOpen, onClose }: AccountModalProps) => {
   const { user } = useUserStore()
 
   const openWhopMemberships = () => {
-    try {
-      // Create iframe SDK instance
-      const iframeSdk = createSdk({
-        appId: process.env.NEXT_PUBLIC_WHOP_APP_ID || ''
-      })
-
-      // Redirect to rettsai membership management page
-      iframeSdk.openExternalUrl({ url: 'https://whop.com/joined/rettsai/' })
-    } catch (error) {
-      console.error('Failed to open Whop membership page:', error)
-      // Fallback to regular window.open
-      window.open('https://whop.com/joined/rettsai/', '_blank')
-    }
+    window.open('https://whop.com/joined/rettsai/', '_blank')
     onClose()
   }
 
