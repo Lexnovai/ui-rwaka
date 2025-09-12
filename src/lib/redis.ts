@@ -3,7 +3,7 @@ import Redis from 'ioredis'
 // Use a global to avoid creating multiple Redis connections during Next.js hot reloads
 const globalForRedis = global as unknown as { redis?: Redis }
 
-const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379'
+const redisUrl = process.env.REDIS_URL || 'redis://host.docker.internal:6379'
 
 export const redis: Redis =
   globalForRedis.redis ||

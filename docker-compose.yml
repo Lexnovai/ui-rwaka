@@ -26,7 +26,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: splank-redis
+    container_name: rettsai-redis
     restart: always
     ports:
       - '6379:6379'
