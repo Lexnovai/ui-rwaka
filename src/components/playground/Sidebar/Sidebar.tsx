@@ -76,7 +76,7 @@ const ProfileMenu = () => {
   }
 
   const handleHelp = () => {
-    window.open('https://rettsai.featurebase.app/help', '_blank')
+    window.open('mailto:support@rettsai.no', '_blank')
   }
 
   const handlePricingPlans = () => {

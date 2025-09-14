@@ -64,7 +64,7 @@ const AccountModal = ({ isOpen, onClose }: AccountModalProps) => {
               </Button>
               <Button
                 variant="outline"
-                onClick={() => window.open('https://rettsai.featurebase.app/help', '_blank')}
+                onClick={() => window.open('mailto:support@rettsai.no', '_blank')}
                 className="flex-1"
               >
                 Get Help
