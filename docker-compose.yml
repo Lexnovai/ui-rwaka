@@ -12,7 +12,7 @@ services:
       - ./public:/public
     environment:
       - REDIS_URL=redis://redis:6379
-      - FREE_REQUEST_LIMIT=5
+      - FREE_REQUEST_LIMIT=10
     networks:
       - dokploy-network
     depends_on:
