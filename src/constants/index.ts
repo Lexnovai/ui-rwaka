@@ -11,7 +11,7 @@ export const LEGAL_CATEGORIES = [
     ]
   },
   {
-    name: 'SEARCH LAWYER EXPERT',
+    name: 'Search Lawyer Expert(Beta)',
     ability: {
       can: 'Find and recommend the top 3 lawyers in Norway based on location and legal specialization',
       cannot: 'Provide legal advice or represent clients in court proceedings'
@@ -22,14 +22,18 @@ export const LEGAL_CATEGORIES = [
     ]
   },
   {
-    name: 'LAND LAW EXPERT',
+    name: 'Court Decision Expert(Beta)',
+    role: 'Analyzes and retrieves relevant Norwegian court decisions from the court decisions knowledge base.',
+    description:
+      'Specializes in searching and summarizing Norwegian court decisions, extracting key holdings, legal reasoning, and outcomes.',
     ability: {
-      can: 'Detail Rwandan land policy, use planning, registration, consolidation, and conflict resolution.',
-      cannot: 'Cover tax, criminal, or civil law beyond land issues'
+      can: 'Search and analyze Norwegian court decisions, extract key legal holdings, summarize judicial reasoning, and identify relevant precedents.',
+      cannot:
+        'Provide legal advice or represent clients in Norwegian court proceedings'
     },
     questions: [
-      'What steps are required to register a land title?',
-      'Explain the land consolidation process in rural Rwanda.'
+      'Find Norwegian Supreme Court decisions on contract interpretation.',
+      'Summarize the key holdings in recent Norwegian criminal law cases.'
     ]
   },
   {
