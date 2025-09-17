@@ -10,11 +10,21 @@ export const redis: Redis =
   new Redis(redisUrl, {
     // Safer defaults
     maxRetriesPerRequest: 3,
-    enableReadyCheck: true
+    enableReadyCheck: true,
+    lazyConnect: true
   })
 
 if (!globalForRedis.redis) {
   globalForRedis.redis = redis
+  
+  // Log Redis connection status
+  redis.on('connect', () => {
+    console.log('Redis connected successfully')
+  })
+  
+  redis.on('error', (err) => {
+    console.error('Redis connection error:', err)
+  })
 }
 
 export async function incrementFreeUsage(userId: string): Promise<number> {
