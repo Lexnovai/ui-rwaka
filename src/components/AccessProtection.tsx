@@ -42,7 +42,7 @@ export default function AccessProtection({
     }
   }, [hasAccess, isLoading])
 
-  // When dialog opens, fetch current usage from server
+  // Fetch usage on component mount to ensure persistence across page refreshes, and when dialog opens for updates
   React.useEffect(() => {
     const fetchUsage = async () => {
       try {
@@ -58,6 +58,13 @@ export default function AccessProtection({
         debug.log('AccessProtection - error fetching usage:', e)
       }
     }
+
+    // Always fetch usage when component mounts (for persistence)
+    if (!showDialog) {
+      fetchUsage()
+    }
+
+    // Also fetch when dialog opens (for updates after user actions)
     if (showDialog) {
       fetchUsage()
     }
