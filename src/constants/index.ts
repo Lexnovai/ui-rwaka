@@ -43,8 +43,8 @@ export const LEGAL_CATEGORIES = [
       cannot: 'Provide legal advice outside Norwegian jurisdiction or represent clients in court'
     },
     questions: [
-      'Find me a criminal defense lawyer in Oslo and relevant court precedents',
-      'Analyze Norwegian contract law and recommend specialized attorneys'
+      'I was accused of theft in Bergen - find me a criminal defense lawyer and relevant court decisions',
+      'My employee stole from the company - what are the legal options and which lawyer should I contact?'
     ]
   },
   {
