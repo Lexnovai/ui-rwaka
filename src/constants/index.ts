@@ -37,14 +37,14 @@ export const LEGAL_CATEGORIES = [
     ]
   },
   {
-    name: 'COURT SUBMISSIONS EXPERT',
+    name: 'Advokat Expert(Beta)',
     ability: {
-      can: 'Draft complaints, motions, and other court filings under Rwandan civil procedure',
-      cannot: 'Offer strategy or negotiate settlements'
+      can: 'Provide comprehensive Norwegian legal guidance by combining law texts, lawyer recommendations, and court decision analysis',
+      cannot: 'Provide legal advice outside Norwegian jurisdiction or represent clients in court'
     },
     questions: [
-      'Draft a summons for unpaid debt recovery',
-      'Prepare a motion to compel discovery'
+      'Find me a criminal defense lawyer in Oslo and relevant court precedents',
+      'Analyze Norwegian contract law and recommend specialized attorneys'
     ]
   },
   {
