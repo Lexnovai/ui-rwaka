@@ -45,7 +45,7 @@ export function redirectToPurchase(): void {
  */
 export function clearAccessCache(): void {
   try {
-    localStorage.removeItem('whop_access_cache')
+    localStorage.removeItem('access_cache')
     console.log('Access cache cleared')
   } catch (error) {
     console.error('Error clearing access cache:', error)
@@ -60,7 +60,7 @@ export function getCachedAccessResult(): {
   userId?: string
 } | null {
   try {
-    const cached = localStorage.getItem('whop_access_cache')
+    const cached = localStorage.getItem('access_cache')
     if (!cached) return null
 
     const parsedCache = JSON.parse(cached)

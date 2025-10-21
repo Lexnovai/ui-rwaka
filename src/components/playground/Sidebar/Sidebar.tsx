@@ -21,6 +21,7 @@ import {
 import { Ellipsis, LogOut, UserCircle } from 'lucide-react'
 import useIsMobile from '@/hooks/useIsMobile'
 import AccountModal from '@/components/AccountModal'
+import { useClerk } from '@clerk/nextjs'
 
 const SidebarHeader = () => (
   <div className="mb-4 flex items-start justify-start gap-2">
@@ -49,29 +50,16 @@ const NewChatButton = ({
 
 const ProfileMenu = () => {
   const [showAccountModal, setShowAccountModal] = useState(false)
+  const { signOut } = useClerk()
 
   const handleLogout = async () => {
     try {
-      // Call logout API to clear cookies
-      await fetch('/api/auth/logout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-      
-      // Clear any client-side storage
       localStorage.clear()
       sessionStorage.clear()
-      
-      // Redirect to landing page
-      window.location.href = 'http://rettsai.no/'
+      await signOut({ redirectUrl: '/sign-in' })
     } catch (error) {
       console.error('Logout error:', error)
-      // Even if API call fails, still redirect to clear client state
-      localStorage.clear()
-      sessionStorage.clear()
-      window.location.href = 'http://rettsai.no/'
+      window.location.href = '/sign-in'
     }
   }
 

@@ -1,18 +1,26 @@
 'use client'
 
 import { useCallback } from 'react'
-import { TokenManager } from '@/utils/tokenManager'
-import { authRedirectManager } from '@/utils/authRedirectManager'
 
 export function useAuth() {
-  const tokenManager = TokenManager.getInstance()
-
   const validateToken = useCallback(async (): Promise<boolean> => {
-    return await tokenManager.validateToken()
-  }, [tokenManager])
+    try {
+      const res = await fetch('/api/auth/me', {
+        method: 'GET',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' }
+      })
+      return res.ok
+    } catch {
+      return false
+    }
+  }, [])
 
   const handleTokenExpired = useCallback(() => {
-    authRedirectManager.redirectToAuth('useAuth_hook')
+    if (typeof window !== 'undefined') {
+      const next = encodeURIComponent(window.location.href)
+      window.location.href = `/sign-in?redirect_url=${next}`
+    }
   }, [])
 
   // Wrapper for API calls that automatically handles token expiration
@@ -34,9 +42,9 @@ export function useAuth() {
 
     // If we get a 401, the token has expired
     if (response.status === 401) {
-      console.log('API call returned 401, token expired')
+      console.log('API call returned 401, unauthorized')
       handleTokenExpired()
-      throw new Error('Token expired')
+      throw new Error('Unauthorized')
     }
 
     return response

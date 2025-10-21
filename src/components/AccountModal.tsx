@@ -11,9 +11,8 @@ interface AccountModalProps {
 
 const AccountModal = ({ isOpen, onClose }: AccountModalProps) => {
   const { user } = useUserStore()
-
-  const openWhopMemberships = () => {
-    window.open('https://whop.com/joined/rettsai/', '_blank')
+  const openAccount = () => {
+    window.location.href = '/user'
     onClose()
   }
 
@@ -45,13 +44,13 @@ const AccountModal = ({ isOpen, onClose }: AccountModalProps) => {
             </div>
           </div>
 
-          {/* Whop Profile Button */}
+          {/* Account Actions */}
           <div className="space-y-3">
             <Button
-              onClick={openWhopMemberships}
+              onClick={openAccount}
               className="w-full bg-[#0096FF] hover:bg-[#0086E6] text-white"
             >
-              Manage Memberships
+              Manage Account
             </Button>
             
             <div className="flex gap-2">

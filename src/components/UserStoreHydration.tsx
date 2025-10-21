@@ -2,8 +2,6 @@
 
 import { useEffect, useCallback } from 'react'
 import { useUserStore } from '@/stores/userStore'
-import { initializeTokenManager } from '@/utils/tokenManager'
-import { authRedirectManager } from '@/utils/authRedirectManager'
 
 export function UserStoreHydration() {
     const { setLoading, clearUser, setUser } = useUserStore()
@@ -12,7 +10,7 @@ export function UserStoreHydration() {
         try {
             setLoading(true)
 
-            // Call server-side auth endpoint that reads whop_access_token cookie
+            // Call server-side auth endpoint backed by Clerk
             const response = await fetch('/api/auth/me', {
                 method: 'GET',
                 credentials: 'include', // This ensures cookies are sent
@@ -22,27 +20,8 @@ export function UserStoreHydration() {
             })
 
             if (!response.ok) {
-                if (response.status === 401) {
-                    console.warn('User not authenticated - checking if we just came from OAuth...')
-                    
-                    // Check if we have URL params indicating we just came from OAuth
-                    const urlParams = new URLSearchParams(window.location.search)
-                    const hasOAuthParams = urlParams.has('code') || urlParams.has('state')
-                    
-                    if (hasOAuthParams) {
-                        console.log('Just came from OAuth, waiting 5 seconds for cookies...')
-                        // Wait 5 seconds and try again
-                        setTimeout(() => {
-                            initializeUser()
-                        }, 5000)
-                        return
-                    }
-                    
-                    // If no OAuth params, this is a genuine auth failure
-                    console.log('No OAuth params found, genuine auth failure')
-                } else {
-                    console.error('Auth check failed:', response.status)
-                }
+                // Unauthenticated or error
+                console.error('Auth check failed:', response.status)
                 clearUser()
                 return
             }
@@ -52,8 +31,6 @@ export function UserStoreHydration() {
             if (userId && user) {
                 setUser(userId, user)
                 console.log('User initialized successfully:', { userId })
-                // Clear any redirect timestamps since auth was successful
-                authRedirectManager.reset()
             } else {
                 console.warn('Auth succeeded but no user data returned')
                 clearUser()
@@ -65,23 +42,10 @@ export function UserStoreHydration() {
         } finally {
             setLoading(false)
         }
-    }, [setLoading, clearUser, setUser]) // Fixed dependency array
+    }, [setLoading, clearUser, setUser])
 
     useEffect(() => {
-        // NOTE: Do NOT reset the redirect manager here – doing so clears the
-        // recent-redirect timestamp and can cause an immediate redirect loop
-        // before cookies have been set.  We only reset after a *successful*
-        // authentication inside initializeUser().
-        
         initializeUser()
-        
-        // Initialize token monitoring with refresh capability
-        initializeTokenManager({
-          onTokenExpired: () => {
-            console.log('Token expired from TokenManager, redirecting...');
-            authRedirectManager.redirectToAuth('token_manager_expiry');
-          }
-        });
     }, [initializeUser, clearUser])
 
     return null

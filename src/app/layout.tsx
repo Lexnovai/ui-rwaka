@@ -5,6 +5,14 @@ import { Toaster } from '@/components/ui/sonner'
 import './globals.css'
 import Script from 'next/script'
 import { UserStoreHydration } from '@/components/UserStoreHydration'
+import {
+  ClerkProvider,
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  SignUpButton,
+  UserButton
+} from '@clerk/nextjs'
 const geistSans = Geist({
   variable: '--font-geist-sans',
   weight: '400',
@@ -42,17 +50,33 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${dmMono.variable} antialiased`}>
-        <Script
-          defer
-          src="https://analytics.rwaka.rw/script.js"
-          data-website-id="beaba870-c958-480e-b11d-dea74f6d60c0"
-        ></Script>
-        <UserStoreHydration />
-        <NuqsAdapter>{children}</NuqsAdapter>
-        <Toaster />
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en" suppressHydrationWarning>
+        <body className={`${geistSans.variable} ${dmMono.variable} antialiased`}>
+          <Script
+            defer
+            src="https://analytics.rwaka.rw/script.js"
+            data-website-id="beaba870-c958-480e-b11d-dea74f6d60c0"
+          ></Script>
+          <header className="border-b">
+            <div className="mx-auto flex max-w-screen-xl items-center justify-between p-3">
+              <div className="font-semibold">Rettsai</div>
+              <div className="flex gap-2">
+                <SignedOut>
+                  <SignInButton />
+                  <SignUpButton />
+                </SignedOut>
+                <SignedIn>
+                  <UserButton />
+                </SignedIn>
+              </div>
+            </div>
+          </header>
+          <UserStoreHydration />
+          <NuqsAdapter>{children}</NuqsAdapter>
+          <Toaster />
+        </body>
+      </html>
+    </ClerkProvider>
   )
 }

@@ -1,19 +1,8 @@
-import { whopSdk } from '@/lib/whop-sdk'
-import { headers } from 'next/headers'
+import { auth, currentUser } from '@clerk/nextjs/server'
 
 export async function getAuthenticatedUser() {
-  try {
-    const headersList = await headers()
-    const { userId } = await whopSdk.verifyUserToken(headersList)
-
-    if (!userId) {
-      throw new Error('No user ID found in token')
-    }
-
-    const user = await whopSdk.users.getUser({ userId })
-    return { userId, user }
-  } catch (error) {
-    console.error('Authentication error:', error)
-    throw error
-  }
+  const { userId } = await auth()
+  if (!userId) throw new Error('Unauthorized')
+  const user = await currentUser()
+  return { userId, user }
 }

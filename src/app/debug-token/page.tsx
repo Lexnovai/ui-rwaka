@@ -1,25 +1,15 @@
 'use client'
 
 import { useState } from 'react'
-import { decodeJWT } from '@/utils/jwtDecoder'
 
 export default function DebugTokenPage() {
-  const [tokenInfo, setTokenInfo] = useState<Record<string, unknown> | null>(null)
+  const [info, setInfo] = useState<Record<string, unknown> | null>(null)
   const [loading, setLoading] = useState(false)
 
   const checkToken = async () => {
     setLoading(true)
     try {
-      // Check what cookies we have
-      const cookies = document.cookie
-      console.log('All cookies:', cookies)
-      
-      // Extract and decode the JWT token
-      const tokenMatch = cookies.match(/whop_access_token=([^;]*)/)
-      const token = tokenMatch ? decodeURIComponent(tokenMatch[1]) : null
-      const decodedToken = token ? decodeJWT(token) : null
-      
-      // Try to call the auth endpoint
+      // Call Clerk-backed auth endpoint
       const response = await fetch('/api/auth/me', {
         method: 'GET',
         credentials: 'include',
@@ -30,18 +20,15 @@ export default function DebugTokenPage() {
 
       const data = await response.json()
       
-      setTokenInfo({
+      setInfo({
         status: response.status,
         ok: response.ok,
-        data: data,
-        cookies: cookies,
-        tokenPresent: !!token,
-        tokenLength: token?.length || 0,
-        decodedToken: decodedToken,
+        userId: data?.userId,
+        user: data?.user,
         timestamp: new Date().toISOString()
       })
     } catch (error) {
-      setTokenInfo({
+      setInfo({
         error: error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date().toISOString()
       })
@@ -68,17 +55,17 @@ export default function DebugTokenPage() {
           cursor: loading ? 'not-allowed' : 'pointer'
         }}
       >
-        {loading ? 'Checking...' : 'Check Token'}
+        {loading ? 'Checking...' : 'Check Auth'}
       </button>
 
-      {tokenInfo && (
+      {info && (
         <div style={{ 
           backgroundColor: '#f8f9fa', 
           padding: '15px', 
           borderRadius: '4px',
           border: '1px solid #dee2e6'
         }}>
-          <h3>Token Check Result:</h3>
+          <h3>Auth Check Result:</h3>
           <pre style={{ 
             whiteSpace: 'pre-wrap', 
             wordBreak: 'break-all',
@@ -87,7 +74,7 @@ export default function DebugTokenPage() {
             borderRadius: '4px',
             border: '1px solid #dee2e6'
           }}>
-            {JSON.stringify(tokenInfo, null, 2)}
+            {JSON.stringify(info, null, 2)}
           </pre>
         </div>
       )}
@@ -95,7 +82,6 @@ export default function DebugTokenPage() {
       <div style={{ marginTop: '20px', fontSize: '14px', color: '#666' }}>
         <p>This page helps debug token issues by:</p>
         <ul>
-          <li>Showing all cookies in the browser</li>
           <li>Making a manual call to /api/auth/me</li>
           <li>Displaying the full response</li>
           <li>Not triggering any automatic redirects</li>

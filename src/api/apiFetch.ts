@@ -1,28 +1,6 @@
-import { authRedirectManager } from '@/utils/authRedirectManager'
+// Simplified fetch helper for Clerk-authenticated app
 
-export const getAccessTokenFromCookies = (): string | null => {
-  if (typeof window === 'undefined') return null
-
-  const cookies = document.cookie
-  const match = cookies.match(/(?:^|;\s*)whop_access_token=([^;]*)/)
-
-  if (match) {
-    const token = decodeURIComponent(match[1])
-    return token
-  }
-
-  // Token not found
-  return null
-}
-const getAccessToken = (): string | null => {
-  const token = getAccessTokenFromCookies()
-  return token
-}
-
-const hasValidAccessToken = (): boolean => {
-  const token = getAccessToken()
-  return !!token
-}
+// No token handling here; Clerk sessions are managed via cookies
 
 const username = process.env.NEXT_PUBLIC_API_USERNAME ?? ''
 const password = process.env.NEXT_PUBLIC_API_PASSWORD ?? ''
@@ -42,20 +20,7 @@ export default async function apiFetch(
   input: RequestInfo | URL,
   init: RequestInit = {}
 ): Promise<Response> {
-  if (!hasValidAccessToken()) {
-    if (typeof window !== 'undefined') {
-      // Don't redirect if we're in OAuth flow
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.has('code') || urlParams.has('state')) {
-        console.log('In OAuth flow, not redirecting for missing token');
-        // Return a rejected promise instead of redirecting
-        return Promise.reject(new Error('No token available during OAuth flow'));
-      }
-      authRedirectManager.redirectToAuth('apiFetch_no_token')
-    }
-    // Return a never-resolving promise to stop execution
-    return new Promise(() => {})
-  }
+  // No pre-check; rely on server to return 401 if unauthenticated
 
   const headers = new Headers(init.headers || {})
 
@@ -76,13 +41,14 @@ export default async function apiFetch(
   try {
     const response = await fetch(input, defaultOptions)
     
-    // Handle token expiration
+    // Handle unauthorized by redirecting to Clerk sign-in
     if (response.status === 401) {
-      console.log('API call returned 401, token expired')
+      console.log('API call returned 401, redirecting to /sign-in')
       if (typeof window !== 'undefined') {
-        authRedirectManager.redirectToAuth('apiFetch_401')
+        const next = encodeURIComponent(window.location.href)
+        window.location.href = `/sign-in?redirect_url=${next}`
       }
-      throw new Error('Token expired')
+      throw new Error('Unauthorized')
     }
     
     return response

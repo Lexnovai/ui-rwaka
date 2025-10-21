@@ -1,22 +1,7 @@
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
 import { getFreeUsage, incrementFreeUsage } from '@/lib/redis'
 import { debug } from '@/utils/debug'
-
-// Helper to fetch current user ID from Whop using the access token cookie
-async function getCurrentUserIdFromWhop(token: string): Promise<string | null> {
-  const res = await fetch('https://api.whop.com/api/v5/me', {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    },
-    // Do not cache
-    cache: 'no-store'
-  })
-  if (!res.ok) return null
-  const data = await res.json()
-  return data?.id || null
-}
+import { auth } from '@clerk/nextjs/server'
 
 function noStoreHeaders() {
   return {
@@ -28,15 +13,9 @@ function noStoreHeaders() {
 
 export async function GET() {
   try {
-    const cookieStore = await cookies()
-    const token = cookieStore.get('whop_access_token')?.value
-    if (!token) {
-      return NextResponse.json({ error: 'No access token' }, { status: 401, headers: noStoreHeaders() })
-    }
-
-    const userId = await getCurrentUserIdFromWhop(token)
+    const { userId } = await auth()
     if (!userId) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401, headers: noStoreHeaders() })
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: noStoreHeaders() })
     }
 
     debug.log('Redis Usage GET - User ID:', userId)
@@ -58,15 +37,9 @@ export async function GET() {
 
 export async function POST() {
   try {
-    const cookieStore = await cookies()
-    const token = cookieStore.get('whop_access_token')?.value
-    if (!token) {
-      return NextResponse.json({ error: 'No access token' }, { status: 401, headers: noStoreHeaders() })
-    }
-
-    const userId = await getCurrentUserIdFromWhop(token)
+    const { userId } = await auth()
     if (!userId) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401, headers: noStoreHeaders() })
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: noStoreHeaders() })
     }
 
     debug.log('Redis Usage POST - User ID:', userId)
