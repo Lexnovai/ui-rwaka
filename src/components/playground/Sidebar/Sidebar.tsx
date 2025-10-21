@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button'
 import { AgentSelector } from '@/components/playground/Sidebar/AgentSelector'
 import useChatActions from '@/hooks/useChatActions'
 import { usePlaygroundStore } from '@/store'
-import { useUserStore } from '@/stores/userStore'
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import Icon from '@/components/ui/icon'
@@ -123,7 +122,6 @@ const Sidebar = ({
     hydrated,
     isEndpointLoading
   } = usePlaygroundStore()
-  const { user, isLoading: isUserLoading } = useUserStore()
   const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
