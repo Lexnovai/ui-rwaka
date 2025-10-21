@@ -17,7 +17,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-import { Ellipsis, LogOut, UserCircle } from 'lucide-react'
+import { Ellipsis, LogOut } from 'lucide-react'
 import useIsMobile from '@/hooks/useIsMobile'
 import { useClerk } from '@clerk/nextjs'
 
@@ -223,31 +223,7 @@ const Sidebar = ({
             )}
           </motion.div>
           {!isCollapsed && (
-            <motion.div className="bottom-3 flex w-60 items-center justify-between bg-fixed">
-              <div className="flex items-center gap-2">
-                <UserCircle size={24} />
-                <div className="flex flex-col">
-                  {isUserLoading ? (
-                    <>
-                      <Skeleton className="h-3 w-20" />
-                      <Skeleton className="mt-1 h-2 w-32" />
-                    </>
-                  ) : (
-                    <>
-                      {(user?.name || user?.username) && (
-                        <div className="text-secondary-foreground text-[12px] font-semibold">
-                          {user?.name || user?.username}
-                        </div>
-                      )}
-                      {user?.email && (
-                        <div className="text-accent-foreground text-[10px]">
-                          {user?.email}
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
-              </div>
+            <motion.div className="bottom-3 flex w-60 items-center justify-end bg-fixed">
               <ProfileMenu />
             </motion.div>
           )}
