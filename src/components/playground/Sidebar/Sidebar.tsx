@@ -14,13 +14,11 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Ellipsis, LogOut, UserCircle } from 'lucide-react'
 import useIsMobile from '@/hooks/useIsMobile'
-import AccountModal from '@/components/AccountModal'
 import { useClerk } from '@clerk/nextjs'
 
 const SidebarHeader = () => (
@@ -49,7 +47,6 @@ const NewChatButton = ({
 )
 
 const ProfileMenu = () => {
-  const [showAccountModal, setShowAccountModal] = useState(false)
   const { signOut } = useClerk()
 
   const handleLogout = async () => {
@@ -71,10 +68,6 @@ const ProfileMenu = () => {
     window.location.href = 'http://rettsai.no/#pricing'
   }
 
-  const handleMyAccount = () => {
-    setShowAccountModal(true)
-  }
-
   return (
     <>
       <DropdownMenu>
@@ -86,13 +79,6 @@ const ProfileMenu = () => {
           align="end"
           forceMount
         >
-          <DropdownMenuLabel 
-            className="cursor-pointer hover:bg-accent"
-            onClick={handleMyAccount}
-          >
-            My Account
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator className="border-border" />
           <DropdownMenuGroup>
             <DropdownMenuItem 
               className="cursor-pointer"
@@ -117,13 +103,6 @@ const ProfileMenu = () => {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      
-      {showAccountModal && (
-        <AccountModal 
-          isOpen={showAccountModal} 
-          onClose={() => setShowAccountModal(false)} 
-        />
-      )}
     </>
   )
 }
@@ -255,12 +234,16 @@ const Sidebar = ({
                     </>
                   ) : (
                     <>
-                      <div className="text-secondary-foreground text-[12px] font-semibold">
-                        {user?.name || user?.username || 'User'}
-                      </div>
-                      <div className="text-accent-foreground text-[10px]">
-                        {user?.email || 'Email'}
-                      </div>
+                      {(user?.name || user?.username) && (
+                        <div className="text-secondary-foreground text-[12px] font-semibold">
+                          {user?.name || user?.username}
+                        </div>
+                      )}
+                      {user?.email && (
+                        <div className="text-accent-foreground text-[10px]">
+                          {user?.email}
+                        </div>
+                      )}
                     </>
                   )}
                 </div>
