@@ -79,7 +79,7 @@ export function useAccessControl(): UseAccessControlReturn {
 
   // Redirect to purchase page
   const redirectToPurchase = useCallback(() => {
-    window.location.href = 'https://rettsai.no/#pricing'
+    window.location.href = 'https://rwaka.rw/#pricing'
   }, [])
 
   // Check access on mount

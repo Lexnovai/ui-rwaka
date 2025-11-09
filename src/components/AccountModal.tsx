@@ -56,14 +56,14 @@ const AccountModal = ({ isOpen, onClose }: AccountModalProps) => {
             <div className="flex gap-2">
               <Button
                 variant="outline"
-                onClick={() => window.open('http://rettsai.no/#pricing', '_blank')}
+                onClick={() => window.open('http://rwaka.rw/#pricing', '_blank')}
                 className="flex-1"
               >
                 Pricing Plans
               </Button>
               <Button
                 variant="outline"
-                onClick={() => window.open('mailto:support@rettsai.no', '_blank')}
+                onClick={() => window.open('mailto:support@rwaka.rw', '_blank')}
                 className="flex-1"
               >
                 Get Help

@@ -26,7 +26,7 @@ export class TokenManager {
 
   setOptions(options: TokenManagerOptions) {
     this.options = {
-      landingPageUrl: 'https://rettsai.no',
+      landingPageUrl: 'https://rwaka.rw',
       ...options
     }
   }
@@ -101,7 +101,7 @@ export class TokenManager {
               Referer:
                 typeof window !== 'undefined'
                   ? window.location.href
-                  : 'https://ask.rettsai.no/'
+                  : 'https://ask.rwaka.rw/'
             }
           })
 

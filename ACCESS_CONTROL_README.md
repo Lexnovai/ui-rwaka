@@ -37,7 +37,7 @@ export default function Home() {
 1. **User visits the app** → AccessProtection checks access using a server API that calls Whop
 2. **If hasAccess: true** → User sees the app normally with "Hello [username]" greeting
 3. **If hasAccess: false** → Chat area blurs, upgrade prompt appears with working redirect
-4. **Upgrade button** → Redirects to `https://rettsai.no/#pricing`
+4. **Upgrade button** → Redirects to `https://rwaka.rw/#pricing`
 5. **Free requests** → If configured, the user can consume limited free requests. The server enforces the limit and returns HTTP 429 when exhausted. No access results are cached.
 
 ## Components Available

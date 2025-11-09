@@ -37,7 +37,7 @@ export async function checkUserAccess(): Promise<AccessResult> {
  * Redirect user to purchase page
  */
 export function redirectToPurchase(): void {
-  window.location.href = 'https://rettsai.no/#pricing'
+  window.location.href = 'https://rwaka.rw/#pricing'
 }
 
 /**

@@ -60,11 +60,11 @@ const ProfileMenu = () => {
   }
 
   const handleHelp = () => {
-    window.open('mailto:support@rettsai.no', '_blank')
+    window.open('mailto:support@rwaka.rw', '_blank')
   }
 
   const handlePricingPlans = () => {
-    window.location.href = 'http://rettsai.no/#pricing'
+    window.location.href = 'http://rwaka.rw/#pricing'
   }
 
   return (
