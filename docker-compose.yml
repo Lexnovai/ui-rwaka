@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
     restart: always
     ports:
-      - 3023
+      - 3017
     volumes:
       - ./public:/public
     environment:
@@ -19,10 +19,10 @@ services:
       - redis
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.rwakanorwychat.rule=Host(`ask.rettsai.no`)'
+      - 'traefik.http.routers.rwakanorwychat.rule=Host(`ask.rwaka.rw`)'
       - 'traefik.http.routers.rwakanorwychat.entrypoints=websecure'
       - 'traefik.http.routers.rwakanorwychat.tls.certResolver=letsencrypt'
-      - 'traefik.http.services.rwakanorwychat.loadbalancer.server.port=3023'
+      - 'traefik.http.services.rwakanorwychat.loadbalancer.server.port=3017'
 
   redis:
     image: redis:7-alpine
@@ -36,9 +36,14 @@ services:
       - dokploy-network
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
-    command: ["sh", "-c", "redis-server --appendonly yes --requirepass \"$REDIS_PASSWORD\""]
+    command:
+      [
+        'sh',
+        '-c',
+        'redis-server --appendonly yes --requirepass "$REDIS_PASSWORD"'
+      ]
     healthcheck:
-      test: ["CMD", "sh", "-c", "redis-cli -a \"$REDIS_PASSWORD\" ping"]
+      test: ['CMD', 'sh', '-c', 'redis-cli -a "$REDIS_PASSWORD" ping']
       interval: 30s
       timeout: 10s
       retries: 3
