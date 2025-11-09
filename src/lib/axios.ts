@@ -1,10 +1,7 @@
 import a from 'axios'
-import { getAuthToken } from './utils'
-const token = getAuthToken()
 const axios = a.create({
-  baseURL: `https://ask.rwaka.rw/api/proxy`,
-  withCredentials: true,
-  headers: token ? { Authorization: `Bearer ${token}` } : {}
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://api.rwaka.rw/api/v1',
+  withCredentials: true
 })
 
 export default axios
