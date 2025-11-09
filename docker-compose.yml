@@ -26,10 +26,10 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: rettsai-redis
+    container_name: rwaka-redis
     restart: always
     ports:
-      - '6777:6379'
+      - '6799:6379'
     volumes:
       - redis_data:/data
     networks:
