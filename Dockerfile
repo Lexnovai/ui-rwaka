@@ -30,15 +30,12 @@ RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs && \
     chown -R nextjs:nodejs /app
 
-# Copy only necessary files
 
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 #COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 # COPY --from=builder --chown=nextjs:nodejs /app/next.config.ts ./
-
 USER nextjs
-
 EXPOSE 3017
 
 CMD ["node", "server.js"]
