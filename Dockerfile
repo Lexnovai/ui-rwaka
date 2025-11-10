@@ -35,7 +35,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 #COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 # COPY --from=builder --chown=nextjs:nodejs /app/next.config.ts ./
-USER nextjsuser
+USER nextjs
 EXPOSE 3017
 
 CMD ["node", "server.js"]
