@@ -21,10 +21,10 @@ services:
       - redis
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.rwakanorwychat.rule=Host(`ask.rwaka.rw`)'
-      - 'traefik.http.routers.rwakanorwychat.entrypoints=websecure'
-      - 'traefik.http.routers.rwakanorwychat.tls.certResolver=letsencrypt'
-      - 'traefik.http.services.rwakanorwychat.loadbalancer.server.port=3017'
+      - 'traefik.http.routers.rwakaaskchat.rule=Host(`ask.rwaka.rw`)'
+      - 'traefik.http.routers.rwakaaskchat.entrypoints=websecure'
+      - 'traefik.http.routers.rwakaaskchat.tls.certResolver=letsencrypt'
+      - 'traefik.http.services.rwakaaskchat.loadbalancer.server.port=3017'
 
   redis:
     image: redis:7-alpine
