@@ -12,6 +12,7 @@ services:
       - ./public:/public
     environment:
       - NEXT_PUBLIC_API_USERNAME=${NEXT_PUBLIC_API_USERNAME}
+      - BACKEND_URL=${BACKEND_URL}
       - NEXT_PUBLIC_API_PASSWORD=${NEXT_PUBLIC_API_PASSWORD}
       - REDIS_URL=redis://default:${REDIS_PASSWORD}@redis:6379
       - FREE_REQUEST_LIMIT=10
