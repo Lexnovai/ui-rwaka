@@ -26,14 +26,14 @@ const dmMono = DM_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Rettsai Legal Assistant',
+  title: 'Rwaka Legal Assistant',
   description:
     'An AI-powered assistant for legal research, document drafting, and compliance support.',
   keywords: [
     'AI Legal Assistant',
     'LegalAI',
-    'Norway Legal AI',
-    'Legal AI Norway',
+    'Rwanda Legal AI',
+    'Legal AI Rwanda',
     'Legal AI',
     'Internertional student legal aid',
     'LegalTech',
@@ -52,7 +52,9 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
-        <body className={`${geistSans.variable} ${dmMono.variable} antialiased`}>
+        <body
+          className={`${geistSans.variable} ${dmMono.variable} antialiased`}
+        >
           <Script
             defer
             src="https://analytics.rwaka.rw/script.js"
@@ -60,7 +62,7 @@ export default function RootLayout({
           ></Script>
           <header className="border-b">
             <div className="mx-auto flex max-w-screen-xl items-center justify-between p-3">
-              <div className="font-semibold">Rettsai</div>
+              <div className="font-semibold">Rwaka</div>
               <div className="flex gap-2">
                 <SignedOut>
                   <SignInButton />
