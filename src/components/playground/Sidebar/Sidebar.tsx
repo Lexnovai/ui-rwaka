@@ -23,7 +23,7 @@ import { useClerk } from '@clerk/nextjs'
 const SidebarHeader = () => (
   <div className="mb-4 flex items-start justify-start gap-2">
     <Icon type="rwaka-chat" size="xl" className="w-48" />
-    <p className="text-2xl font-semibold md:text-3xl">Rettsai</p>
+    <p className="text-2xl font-semibold md:text-3xl">Rwaka</p>
   </div>
 )
 
@@ -79,13 +79,10 @@ const ProfileMenu = () => {
           forceMount
         >
           <DropdownMenuGroup>
-            <DropdownMenuItem 
-              className="cursor-pointer"
-              onClick={handleHelp}
-            >
+            <DropdownMenuItem className="cursor-pointer" onClick={handleHelp}>
               Help
             </DropdownMenuItem>
-            <DropdownMenuItem 
+            <DropdownMenuItem
               className="cursor-pointer"
               onClick={handlePricingPlans}
             >
@@ -93,8 +90,8 @@ const ProfileMenu = () => {
             </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
-          <DropdownMenuItem 
-            className="flex justify-between font-semibold cursor-pointer"
+          <DropdownMenuItem
+            className="flex cursor-pointer justify-between font-semibold"
             onClick={handleLogout}
           >
             Log out
