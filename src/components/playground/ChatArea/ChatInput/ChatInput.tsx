@@ -160,7 +160,7 @@ const ChatInput = ({ className }: { className: string }) => {
           onClick={handleFileButtonClick}
           disabled={!selectedAgent || isStreaming || isLoadingFile}
           size="icon"
-          className="text-primary rounded-xl bg-[#0096FF] cursor-pointer p-5"
+          className="text-primary rounded-xl bg-[#0c555d] cursor-pointer p-5"
           title="Upload file"
         >
           {isLoadingFile ? (
@@ -174,7 +174,7 @@ const ChatInput = ({ className }: { className: string }) => {
           onClick={uploads.length ? handleSubmitWithFiles : handleSubmit}
           disabled={!selectedAgent || (!inputMessage.trim() && uploads.length === 0) || isStreaming || isLoadingFile}
           size="icon"
-          className="text-primary rounded-xl bg-[#0096FF] p-5"
+          className="text-primary rounded-xl bg-[#0c555d] p-5"
         >
           <Icon type="send" color="#49EA99" />
         </Button>

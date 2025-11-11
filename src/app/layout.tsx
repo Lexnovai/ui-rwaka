@@ -26,7 +26,7 @@ const dmMono = DM_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Rwaka Legal Assistant',
+  title: 'Rwaka Assistant',
   description:
     'An AI-powered assistant for legal research, document drafting, and compliance support.',
   keywords: [
@@ -39,7 +39,9 @@ export const metadata: Metadata = {
     'LegalTech',
     'Document Drafting',
     'Case Law',
-    'Compliance'
+    'Compliance',
+    'Precence search tool',
+    'Tool for case search in Rwanda'
   ],
   authors: [{ name: 'Lexnovai.com', url: 'https://lexnovai.com' }]
 }

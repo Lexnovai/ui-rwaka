@@ -93,14 +93,15 @@ const AgentMessage = ({ message }: MessageProps) => {
       await handleStreamResponse('Summarize')
     } catch (error) {
       toast.error(
-        `Error in handleSubmit: ${error instanceof Error ? error.message : String(error)
+        `Error in handleSubmit: ${
+          error instanceof Error ? error.message : String(error)
         }`
       )
     }
   }
   return (
     <div className="font-geist flex flex-row items-start gap-4">
-      <div className="rounded-md bg-[#0096FF]/90 p-0.5">
+      <div className="rounded-md bg-[#000000]/90 p-0.5">
         <Icon type="rwaka-chat" size="sm" />
       </div>
       <div className="flex flex-col gap-2">
@@ -142,7 +143,7 @@ const UserMessage = memo(({ message }: MessageProps) => {
         <p className="text-muted flex items-center gap-x-2 text-base font-medium">
           <Icon type="user" size="sm" />
         </p>
-        <div className="text-base font-geist text-secondary rounded-lg py-1">
+        <div className="font-geist text-secondary rounded-lg py-1 text-base">
           {message.content}
         </div>
       </div>
