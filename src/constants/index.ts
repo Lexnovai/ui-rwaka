@@ -22,5 +22,17 @@ export const LEGAL_CATEGORIES = [
       'Summarize the latest Rwandan data-protection statute changes and their effective dates.',
       'Provide cited sources on recent case law interpreting cross-border merger regulations in Rwanda.'
     ]
+  },
+  {
+    name: 'CONTRACT ANALYSIS',
+    ability: {
+      can: 'Review and analyze contracts to identify key terms, obligations, risks, and potential issues; summarize contract provisions and highlight important clauses.',
+      cannot:
+        'Provide legal advice on whether to sign a contract, negotiate on behalf of parties, or guarantee legal compliance of contract terms.'
+    },
+    questions: [
+      'Analyze this employment contract and highlight key obligations for both parties.',
+      'Identify potential risks and ambiguous clauses in this service agreement.'
+    ]
   }
 ]
