@@ -24,7 +24,7 @@ export const LEGAL_CATEGORIES = [
     ]
   },
   {
-    name: 'CONTRACT ANALYSIS',
+    name: 'CONTRACT ANALYSIS EXPERT',
     ability: {
       can: 'Review and analyze contracts to identify key terms, obligations, risks, and potential issues; summarize contract provisions and highlight important clauses.',
       cannot:
