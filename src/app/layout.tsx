@@ -13,6 +13,7 @@ import {
   SignUpButton,
   UserButton
 } from '@clerk/nextjs'
+import Icon from '@/components/ui/icon'
 const geistSans = Geist({
   variable: '--font-geist-sans',
   weight: '400',
@@ -64,7 +65,7 @@ export default function RootLayout({
           ></Script>
           <header className="border-b">
             <div className="mx-auto flex max-w-screen-xl items-center justify-between p-3">
-              <div className="font-semibold">Rwaka</div>
+              <Icon type="rwaka" size="xl" className="h-10 w-auto" />
               <div className="flex gap-2">
                 <SignedOut>
                   <SignInButton />

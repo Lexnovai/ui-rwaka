@@ -70,7 +70,7 @@ export function AgentSelector() {
             value={agent.value}
           >
         <div className="flex items-center gap-3 text-xs font-medium uppercase">
-          <Icon type="rwaka-chat" size="sm" />
+          <Icon type="rwaka-chat" size="md" />
           <span className="truncate overflow-hidden text-ellipsis whitespace-nowrap">
             {agent.label}
           </span>

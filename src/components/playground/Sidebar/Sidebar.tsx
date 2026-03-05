@@ -22,8 +22,7 @@ import { useClerk } from '@clerk/nextjs'
 
 const SidebarHeader = () => (
   <div className="mb-4 flex items-start justify-start gap-2">
-    <Icon type="rwaka-chat" size="xl" className="w-48" />
-    <p className="text-2xl font-semibold md:text-3xl">Rwaka</p>
+    <Icon type="rwaka" size="xl" className="h-16 w-52" />
   </div>
 )
 

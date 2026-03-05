@@ -19,7 +19,6 @@ const Icon: FC<IconProps> = ({
       className={cn(
         color && !disabled ? `text-${color}` : 'text-primary',
         disabled && 'cursor-default text-muted/50',
-        className,
         size === 'xxs' && 'size-3',
         size === 'xs' && 'size-4',
         size === 'sm' && 'size-6',
@@ -29,7 +28,7 @@ const Icon: FC<IconProps> = ({
         size === 'default' && ' ',
         size === 'xl' && 'size-10',
         size === '2xl' && 'size-36',
-
+        className,
       )}
     />
   )

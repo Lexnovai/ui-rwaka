@@ -101,8 +101,8 @@ const AgentMessage = ({ message }: MessageProps) => {
   }
   return (
     <div className="font-geist flex flex-row items-start gap-4">
-      <div className="rounded-md bg-[#ffffff]/90 p-0.5">
-        <Icon type="rwaka-chat" size="sm" />
+      <div className="rounded-lg bg-[#ffffff]/90 p-1.5">
+        <Icon type="rwaka-chat" size="lg" />
       </div>
       <div className="flex flex-col gap-2">
         {messageContent}
@@ -141,7 +141,7 @@ const UserMessage = memo(({ message }: MessageProps) => {
     <div className="flex items-start pt-4 text-start">
       <div className="flex flex-row gap-x-3">
         <p className="text-muted flex items-center gap-x-2 text-base font-medium">
-          <Icon type="user" size="sm" />
+          <Icon type="user" size="lg" />
         </p>
         <div className="font-geist text-secondary rounded-lg py-1 text-base">
           {message.content}
